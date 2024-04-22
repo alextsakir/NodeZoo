@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %} {% endblock %}</title>
+    <title>{{{title}}}</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
-    <link rel="stylesheet" href="{{ url_for("static", filename="style.css") }}">
-    <link rel="shortcut icon" href="{{ url_for("static", filename="favicon.ico") }}">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="shortcut icon" href="/favicon.ico">
 </head>
 <body>
     <header>
@@ -14,7 +14,7 @@
         </div>
         <div id="header-menu-div">
             <nav class="menu">
-                <a href="/public" class="needs-margin">Home</a>
+                <a href="/index/" class="needs-margin">Home</a>
                 <a href="/gallery/" class="needs-margin">Gallery</a>
                 <a href="/tickets/" class="needs-margin">Tickets</a>
                 <a href="/animals/" class="needs-margin">Animals</a>
@@ -29,7 +29,7 @@
     </header>
 
     <dialog class="form-popup" id="my-form">
-        <form action="/auth/" class="form-container" id="login-form" method="POST">
+        <form action="/api/login" class="form-container" id="login-form" method="POST">
             <input type="email" name="email" placeholder="Enter your email" class="login-form-input">
             <input type="password" name="password" placeholder="Enter your password" class="login-form-input">
             <div class="remember">
@@ -50,7 +50,7 @@
     </script>
 
     <main class="content">
-        {% block content %} {% endblock %}
+        {{{body}}}
     </main>
 
     <footer>
@@ -114,15 +114,15 @@
 
             <div class="box" id="footer-sigma-taf">
                 <h3>newsletter</h3>
-                <form action="/subscribe/" id="subscribe-form" method="POST">
+                <form action="/api/subscribe/" id="subscribe-form" method="POST">
                     <label for="subscribe-form-input">subscribe for latest updates</label>
                     <input type="email" name="email" placeholder="Your Email"
                            class="subscribe-input" id="subscribe-form-input">
                     <button type="submit" id="subscribe-button">Subscribe</button>
                 </form>
-                <script type="text/javascript"> {# TODO ---------------------------------------------- TO BE REMOVED #}
+                <script type="text/javascript">
                     document.getElementById("subscribe-button").addEventListener("click", () => {
-                        {#document.getElementById("subscribe-form-input").reset(); it is the default behavior! #}
+                        // document.getElementById("subscribe-form-input").reset(); it is the default behavior!
                         console.log("subscribed");});
                 </script>
                 <div class="share">
