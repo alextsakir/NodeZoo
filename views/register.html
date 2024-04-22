@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %} Register Page {% endblock %}
+{% block content %}
+    <div id="register-form-container">
+    <form action="/new/" class="form-class" id="register-form" method="POST">
+        <fieldset id="register-credentials-fieldset">
+            <legend>New user registration</legend>
+            <label for="name">Full Name</label>
+            <div id="name">
+                <input type="text" id="first_name" name="first_name" placeholder="First name">
+                <input type="text" id="last_name" name="last_name" placeholder="Last name"> <br>
+            </div>
+
+            <label for="address">Address</label>
+            <div id="address">
+                <input type="text" id="street" name="street" placeholder="Street and Number"> <br>
+                <input type="text" id="town" name="town" placeholder="City">
+                <input type="text" id="postal_code" name="postal_code" placeholder="Postal Code"> <br>
+            </div>
+            <div> <label for="date_picker">Birthdate</label>
+                <input type="date" id="date_picker" value="1965-01-01" min="1900-01-01">
+            </div>
+            <label for="contact">Contact</label>
+            <div id="contact">
+                <input type="text" id="phone" name="phone" placeholder="Telephone">
+                <input type="email" id="email" name="email" placeholder="Email"> <br>
+            </div>
+
+            <label for="password">Password</label>
+            <div id="password">
+                <input type="password" placeholder="Password" id="password" >
+                <input type="password" placeholder="Confirm Password" id="confirm-password" > <br>
+            </div>
+        </fieldset>
+        <fieldset id="register-credentials-user-type-fieldset">
+            <label for="user_type">User Type</label>
+            <select id="user_type">
+                <option>Accountant</option>      <option>Administrator</option>        <option>Cleaner</option>
+                <option>Customer</option>        <option>Employee</option>             <option>Guard</option>
+                <option>Secretary</option>       <option>Supplier</option>             <option>Veterinary</option>
+            </select>
+            <br>
+        </fieldset>
+
+        <span class="form-buttons button-div">
+            <button type="reset" >Clear</button><button type="submit" >Register</button>
+        </span>
+    </form>
+    </div>
+{% endblock %}

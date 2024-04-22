@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %}</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
+    <link rel="stylesheet" href="{{ url_for("static", filename="style.css") }}">
+    <link rel="shortcut icon" href="{{ url_for("static", filename="favicon.ico") }}">
+</head>
+<body>
+    <header>
+        <div id="header-logo-div">
+            <a href="/public" class="logo"><i class="needs-margin fas fa-paw"></i>MY ZOO</a>
+        </div>
+        <div id="header-menu-div">
+            <nav class="menu">
+                <a href="/public" class="needs-margin">Home</a>
+                <a href="/gallery/" class="needs-margin">Gallery</a>
+                <a href="/tickets/" class="needs-margin">Tickets</a>
+                <a href="/animals/" class="needs-margin">Animals</a>
+                <a href="/about/">About</a>
+            </nav>
+        </div>
+        <div class="button-div" id="header-login-register-div">
+            <button id="login-button">Log in</button>
+            <button id="register-button" onclick="window.location.href='/register/';">Register</button>
+
+        </div>
+    </header>
+
+    <dialog class="form-popup" id="my-form">
+        <form action="/auth/" class="form-container" id="login-form" method="POST">
+            <input type="email" name="email" placeholder="Enter your email" class="login-form-input">
+            <input type="password" name="password" placeholder="Enter your password" class="login-form-input">
+            <div class="remember">
+                <input type="checkbox" name="" id="remember-me">
+                <label for="remember-me">remember me</label>
+            </div>
+            <div class="form-buttons button-div">
+                <button type="reset" id="login-form-reset" >Clear</button>
+                <button type="submit" id="login-form-submit" >Login</button>
+            </div>
+        </form>
+    </dialog>
+    <script type="text/javascript">
+        const login_dialog = document.getElementById("my-form");
+        document.getElementById("login-button").addEventListener("click", () => {login_dialog.showModal();});
+        document.getElementById("login-form-submit").addEventListener("click", () => {login_dialog.close();});
+        function keyPress (e) { if(e.key === "Escape") { login_dialog.close(); } }
+    </script>
+
+    <main class="content">
+        {% block content %} {% endblock %}
+    </main>
+
+    <footer>
+        <div class="box-container">
+
+            <div class="box" id="footer-alpha">
+                <h3><i class="fas fa-paw"></i> zoo</h3>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                <p class="links"><i class="fas fa-clock"></i>monday - friday</p>
+                <p class="days">7:00AM - 11:00PM</p>
+            </div>
+
+            <div class="box" id="footer-beta">
+                <h3>Contact Info</h3>
+                <a href="#" class="links"><i class="fas fa-phone"></i> 2610-135-2468 </a>
+                <a href="#" class="links" style="text-transform: none">
+                    <i class="fas fa-envelope"></i> info@patraszoo.gr </a>
+                <a href="#" class="links"><i class="fas fa-map-marker-alt"></i> Patras, Greece </a>
+            </div>
+
+            <div class="box" id="footer-gamma">
+                <h3>site map</h3>
+                <a href="/public" class="links"> <i class="fas fa-arrow-right"></i>home</a>
+                <a href="/gallery/" class="links"> <i class="fas fa-arrow-right"></i>gallery</a>
+                <a href="/animals/" class="links"> <i class="fas fa-arrow-right"></i>animals</a>
+            </div>
+
+            <div class="box" id="footer-delta">
+                <h3>quick links</h3>
+                <a href="/public#tickets" class="links"> <i class="fas fa-arrow-right"></i>tickets</a>
+                <a href="/about/" class="links"> <i class="fas fa-arrow-right"></i>about</a>
+                <a href="#" class="links" id="accessibility"> <i class="fas fa-arrow-right"></i>accessibility</a>
+                <dialog id="accessibility-dialog">
+                    <h3 id="accessibility-dialog-title">Accessibility Statement</h3>
+                    <p id="accessibility-statement-text">
+                        We are committed to providing a website that is accessible to the widest possible audience,
+                        regardless of technology or ability, by making sure that the whole content is compatible
+                        with screen readers. This website endeavours to conform to the World Wide Web Consortium
+                        Web Content Accessibility Guidelines. <br> <br>Should you experience any difficulty
+                        in accessing the current website, please don’t hesitate to contact us.
+                    </p>
+                    <div id="accessibility-button-div">
+                    <button autofocus id="close-accessibility">Close</button>  <!----- autofocus attr to be removed -->
+                    </div>
+                </dialog>
+                <script type="text/javascript">
+                    const dialog = document.getElementById("accessibility-dialog");
+                    document.getElementById("accessibility").addEventListener("click", () => {dialog.showModal();});
+                    document.getElementById("close-accessibility").addEventListener("click", () => {dialog.close();});
+                </script>
+            </div>
+
+            <div class="box" id="footer-epsilon">
+                <h3>Location</h3>
+                <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=21.73233558053101%2C38.240105978598706%2C21.74035538548554%2C38.24356083673144&amp;layer=mapnik"
+                        style="border: 1px solid black"></iframe>
+                <br/>
+                <small><a href="https://www.openstreetmap.org/#map=18/38.24183/21.73635">View Larger Map</a></small>
+
+            </div>
+
+            <div class="box" id="footer-sigma-taf">
+                <h3>newsletter</h3>
+                <form action="/subscribe/" id="subscribe-form" method="POST">
+                    <label for="subscribe-form-input">subscribe for latest updates</label>
+                    <input type="email" name="email" placeholder="Your Email"
+                           class="subscribe-input" id="subscribe-form-input">
+                    <button type="submit" id="subscribe-button">Subscribe</button>
+                </form>
+                <script type="text/javascript"> {# TODO ---------------------------------------------- TO BE REMOVED #}
+                    document.getElementById("subscribe-button").addEventListener("click", () => {
+                        {#document.getElementById("subscribe-form-input").reset(); it is the default behavior! #}
+                        console.log("subscribed");});
+                </script>
+                <div class="share">
+                    <a href="https://www.facebook.com/groups/pacmansplayground" class="fab fa-facebook-f"></a>
+                    <a href="https://twitter.com/home" class="fab fa-twitter"></a>
+                    <a href="https://www.instagram.com/" class="fab fa-instagram"></a>
+                    <a href="https://www.linkedin.com/feed/" class="fab fa-linkedin"></a>
+                </div>
+            </div>
+        </div>
+        <div class="credit">&copy; 2024 All rights reserved by
+            <a href="https://github.com/alextsakir/ZooWebsite" class="link">team 30</a></div>
+    </footer>
+
+</body>
+</html>

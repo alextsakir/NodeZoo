@@ -1,0 +1,468 @@
+:root {
+    --alpha_color: #124076;
+    --beta_color: #7F9F80;
+    --gamma_color: #F9E897;
+    --delta_color: #FFC374;
+    --background_color: #101010;
+    --textfield_background: #161616;
+    --foreground: yellow;
+}
+
+html {
+    box-sizing: border-box;
+    font-family: "Cambria Math", sans-serif;
+    font-size: 12pt;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: none;
+    scroll-behavior: smooth;
+    color: var(--gamma_color);
+    text-decoration: none;
+    text-transform: capitalize;
+    transition: 1s linear;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+html::-webkit-scrollbar{
+  width: 0.4rem;
+}
+
+html::-webkit-scrollbar-track{
+  background: black;
+}
+
+html::-webkit-scrollbar-thumb{
+  background: var(--alpha_color);
+  border-radius: 5rem;
+    width: 1em;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background_color);
+}
+
+header {
+    align-content: center;
+    background: var(--alpha_color);
+    display: flex;
+    flex-direction: row;
+    /*justify-content: center;*/
+}
+
+#header-logo-div, #header-menu-div, #header-login-register-div {
+    border: thick white;                                                                               /*where is it */
+}
+
+header #header-logo-div {
+    float: left;
+    flex-direction: row;
+    width: 20%;
+    /*margin: auto auto auto 3rem;*/
+    margin: auto;
+}
+
+header .logo {
+    vertical-align: middle;
+    top: 50%;
+}
+
+header #header-logo-div .needs-margin {
+    margin-right: 0.4rem;
+}
+
+header #header-menu-div {
+    /*float: left;*/
+    margin: auto;
+    padding: 0;
+    justify-content: space-between;
+}
+
+header .menu {
+    align-items: center;
+    /*margin: 0 auto;*/
+    padding: 1rem;
+    text-align: center;
+}
+
+#header-menu-div .needs-margin {
+    margin-right: 5rem;
+}
+
+header #header-login-register-div {
+    float: right;
+    width: 20%;
+    text-align: right;
+    margin: auto;
+}
+
+header a, header .menu {
+    color: var(--gamma_color);
+    font-size: 1.4em;
+    text-decoration: none;
+}
+
+.button-div {
+    display: inline-block;
+
+
+    margin: auto;
+
+}
+
+main {
+    /*display: flex;*/
+}
+
+.form-container {
+    max-width: 300px;
+    padding: 10px;
+}
+
+#register-form-container {
+    width: 100%;
+    text-align: center;
+    margin: auto;
+    min-height: 60rem;
+}
+
+#register-form {
+    /*display: grid;*/
+    /*grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));*/
+    /*grid-template-columns: 70% 70%;*/
+    /*gap: 0.2rem;*/
+}
+
+#register-credentials-fieldset {
+    column-count: 2;
+    margin-top: 20rem;
+}
+
+#register-credentials-user-type-fieldset {
+    margin-top: 5rem;
+}
+
+form input {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    border: none;
+    background: var(--textfield_background);
+    color: var(--foreground);
+}
+
+form input :focus {
+    background-color: #252525;
+    outline: none;
+}
+
+form .remember {
+    text-align: right;
+    padding-top: 1em;
+}
+
+form label {
+    color: lightsteelblue;
+}
+
+form button {
+    padding: 16px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+form button .cancel {
+    background-color: red; /* ------------------------------------- does not exist yet ----------------------------- */
+}
+
+form button :hover {
+    opacity: 1;
+}
+
+select {
+    background: var(--textfield_background);
+    color: var(--foreground);
+}
+
+.content {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.image {
+    flex: 1 1 31rem;
+    width: 100%;
+}
+
+* {box-sizing:border-box}  /* --------------------------------- WHAT IS THIS? -------------------------------------- */
+
+/* Slideshow container */
+.slideshow-container {
+    max-width: 1000px;
+    position: relative;
+    margin: auto;
+}
+
+/* Hide the images by default */
+.slide {
+    display: none;
+}
+
+/* Next & previous buttons */
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    margin-top: -22px;
+    padding: 16px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    transition: 0.6s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+}
+
+/* Position the "next button" to the right */
+.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover, .next:hover {
+    background-color: rgba(0,0,0,0.8);
+}
+
+/* The dots/bullets/indicators */
+.dot {
+    cursor: pointer;
+    height: 15px;
+    width: 15px;
+    margin: 0 2px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.6s ease;
+}
+
+.active, .dot:hover {
+    background-color: #717171;
+}
+
+/* Fading animation */
+.fade {
+    animation-name: fade;
+    animation-duration: 1.5s;
+}
+
+@keyframes fade {
+    from {opacity: .4}
+    to {opacity: 1}
+}
+
+.footer {
+    align-content: center;
+}
+
+.form-class {
+    width: max-content;
+    border-color: black;
+    height: 30em;
+    align-content: center;
+    margin: auto;
+}
+
+.form-class h3 {
+    margin: auto;
+    padding-bottom: 2em;
+    text-align: center;
+}
+.form-class .remember {
+    text-align: right;
+    padding-top: 1em;
+}
+
+::placeholder {
+    text-align: center;
+}
+
+.form-buttons {
+    text-align: center;
+    align-items: center;
+    margin: auto;
+    justify-content: center;
+    padding-top: 1em;
+}
+
+button {
+    /*Styles defined by the :active pseudo-class will be overridden by any subsequent link-related pseudo-class
+    (:link, :hover, or :visited) that has at least equal specificity. To style links appropriately,
+    put the :active rule after all other link-related rules, as defined by the LVHA-order:
+    :link — :visited — :hover — :active.*/
+    background-color: var(--beta_color);
+    border: none;
+    border-radius: 8px;
+    color: var(--alpha_color);
+    padding: 15px 32px;
+    text-align: center;
+    align-content: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.2);
+    z-index: 0;
+    cursor: pointer;
+}
+
+button :hover {
+    box-shadow: 2rem 2rem 5rem #fc894d;
+
+}
+
+button :active:focus {
+    padding-top: 10rem;
+    background-color: #050505;
+    font-size: 1.5rem;
+}
+
+/* =================================================== FOOTER ====================================================== */
+
+footer {
+    background: url(/footer.jpg) no-repeat;
+    background-size: cover;
+    margin: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 1.5rem;
+}
+
+footer .box-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); /* -------------- What is 1fr unit? --------------- */
+    gap: 0.2rem;
+}
+
+footer .box-container .box h3 {
+    font-size: 1.2rem;
+    color: #ff6e01;
+    padding: 0;
+}
+
+footer .box-container .box p{
+    font-size: 0.8rem;
+    line-height: 1;
+    color: ghostwhite;
+    padding-top: 0.3rem;
+}
+
+footer .box-container .box .links{
+    display: block;
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: ghostwhite;
+    padding: 1rem 0;
+}
+
+footer .box-container .box .links i{
+    color: #ff6e01;
+    padding-right: .5rem;
+}
+
+footer .box-container .box .links:hover i{
+    padding-right: 2rem;
+    color: var(--foreground); /* not working */
+}
+
+footer .box-container .box .days {
+  margin-left: 2.2rem;
+  line-height: 0.2;
+}
+
+footer .box-container .box .email {
+  width: 100%;
+  margin: .7rem 0;
+  padding: 1rem;
+  border-radius: .5rem;
+  background: ghostwhite;
+  font-size: 0.8rem;
+  color: black;
+  text-transform: none;
+}
+
+footer .box-container .box .share a {
+    height: 3rem;
+    width: 3rem;
+    line-height: 3rem;
+    color: black;
+    background: ghostwhite;
+    font-size: 1.2rem;
+    border-radius: 5rem;
+    margin-right: .8rem;
+    text-align: center;
+    margin-top: 1.4rem;
+    text-decoration: none;
+}
+
+footer .box-container .box .share a:hover {
+  background: #ff6e01;
+}
+
+footer .box-container .box #footer-epsilon {
+    padding: 0 5rem 0 5rem;
+}
+
+#footer-epsilon a :link, #footer-epsilon a :visited {
+    color: var(--gamma_color);
+}
+
+footer .credit {
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 1rem;
+    padding-top: 2.5rem;
+    color: lightgray;
+    border-top: .2rem solid rgba(0, 0, 0, 0.2);
+}
+
+footer .credit .link{
+    color: #ff6e01;
+}
+
+/* =================================================== DIALOG ====================================================== */
+
+dialog {
+    max-width: 30%;
+    background-color: black;
+}
+
+dialog h3 {
+    text-align: center;
+}
+
+dialog p {
+    text-justify: inter-word;
+    text-transform: none;
+    color: var(--foreground);
+    font-size: 2rem;
+}
+
+dialog div {
+    text-align: right;
+}
+
+::backdrop {
+    background-image: linear-gradient(45deg, magenta, rebeccapurple, dodgerblue, green);
+    opacity: 0.45;
+}
