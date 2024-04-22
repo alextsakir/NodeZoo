@@ -12,7 +12,7 @@ router.get('/',
         // });
         // res.end();
 
-        res.sendFile(path.join(__dirname + '/../views/' + 'index.html'))
+        res.sendFile(path.join(__dirname + '/../views/' + 'index.hbs'))
     });
 
 router.get('/home', (req, res, next) => {

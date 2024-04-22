@@ -1,8 +1,8 @@
 {
   "name": "nodezoo",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "a zoo website, made in Spring 2024",
+  "main": "server.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
