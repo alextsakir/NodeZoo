@@ -10,6 +10,9 @@
   "dependencies": {
     "express": "^4.19.2",
     "express-handlebars": "^7.1.2",
-    "handlebars": "^4.7.8"
+    "fs": "^0.0.1-security",
+    "handlebars": "^4.7.8",
+    "http": "^0.0.1-security",
+    "path": "^0.12.7"
   }
 }
