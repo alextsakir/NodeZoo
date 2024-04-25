@@ -147,6 +147,13 @@ main {
 }
 
 #tickets-container {
+
+    text-align: center;
+
+    ul {
+        list-style: none;
+    }
+
     .ticket-selector {
         display: inline-block;
 

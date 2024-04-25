@@ -1,31 +1,28 @@
-<h1>Buy your tickets here</h1>
+
+
 <div id="tickets-container">
     <form class="booking-form capture-add-to-cart" id="ticket-selection-form" action="api/tickets-selected" method="POST">
+        <h1>Buy your tickets here</h1>
         <ul id="choose-tickets" class="ticket-list">
-<!--            {{tickets}}-->
             {{#each tickets}}
-            <li class="ticket" style="clear: both;">
-                <div class="ticket-layout">
-                    <div class="text">
-                        <strong class="ticket-title"> {{ name_EN }} / {{ name_GR }} </strong>
-                        <div class="price"> <span class="price-active"> € {{ price }} </span> </div>
-                    </div>
-                    <div class="quantity">
-                        <input type="hidden" id="price" value="{{ price }}">
-                        <span class="ticket-selector">
-                            <button type="button" aria-label="decrease quantity" class="minus-ticket-selector" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Click and hold to remove faster..." title="">
-                            <i class="fa fa-minus" aria-hidden="true"></i>
-                            </button>
-                            <span class="selector-total">
-                                <span class="hidden-ticket-qty true-item-quantity" aria-label="selected ticket quantity" style="display: none!important;" data-item-name="Ενήλικες/ Adults" data-item-price="21" data-item-id="105451" data-item-category="Απλά εισιτήρια/ General Tickets"> 0 </span>
-                                <input type="text" inputmode="numeric" pattern="^\d+$" name="tickets[105451][qty]" value="0" id="qty_105451" class="ticket-qty-input" data-min="1" data-max="30">
-                                <small class="max-total" data-min="1" data-max="30">30 max</small>
-                            </span>
-                            <button type="button" aria-label="increase quantity" class="plus-ticket-selector" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Click and hold to add faster..." title="">
-                                <i class="ticket-selector-icon ticket-selector-icon--plus fa fa-plus" aria-hidden="true"></i>
-                            </button>
+            <li class="ticket" id="{{name_EN}}" style="clear: both;">
+                <div class="text">
+                    <strong class="ticket-title"> {{ name_EN }} / {{ name_GR }} </strong>
+                    <div class="price"> <span class="price-active"> € {{ price }} </span> </div>
+                </div>
+                <div class="quantity">
+                    <span class="ticket-selector">
+                        <button type="button" aria-label="decrease quantity" class="minus-ticket-selector" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Click and hold to remove faster..." title="">
+                        <i class="fa fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <span class="selector-total">
+                            <input type="text" inputmode="numeric" pattern="^\d+$" value="0" id="{{name_EN}}" class="ticket-quantity-input" data-min="0" data-max="30">
+                            <small class="max-total" data-min="1" data-max="30">40 max</small>
                         </span>
-                    </div>
+                        <button type="button" aria-label="increase quantity" class="plus-ticket-selector" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Click and hold to add faster..." title="">
+                            <i class="ticket-selector-icon ticket-selector-icon--plus fa fa-plus" aria-hidden="true"></i>
+                        </button>
+                    </span>
                 </div>
             </li>
         {{/each}}
@@ -38,3 +35,39 @@
         </div>
     </form>
 </div>
+<script>
+    let tickets = document.getElementsByTagName("li");
+    console.log(Array.from(tickets));
+    Array.from(tickets).forEach(function (element) {
+        console.log(element);
+
+        let ticketId = element.id;
+        console.log(ticketId)
+        let minusButton = document.querySelector(`#${ticketId} .minus-ticket-selector`);
+        // console.log(minusButton);
+        minusButton.addEventListener("click", function () {
+            console.log("got here");
+            let quantityInput = document.querySelector(`#${ticketId} .ticket-quantity-input`);
+            if (quantityInput.value > 0)
+                quantityInput.value--;
+        });
+        let plusButton = document.querySelector(`#${ticketId} .plus-ticket-selector`);
+        plusButton.addEventListener("click", function () {
+            console.log("got here");
+            let quantityInput = document.querySelector(`#${ticketId} .ticket-quantity-input`);
+            if (quantityInput.value < 40)
+                quantityInput.value++;
+        });
+    });
+
+    let clearButton = document.querySelector("#clear-ticket-selection");
+    console.log(clearButton)
+    clearButton.addEventListener("click", function () {
+        let quantityInputs = document.querySelectorAll(".ticket-quantity-input");
+        console.log(quantityInputs);
+        for (let input of quantityInputs) {
+            input.value = 0;
+        }
+    });
+
+</script>

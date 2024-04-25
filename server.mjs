@@ -45,7 +45,8 @@ class Database {
 
     tickets = [
         new Ticket("Παιδικό", "Child", "child ticket", 5),
-        new Ticket("Ενήλικας", "Adult", "adult ticket", 12)
+        new Ticket("Ενήλικας", "Adult", "adult ticket", 12),
+        new Ticket("ΑμΕΑ", "Disabled", "disabled ticket", 8)
     ]
 
     saveSubscription(email) {
