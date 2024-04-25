@@ -1,7 +1,7 @@
 :root {
     --alpha_color: #124076;
-    --beta_color: #7F9F80;
-    --gamma_color: #F9E897;
+    --beta_color: hsl(122, 14%, 56%);
+    --gamma_color: #f9e895;
     --delta_color: #FFC374;
     --background_color: #101010;
     --textfield_background: #161616;
@@ -55,6 +55,10 @@ header {
     display: flex;
     flex-direction: row;
     /*justify-content: center;*/
+}
+
+header a:hover{
+    color: hsl(50, 89%, 48%);
 }
 
 #header-logo-div, #header-menu-div, #header-login-register-div {
@@ -207,7 +211,7 @@ form input {
     color: var(--foreground);
 }
 
-form input :focus {
+form input:focus {
     background-color: #252525;
     outline: none;
 }
@@ -375,15 +379,14 @@ button {
     cursor: pointer;
 }
 
-button :hover {
-    box-shadow: 2rem 2rem 5rem #fc894d;
-
+button:hover {
+    background-color: hsl(122, 14%, 66%);
+    
 }
 
-button :active:focus {
-    padding-top: 10rem;
-    background-color: #050505;
-    font-size: 1.5rem;
+button:active:focus {
+    background-color: hsl(122, 14%, 76%);
+    border-radius: 12px;
 }
 
 /* =================================================== FOOTER ====================================================== */
