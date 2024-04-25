@@ -1,7 +1,8 @@
 
 
 <div id="tickets-container">
-    <form class="booking-form capture-add-to-cart" id="ticket-selection-form" action="api/tickets-selected" method="POST">
+<!--    <form class="booking-form capture-add-to-cart" id="ticket-selection-form" action="/api/tickets-selected" method="POST">-->
+    <form class="booking-form capture-add-to-cart" id="ticket-selection-form">
         <h1>Buy your tickets here</h1>
         <ul id="choose-tickets" class="ticket-list">
             {{#each tickets}}
@@ -23,51 +24,85 @@
                         </button>
                     </span>
                 </div>
-                <small class="max-total" data-min="1" data-max="30">40 max</small>
+                <small class="max-indicator">40 max</small>
             </li>
         {{/each}}
         </ul>
         <div id="cat-total">
             <div id="ticket-list-actions">
                 <button id="clear-ticket-selection" type="button">Clear selection <i class="fa fa-times" aria-hidden="true"></i></button>
-                <button id="submit-tickets-button" type="submit" class="fill me" data-analytics-event="click">Select your session<i class="fa fa-chevron-right"></i> </button>
+                <button id="submit-tickets-button" type="button" class="fill me" data-analytics-event="click">Select your session<i class="fa fa-chevron-right"></i> </button>
             </div>
         </div>
     </form>
 </div>
-<script>
-    let tickets = document.getElementsByTagName("li");
-    console.log(Array.from(tickets));
-    Array.from(tickets).forEach(function (element) {
-        console.log(element);
 
+<dialog id="ticket-confirmation-dialog">
+    <h1 id="ticket-confirmation-header">Are you sure for your choices?</h1>
+    <p id="ticket-confirmation-paragraph"></p>
+    <span id="ticket-confirmation-buttons">
+        <button id="ticket-dialog-ok">OK</button>
+        <button id="ticket-dialog-back">BACK</button>
+    </span>
+</dialog>
+
+<script>
+    let selectedData = {};
+
+    let tickets = document.getElementsByTagName("li");
+    // console.log(Array.from(tickets));
+    Array.from(tickets).forEach(function (element) {
         let ticketId = element.id;
-        console.log(ticketId)
         let minusButton = document.querySelector(`#${ticketId} .minus-ticket-selector`);
-        // console.log(minusButton);
         minusButton.addEventListener("click", function () {
-            console.log("got here");
             let quantityInput = document.querySelector(`#${ticketId} .ticket-quantity-input`);
-            if (quantityInput.value > 0)
-                quantityInput.value--;
+            if (quantityInput.value > 0) quantityInput.value--;
         });
         let plusButton = document.querySelector(`#${ticketId} .plus-ticket-selector`);
         plusButton.addEventListener("click", function () {
-            console.log("got here");
             let quantityInput = document.querySelector(`#${ticketId} .ticket-quantity-input`);
-            if (quantityInput.value < 40)
-                quantityInput.value++;
+            if (quantityInput.value < 40) quantityInput.value++;
         });
     });
 
-    let clearButton = document.querySelector("#clear-ticket-selection");
-    console.log(clearButton)
-    clearButton.addEventListener("click", function () {
+    function clearQuantities () {
         let quantityInputs = document.querySelectorAll(".ticket-quantity-input");
         console.log(quantityInputs);
-        for (let input of quantityInputs) {
-            input.value = 0;
+        for (let input of quantityInputs) input.value = 0;
+    }
+
+    document.querySelector("#clear-ticket-selection").addEventListener("click", clearQuantities);
+
+    let submitButton = document.querySelector("#submit-tickets-button");
+    submitButton.addEventListener("click", function () {
+        let ticketDivisions = document.querySelectorAll(".ticket");
+        for (let ticket of ticketDivisions) {
+            ticket.getElementsByTagName("span");
+            let quantity = ticket.querySelector(".ticket-quantity-input");
+            if (quantity.value > 0) selectedData[ticket.id] = quantity.value;
         }
+        let confirmationDialog = document.querySelector("#ticket-confirmation-dialog");
+        confirmationDialog.showModal();
+        let paragraph = confirmationDialog.querySelector("p");
+        paragraph.innerHTML = "little table with tickets and quantities" + selectedData.toString(); // ----------- todo
     });
+
+    let confirmationBACK = document.querySelector("#ticket-dialog-back");
+    confirmationBACK.addEventListener("click", function () {
+        document.querySelector("#ticket-confirmation-dialog").close();
+    });
+
+    let confirmationOK = document.querySelector("#ticket-dialog-ok");
+    confirmationOK.addEventListener("click", function () {
+        console.log("sending data...");
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/tickets-selected", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.status === 200) console.log(this.responseText);
+        };
+        xhr.send(JSON.stringify(selectedData));
+    });
+
 
 </script>

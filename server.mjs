@@ -161,11 +161,18 @@ class API {
         response.redirect(request.route);
         // response.sendStatus(200);
     }
+
+    static ticketsSelected(request, response) {
+        if (DEBUG_FUNCTION_CALL === true) console.log("API tickets");
+        console.log(request.body, request);
+        response.redirect("/payment");
+    }
 }
 
 router.route("/api/login").post(API.login);
 router.route("/api/register").post(API.register);
 router.route("/api/subscribe").post(API.subscribe);
+router.route("/api/tickets-selected").post(API.ticketsSelected);
 
 // ================================================== RUN APP =========================================================
 
