@@ -152,6 +152,20 @@ main {
 
     ul {
         list-style: none;
+        /* padding-bottom: 5rem; */
+    }
+
+    .ticket{
+        margin-bottom: 3.5rem;
+    }
+
+    .selector-total{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        input{
+            text-align: center;
+        }
     }
 
     .ticket-selector {

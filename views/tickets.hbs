@@ -17,13 +17,13 @@
                         </button>
                         <span class="selector-total">
                             <input type="text" inputmode="numeric" pattern="^\d+$" value="0" id="{{name_EN}}" class="ticket-quantity-input" data-min="0" data-max="30">
-                            <small class="max-total" data-min="1" data-max="30">40 max</small>
                         </span>
                         <button type="button" aria-label="increase quantity" class="plus-ticket-selector" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Click and hold to add faster..." title="">
                             <i class="ticket-selector-icon ticket-selector-icon--plus fa fa-plus" aria-hidden="true"></i>
                         </button>
                     </span>
                 </div>
+                <small class="max-total" data-min="1" data-max="30">40 max</small>
             </li>
         {{/each}}
         </ul>
