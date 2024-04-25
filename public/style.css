@@ -147,8 +147,15 @@ main {
 }
 
 #tickets-container {
+
+    text-align: center;
+
+    ul {
+        list-style: none;
+    }
+
     .ticket-selector {
-        display: inline-block;
+        display: inline-flex;
 
         .minus-ticket-selector {
             float: left;
