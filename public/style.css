@@ -111,10 +111,7 @@ header a, header .menu {
 
 .button-div {
     display: inline-block;
-
-
     margin: auto;
-
 }
 
 main {
@@ -148,6 +145,21 @@ main {
 #register-credentials-user-type-fieldset {
     margin-top: 5rem;
 }
+
+#tickets-container {
+    .ticket-selector {
+        display: inline-block;
+
+        .minus-ticket-selector {
+            float: left;
+        }
+
+        .plus-ticket-selector {
+            float: right;
+        }
+    }
+}
+
 
 form input {
     width: 100%;
@@ -340,7 +352,7 @@ button :active:focus {
 /* =================================================== FOOTER ====================================================== */
 
 footer {
-    background: url(/footer.jpg) no-repeat;
+    background: url(/footer.jpg) no-repeat;  /*don't worry, it's ok*/
     background-size: cover;
     margin: 0;
     padding-left: 1rem;
