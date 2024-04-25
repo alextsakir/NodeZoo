@@ -147,16 +147,25 @@ main {
 }
 
 #tickets-container {
-
     text-align: center;
-
+    
+    #ticket-selection-form{
+        width: 50%; 
+        max-width: 50%; 
+        margin: 0 auto;         
+    }
     ul {
         list-style: none;
+        padding: 0;
+        
         /* padding-bottom: 5rem; */
     }
 
     .ticket{
+        margin-top: 3.5rem;
         margin-bottom: 3.5rem;
+        padding: 0;
+        border: 1px red;
     }
 
     .selector-total{
@@ -165,6 +174,7 @@ main {
         align-items: center;
         input{
             text-align: center;
+            margin: auto;
         }
     }
 
@@ -177,6 +187,12 @@ main {
 
         .plus-ticket-selector {
             float: right;
+        }
+        button{
+            width: 20%;
+            height: 50%;
+            align-items: center;
+            margin: auto;
         }
     }
 }
