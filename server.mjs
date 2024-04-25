@@ -7,6 +7,7 @@ import express from "express";
 import {engine} from "express-handlebars";
 import fs from "fs";
 import http from "http";
+import fetch from "node-fetch"; // has to be npm installed
 import path from "path";
 
 // ================================================ CONFIGURATION =====================================================
@@ -116,7 +117,7 @@ function registered(request, response) {
 
 function tickets(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: tickets rendered");
-    console.log(database.tickets);
+    // console.log(database.tickets);
     response.render("tickets", {tickets: database.tickets});
 }
 
@@ -164,7 +165,7 @@ class API {
 
     static ticketsSelected(request, response) {
         if (DEBUG_FUNCTION_CALL === true) console.log("API tickets");
-        console.log(request.body, request);
+        console.log(request.body);
         response.redirect("/payment");
     }
 }

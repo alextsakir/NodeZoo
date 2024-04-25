@@ -114,8 +114,15 @@ header a, header .menu {
 }
 
 .button-div {
-    display: inline-block;
+
     margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    button {
+        width: 45%;
+    }
 }
 
 main {
@@ -125,6 +132,11 @@ main {
 .form-container {
     max-width: 300px;
     padding: 10px;
+    display: block;
+}
+
+.form-popup {
+    /*display: flex;*/
 }
 
 #register-form-container {
@@ -154,7 +166,7 @@ main {
     text-align: center;
     
     #ticket-selection-form{
-        width: 50%; 
+        width: 25%;
         max-width: 50%; 
         margin: 0 auto;         
     }
@@ -168,8 +180,11 @@ main {
     .ticket{
         margin-top: 3.5rem;
         margin-bottom: 3.5rem;
-        padding: 0;
+        padding: 1.5em 0 1.5em 0;
         border: 1px red;
+        border-radius: 1.2em;
+        background-color: #070707;
+
     }
 
     .selector-total{
@@ -199,6 +214,15 @@ main {
             margin: auto;
         }
     }
+}
+
+#ticket-confirmation-dialog {
+
+    h1 {
+        color: yellow;
+        text-align: center;
+    }
+
 }
 
 
@@ -349,14 +373,6 @@ select {
 
 ::placeholder {
     text-align: center;
-}
-
-.form-buttons {
-    text-align: center;
-    align-items: center;
-    margin: auto;
-    justify-content: center;
-    padding-top: 1em;
 }
 
 button {

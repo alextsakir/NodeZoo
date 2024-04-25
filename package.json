@@ -13,6 +13,7 @@
     "fs": "^0.0.1-security",
     "handlebars": "^4.7.8",
     "http": "^0.0.1-security",
+    "node-fetch": "^3.3.2",
     "path": "^0.12.7"
   }
 }
