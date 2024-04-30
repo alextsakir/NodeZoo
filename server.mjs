@@ -5,6 +5,7 @@
 
 import express from "express";
 import {engine} from "express-handlebars";
+import bcrypt from "bcrypt";
 import fs from "fs";
 import http from "http";
 import fetch from "node-fetch"; // has to be npm installed
@@ -42,6 +43,23 @@ class Ticket {
         else console.error("Please set a Locale")
     }
 }
+
+class User{
+    constructor(firstname, lastname, address, city, postal_code, birthdate, telephone, email, password){
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.address = address;
+        this.city = city;
+        this.postal_code = postal_code;
+        this.birthdate = birthdate;
+        this.telephone = telephone;
+        this.email = email;
+        this.password = password;
+    }
+
+    
+}
+
 class Database {
 
     tickets = [
@@ -50,8 +68,14 @@ class Database {
         new Ticket("ΑμΕΑ", "Disabled", "disabled ticket", 8)
     ]
 
-    saveSubscription(email) {
-        // todo
+    users = [    ]
+
+    saveSubscription(user) {
+        // todo-- for now it only appends the users array of class Database
+        this.users.push(user);
+        console.log("The users are: ");
+        console.log(this.users);
+
     }
 }
 
@@ -150,9 +174,45 @@ class API {
     }
 
     static register(request, response) {
+        // https://medium.com/@jasondotparse/add-user-authentication-to-your-node-expressjs-application-using-bcrypt-81bb0f618ab3
         if (DEBUG_FUNCTION_CALL === true) console.log("API register");
-        console.log(request.body);  // todo ---------------------------- doesn't get birth date, user type and password
-        database.saveSubscription(request.body["email"]);
+        console.log("got here");
+        console.log(request.body);  // todo ---------------------------- doesn't get birth date, user type and password -> update(by bobotas): it does now!!
+        let email = request.body.email;
+        let enderedPassword = request.body.password;
+        let c_enderedPassword = request.body.confirm_password;
+
+        
+
+        if (enderedPassword == c_enderedPassword){
+            const saltRounds =  10
+            bcrypt.hash(enderedPassword, saltRounds, function(err, hash){
+                let user = new User(request.body.first_name,
+                                     request.body.last_name,
+                                     request.body.street,
+                                     request.body.town,
+                                     request.body.postal_code,
+                                     request.body.birthdate,
+                                     request.body.phone,
+                                     request.body.email,
+                                     hash)
+                database.saveSubscription(user); //
+            } )
+
+
+            
+
+        } else{
+            // should say sth like: "Passwords dont match" ---TODO
+            response.redirect("/register");
+        }
+
+        // console.log(email);
+        // console.log(enderedPassword);
+
+
+        //-------------------------------------------------
+        // database.saveSubscription(request.body["email"]);
         response.redirect("/registered");
     }
 
