@@ -53,6 +53,16 @@ body {
 
 /* ================================================== HEADER ======================================================= */
 
+.sticky-header {
+    position: fixed;
+    top: 0;
+    width: 100%
+}
+
+.sticky-header + .content {
+    padding-top: 102px;  /* prevent sudden quick movement between header and main */
+}
+
 header {
     align-content: center;
     background: var(--alpha_color);
@@ -71,7 +81,7 @@ header {
     }
 
     #header-logo-div, #header-menu-div, #header-login-register-div {
-        border: 0.1em dashed floralwhite; /*where is it */
+        border: 0.1em dashed floralwhite;
         margin: 5rem;
     }
 
