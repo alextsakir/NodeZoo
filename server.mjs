@@ -45,7 +45,7 @@ class Ticket {
 }
 
 class User{
-    constructor(firstname, lastname, address, city, postal_code, birthdate, telephone, email, password){
+    constructor(firstname, lastname, address, city, postal_code, birthdate, telephone, email, password) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.address = address;
@@ -86,63 +86,64 @@ const database = new Database();
 
 function index(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: index rendered");
-    response.render("index", {layout: "main"});  // ---------------- with layout you can change the Handlebars template
+    response.render("index", {layout: "main", title: "Patras Zoo"});
+    // ------------------------------------------------------------- with layout you can change the Handlebars template
 }
 
 function april(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: april rendered");
-    response.render("april");
+    response.render("april", {layout: "main", title: "April"});
 }
 
 function about(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: about rendered");
-    response.render("about");
+    response.render("about", {layout: "main", title: "About"});
 }
 
 function animals(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: animals rendered");
-    response.render("animals");
+    response.render("animals", {layout: "main", title: "Animals"});
 }
 
 function contact(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: contact rendered");
-    response.render("contact");
+    response.render("contact", {layout: "main", title: "Contact"});
 }
 
 function dashboard(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: dashboard rendered");
-    response.render("dashboard");
+    response.render("dashboard", {layout: "main", title: "Dashboard"});
 }
 
 function gallery(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: gallery rendered");
-    response.render("gallery");
+    response.render("gallery", {layout: "main", title: "Gallery"});
 }
 
 function login(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: login rendered");
-    response.render("login");
+    response.render("login", {layout: "main", title: "Login"});
 }
 
 function payment(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: payment rendered");
-    response.render("payment"); // https://codepen.io/quinlo/pen/YONMEa
+    response.render("payment", {layout: "main", title: "Payment"}); // https://codepen.io/quinlo/pen/YONMEa
 }
 
 function register(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: register rendered");
-    response.render("register");
+    response.render("register", {layout: "main", title: "Register"});
 }
 
 function registered(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: registered rendered");
-    response.render("registered");
+    response.render("registered", {layout: "main", title: "Registered"});
 }
 
 function tickets(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: tickets rendered");
     // console.log(database.tickets);
-    response.render("tickets", {tickets: database.tickets});
+    response.render("tickets", {layout: "main", title: "Tickets", tickets: database.tickets});
 }
 
 router.route("/").get(index);  // preserve alphabetical order!
@@ -177,16 +178,14 @@ class API {
         // https://medium.com/@jasondotparse/add-user-authentication-to-your-node-expressjs-application-using-bcrypt-81bb0f618ab3
         if (DEBUG_FUNCTION_CALL === true) console.log("API register");
         console.log("got here");
-        console.log(request.body);  // todo ---------------------------- doesn't get birth date, user type and password -> update(by bobotas): it does now!!
+        console.log(request.body);  // todo doesn't get birth date, user type and password -> update(by bobotas): it does now!!  nice
         let email = request.body.email;
         let enderedPassword = request.body.password;
         let c_enderedPassword = request.body.confirm_password;
 
-        
-
-        if (enderedPassword == c_enderedPassword){
+        if (enderedPassword == c_enderedPassword) {
             const saltRounds =  10
-            bcrypt.hash(enderedPassword, saltRounds, function(err, hash){
+            bcrypt.hash(enderedPassword, saltRounds, function(err, hash) {
                 let user = new User(request.body.first_name,
                                      request.body.last_name,
                                      request.body.street,
@@ -197,12 +196,12 @@ class API {
                                      request.body.email,
                                      hash)
                 database.saveSubscription(user); //
-            } )
+            })
 
 
             
 
-        } else{
+        } else {
             // should say sth like: "Passwords dont match" ---TODO
             response.redirect("/register");
         }

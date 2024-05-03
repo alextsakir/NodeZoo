@@ -25,17 +25,19 @@ html {
     overflow-x: hidden;
 }
 
-html::-webkit-scrollbar{
-  width: 0.4rem;
+/* ===================================================== SCROLLBAR ================================================= */
+
+html::-webkit-scrollbar {
+    width: 0.4rem;
 }
 
-html::-webkit-scrollbar-track{
-  background: black;
+html::-webkit-scrollbar-track {
+    background: black;
 }
 
-html::-webkit-scrollbar-thumb{
-  background: var(--alpha_color);
-  border-radius: 5rem;
+html::-webkit-scrollbar-thumb {
+    background: var(--alpha_color);
+    border-radius: 5rem;
     width: 1em;
 }
 
@@ -49,72 +51,96 @@ body {
     background-color: var(--background_color);
 }
 
+/* ================================================== HEADER ======================================================= */
+
 header {
     align-content: center;
     background: var(--alpha_color);
     display: flex;
     flex-direction: row;
+    padding: 0.66rem;
     /*justify-content: center;*/
-}
 
-header a:hover{
-    color: hsl(50, 89%, 48%);
-}
+    a {
+        display: inline;
+        transition: 500ms linear;
+    }
 
-#header-logo-div, #header-menu-div, #header-login-register-div {
-    border: thick white;                                                                               /*where is it */
-}
+    a:hover {
+        color: hsl(50, 89%, 38%);
+    }
 
-header #header-logo-div {
-    float: left;
-    flex-direction: row;
-    width: 20%;
-    /*margin: auto auto auto 3rem;*/
-    margin: auto;
-}
+    #header-logo-div, #header-menu-div, #header-login-register-div {
+        border: 0.1em dashed floralwhite; /*where is it */
+        margin: 5rem;
+    }
 
-header .logo {
-    vertical-align: middle;
-    top: 50%;
-}
+    #header-logo-div {
+        float: left;
+        flex-direction: row;
+        width: 20%;
+        /*margin: auto auto auto 3rem;*/
+        margin: auto;
 
-header #header-logo-div .needs-margin {
-    margin-right: 0.4rem;
-}
+        .logo {
+            vertical-align: middle;
+            top: 50%;
+        }
 
-header #header-menu-div {
-    /*float: left;*/
-    margin: auto;
-    padding: 0;
-    justify-content: space-between;
-}
+        .needs-margin {
+            margin-right: 0.4rem;
+        }
+    }
 
-header .menu {
-    align-items: center;
-    /*margin: 0 auto;*/
-    padding: 1rem;
-    text-align: center;
-}
+    #header-menu-div {
+        /*float: left;*/
+        margin: auto;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+    }
 
-#header-menu-div .needs-margin {
-    margin-right: 5rem;
-}
+    nav {
+        /*align-items: center;*/
+        /*margin: 0 auto;*/
+        /*padding: 1rem;*/
+        /*text-align: center;*/
+        display: flex;
+        justify-content: space-between;
 
-header #header-login-register-div {
-    float: right;
-    width: 20%;
-    text-align: right;
-    margin: auto;
-}
+        a {
+            display: inline;
+        }
 
-header a, header .menu {
-    color: var(--gamma_color);
-    font-size: 1.4em;
-    text-decoration: none;
+    }
+
+    #header-menu-div .needs-margin {
+        /*margin-right: 5rem;*/
+    }
+
+    #header-login-register-div {
+        float: right;
+        width: 20%;
+        text-align: right;
+        margin: auto;
+    }
+
+    a, .menu {
+        color: var(--gamma_color);
+        font-size: 1.4em;
+        text-decoration: none;
+    }
+
+    @media screen and (max-width: 1440px) { /* laptop screen? */
+        background: ghostwhite; /* test */
+    }
+
+    @media screen and (max-width: 800px) { /* mobile screen? */
+        background: yellow; /* test */
+    }
 }
 
 .button-div {
-
     margin: auto;
     display: flex;
     align-items: center;
@@ -161,6 +187,8 @@ main {
 #register-credentials-user-type-fieldset {
     margin-top: 5rem;
 }
+
+/* =================================================== TICKETS ===================================================== */
 
 #tickets-container {
     text-align: center;
