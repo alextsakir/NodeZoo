@@ -53,17 +53,10 @@ body {
 
 /* ================================================== HEADER ======================================================= */
 
-.sticky-header {
+header {
     position: fixed;
     top: 0;
-    width: 100%
-}
-
-.sticky-header + .content {
-    padding-top: 102px;  /* prevent sudden quick movement between header and main */
-}
-
-header {
+    width: 100%;
     align-content: center;
     background: var(--alpha_color);
     display: flex;
