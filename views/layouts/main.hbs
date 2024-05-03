@@ -27,6 +27,16 @@
             <button id="register-button" onclick="window.location.href='/register/';">Register</button>
         </div>
     </header>
+    <script>
+        const header = document.querySelector("header");
+        window.onscroll = function () {
+            if (window.scrollY > header.offsetTop) {
+                header.classList.add("sticky-header");
+            } else {
+                header.classList.remove("sticky-header");
+            }
+        }
+    </script>
 
     <dialog class="form-popup" id="login-form-dialog">
         <form action="/api/login" class="form-container" id="login-form" method="POST">
