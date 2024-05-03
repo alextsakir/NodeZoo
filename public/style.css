@@ -27,6 +27,9 @@ html {
 
 /* ===================================================== SCROLLBAR ================================================= */
 
+/*These are the vendor-prefixed properties offered by the relevant rendering engines:
+-webkit for Chrome, Safari; -moz for Firefox, -o for Opera, -ms for Internet Explorer */
+
 html::-webkit-scrollbar {
     width: 0.4rem;
 }
@@ -49,6 +52,7 @@ body {
     display: flex;
     flex-direction: column;
     background-color: var(--background_color);
+    transition: 500ms linear;
 }
 
 /* ================================================== HEADER ======================================================= */
@@ -62,7 +66,7 @@ header {
     display: flex;
     flex-direction: row;
     padding: 0.66rem;
-    /*justify-content: center;*/
+
 
     a {
         display: inline;
@@ -89,18 +93,13 @@ header {
             vertical-align: middle;
             top: 50%;
         }
-
-        .needs-margin {
-            margin-right: 0.4rem;
-        }
     }
 
     #header-menu-div {
         /*float: left;*/
         margin: auto;
         padding: 0;
-        display: flex;
-        justify-content: center;
+        width: 50%;
     }
 
     nav {
@@ -115,10 +114,6 @@ header {
             display: inline;
         }
 
-    }
-
-    #header-menu-div .needs-margin {
-        /*margin-right: 5rem;*/
     }
 
     #header-login-register-div {
@@ -238,7 +233,7 @@ main {
         .plus-ticket-selector {
             float: right;
         }
-        button{
+        button {
             width: 20%;
             height: 50%;
             align-items: center;
@@ -424,6 +419,7 @@ button {
     box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.2);
     z-index: 0;
     cursor: pointer;
+    transition: 400ms linear;
 }
 
 button:hover {
