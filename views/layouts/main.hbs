@@ -9,12 +9,12 @@
     <link rel="shortcut icon" href="/favicon.ico">
 </head>
 <body>
-    <header class="sticky-header">
+    <header class="">
         <div id="header-logo-div">
             <a href="/index/" class="logo"><i class="needs-margin fas fa-paw"></i>MY ZOO</a>
         </div>
         <div id="header-menu-div">
-            <nav class="menu">
+            <nav class="header-menu">
                 <a href="/index/">Home</a>
                 <a href="/gallery/">Gallery</a>
                 <a href="/tickets/">Tickets</a>
@@ -26,13 +26,36 @@
             <button id="login-button">Log in</button>
             <button id="register-button" onclick="window.location.href='/register/';">Register</button>
         </div>
+        <div id="header-mobile-navigation-div">
+            <!-- <a href="#home" class="active">Logo</a> -->
+            <div id="header-mobile-navigation-close-div">
+                <a class="icon" onclick="hamburger();"><i class="fa fa-times"></i></a>
+            </div>
+            <a href="/index/">Home</a>
+            <a href="/gallery/">Gallery</a>
+            <a href="/tickets/">Tickets</a>
+            <a href="/animals/">Animals</a>
+            <a href="/about/">About</a>
+            <div class="button-div" id="header-login-register-div-mobile">
+                <button id="login-button-mobile">Log in</button>
+                <button id="register-button-mobile" onclick="window.location.href='/register/';">Register</button>
+            </div>
+        </div>
+        <div id="header-mobile-hamburger-div">
+            <a class="icon" onclick="hamburger();"><i class="fa fa-bars"></i></a>
+        </div>
     </header>
-    <script>
-        // const header = document.querySelector("header");
+    <script type="text/javascript">
+        // const header = document.querySelector("header"); // TODO ------------------------------------ no more needed
         // window.onscroll = function () {
         //     if (window.scrollY > header.offsetTop) header.classList.add("sticky-header");
         //     else header.classList.remove("sticky-header");
         // }
+        function hamburger() {  // --------------------------------- opens and closes hamburger menu for mobile devices
+            let mobileNavigation = document.getElementById("header-mobile-navigation-div");
+            if (mobileNavigation.style.display === "block") mobileNavigation.style.display = "none";
+            else mobileNavigation.style.display = "block";
+        }
     </script>
 
     <dialog class="form-popup" id="login-form-dialog">
@@ -44,14 +67,15 @@
                 <label for="remember-me">remember me</label>
             </div>
             <div class="form-buttons button-div">
-                <button type="reset" id="login-form-reset" >Clear</button>
-                <button type="submit" id="login-form-submit" >Login</button>
+                <button type="reset" id="login-form-reset">Clear</button>
+                <button type="submit" id="login-form-submit">Login</button>
             </div>
         </form>
     </dialog>
     <script type="text/javascript">
         const login_dialog = document.getElementById("login-form-dialog");
         document.getElementById("login-button").addEventListener("click", () => {login_dialog.showModal();});
+        document.getElementById("login-button-mobile").addEventListener("click", () => {login_dialog.showModal();});
         document.getElementById("login-form-submit").addEventListener("click", () => {login_dialog.close();});
         function keyPress (e) { if(e.key === "Escape") login_dialog.close();}
     </script>

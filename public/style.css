@@ -30,6 +30,13 @@ html {
 /*These are the vendor-prefixed properties offered by the relevant rendering engines:
 -webkit for Chrome, Safari; -moz for Firefox, -o for Opera, -ms for Internet Explorer */
 
+/*Commonly used media breakpoints
+320px — 480px: Mobile devices
+481px — 768px: iPads, Tablets
+769px — 1024px: Small screens, laptops
+1025px — 1200px: Desktops, large screens
+1201px and more: Extra large screens, TV*/
+
 html::-webkit-scrollbar {
     width: 0.4rem;
 }
@@ -66,7 +73,7 @@ header {
     display: flex;
     flex-direction: row;
     padding: 0.66rem;
-
+    transition: 800ms linear;
 
     a {
         display: inline;
@@ -75,6 +82,10 @@ header {
 
     a:hover {
         color: hsl(50, 89%, 38%);
+    }
+
+    .active-tab, .active-tab-mobile {
+        color: var(--foreground);
     }
 
     #header-logo-div, #header-menu-div, #header-login-register-div {
@@ -103,17 +114,12 @@ header {
     }
 
     nav {
-        /*align-items: center;*/
-        /*margin: 0 auto;*/
-        /*padding: 1rem;*/
-        /*text-align: center;*/
         display: flex;
         justify-content: space-between;
 
         a {
             display: inline;
         }
-
     }
 
     #header-login-register-div {
@@ -123,7 +129,50 @@ header {
         margin: auto;
     }
 
-    a, .menu {
+    #header-mobile-navigation-div {
+        display: none;
+        overflow: hidden;
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        background: hsla(0, 43%, 17%, 0.85);
+        width: 100%; height: 400px;
+        text-align: center;
+
+        #header-mobile-navigation-close-div {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 20px;
+            padding: 0 20px 0 20px;
+
+            a {
+                position: absolute;
+                top: 0;
+                right: 0;
+                color: var(--gamma_color);
+                transition: 500ms linear;
+            }
+
+            a:hover {
+                color: hsl(50, 89%, 38%);
+            }
+        }
+
+        a {
+            display: block;
+            margin: 2rem;
+        }
+
+        #header-login-register-div-mobile {
+            max-width: 300px;
+        }
+    }
+
+    #header-mobile-hamburger-div {
+        display: none;
+    }
+
+    a, .header-menu {
         color: var(--gamma_color);
         font-size: 1.4em;
         text-decoration: none;
@@ -133,8 +182,25 @@ header {
         background: ghostwhite; /* test */
     }
 
-    @media screen and (max-width: 800px) { /* mobile screen? */
-        background: yellow; /* test */
+    @media screen and (max-width: 1000px) {
+        /*background: yellow; !* test *!*/
+
+        #header-logo-div {
+            width: 40%;
+            text-align: center;
+        }
+
+        #header-menu-div, #header-login-register-div {
+            display: none;
+        }
+
+        #header-mobile-hamburger-div {
+            display: block;
+        }
+    }
+
+    @media screen and (max-width: 700px) {
+
     }
 }
 
@@ -410,7 +476,7 @@ button {
     border: none;
     border-radius: 8px;
     color: var(--alpha_color);
-    padding: 15px 32px;
+    padding: 12px 2px;
     text-align: center;
     align-content: center;
     text-decoration: none;
