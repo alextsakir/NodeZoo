@@ -3,9 +3,16 @@
     --beta_color: hsl(122, 14%, 56%);
     --gamma_color: #f9e895;
     --delta_color: #FFC374;
-    --background_color: #101010;
-    --textfield_background: #161616;
+    --background-alpha: #101010;
+    --background-beta: #181818;
+    --background-gamma: #202020;
+    --background-delta: #282828;
     --foreground: yellow;
+    --footer: #ff6e01;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 html {
@@ -112,7 +119,7 @@ body {
     height: auto;
     display: flex;
     flex-direction: column;
-    background-color: var(--background_color);
+    background-color: var(--background-alpha);
     transition: 500ms linear;
 }
 
@@ -260,6 +267,31 @@ header {
     }
 }
 
+/* =================================================== INPUT ======================================================= */
+
+input {
+
+    text-align: center;
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 8px;
+    background: var(--background-beta);
+    color: var(--foreground);
+}
+
+input:hover {
+    background: var(--background-gamma);
+}
+
+input:focus {
+    background: var(--background-delta);
+    outline: none;
+}
+
+
+
 .button-div {
     margin: auto;
     display: flex;
@@ -269,10 +301,6 @@ header {
     button {
         width: 45%;
     }
-}
-
-main {
-    /*display: flex;*/
 }
 
 .form-container {
@@ -339,10 +367,6 @@ main {
         display: flex;
         justify-content: center;
         align-items: center;
-        input{
-            text-align: center;
-            margin: auto;
-        }
     }
 
     .ticket-selector {
@@ -374,19 +398,7 @@ main {
 }
 
 
-form input {
-    width: 100%;
-    padding: 15px;
-    margin: 5px 0 22px 0;
-    border: none;
-    background: var(--textfield_background);
-    color: var(--foreground);
-}
 
-form input:focus {
-    background-color: #252525;
-    outline: none;
-}
 
 form .remember {
     text-align: right;
@@ -415,7 +427,7 @@ form button :hover {
 }
 
 select {
-    background: var(--textfield_background);
+    background: var(--background-beta);
     color: var(--foreground);
 }
 
@@ -429,9 +441,6 @@ select {
     width: 100%;
 }
 
-* {box-sizing:border-box}  /* --------------------------------- WHAT IS THIS? -------------------------------------- */
-
-/* Slideshow container */
 .slideshow-container {
     max-width: 1000px;
     position: relative;
@@ -557,117 +566,146 @@ button:active:focus {
 /* =================================================== FOOTER ====================================================== */
 
 footer {
-    background: url(/footer.jpg) no-repeat;  /*don't worry, it's ok*/
+    background: url(/footer.jpg) no-repeat; /*don't worry, it's ok*/
     background-size: cover;
+    transition: 800ms linear;
     margin: 0;
     padding-left: 1rem;
     padding-right: 1rem;
     padding-bottom: 1.5rem;
-}
 
-footer .box-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); /* -------------- What is 1fr unit? --------------- */
-    gap: 0.2rem;
-}
+    .box-container {
+        display: grid;
+        /*grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); !* ------------ What is 1fr unit? ------------- *!*/
+        /*grid-template-columns: [first] 40px [line2] 50px [line3] auto [col4-start] 50px [five] 40px [end];*/
+        /*grid-template-columns: [first] 15% [second] 15% [third] 15% [fourth] 15% [fifth] 20% [sixth] 20%;*/
+        grid-template-columns: repeat(4, 14%) repeat(2, 22%);
+        gap: 0.2rem;
 
-footer .box-container .box h3 {
-    font-size: 1.2rem;
-    color: #ff6e01;
-    padding: 0;
-}
+        .box {
 
-footer .box-container .box p{
-    font-size: 0.8rem;
-    line-height: 1;
-    color: ghostwhite;
-    padding-top: 0.3rem;
-}
+            h3 {
+                font-size: 1.2rem;
+                color: var(--footer);
+                padding: 0;
+            }
 
-footer .box-container .box .links{
-    display: block;
-    font-size: 0.8rem;
-    text-decoration: none;
-    color: ghostwhite;
-    padding: 1rem 0;
-}
+            p {
+                font-size: 0.8rem;
+                line-height: 1;
+                color: ghostwhite;
+                padding-top: 0.3rem;
+            }
 
-footer .box-container .box .links i{
-    color: #ff6e01;
-    padding-right: .5rem;
-}
+            .links {
+                display: block;
+                font-size: 0.8rem;
+                text-decoration: none;
+                color: ghostwhite;
+                padding: 1rem 0;
 
-footer .box-container .box .links:hover i{
-    padding-right: 2rem;
-    color: var(--foreground); /* not working */
-}
+                i {
+                    color: var(--footer);
+                    padding-right: .5rem;
+                }
+            }
 
-footer .box-container .box .days {
-  margin-left: 2.2rem;
-  line-height: 0.2;
-}
+            .links:hover i {
+                padding-right: 2rem;
+                color: var(--foreground); /* not working */
+            }
 
-footer .box-container .box .email {
-  width: 100%;
-  margin: .7rem 0;
-  padding: 1rem;
-  border-radius: .5rem;
-  background: ghostwhite;
-  font-size: 0.8rem;
-  color: black;
-  text-transform: none;
-}
+            .days {
+                margin-left: 2.2rem;
+                line-height: 0.2;
+            }
 
-footer .box-container .box .share a {
-    height: 3rem;
-    width: 3rem;
-    line-height: 3rem;
-    color: black;
-    background: ghostwhite;
-    font-size: 1.2rem;
-    border-radius: 5rem;
-    margin-right: .8rem;
-    text-align: center;
-    margin-top: 1.4rem;
-    text-decoration: none;
-}
+            .email {
+                width: 100%;
+                margin: .7rem 0;
+                padding: 1rem;
+                background: ghostwhite;
+                font-size: 0.8rem;
+                color: var(--background-beta);
+                text-transform: none;
+            }
 
-footer .box-container .box .share a:hover {
-  background: #ff6e01;
-}
+            .share {
+                text-align: center;
+                display: flex;
+                justify-content: space-between;
 
-footer .box-container .box #footer-epsilon {
-    padding: 0 5rem 0 5rem;
-    iframe{
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
+                a {
+                    height: 2rem;
+                    width: 2rem;
+                    line-height: 2rem;
+                    color: var(--background-alpha);
+                    background: var(--foreground);
+                    font-size: 1.2rem;
+                    border-radius: 5rem;
+                    /*margin-right: 0.6rem;*/
+                    text-align: center;
+                    margin-top: 0.8rem;
+                    text-decoration: none;
+                    transition: 800ms linear;
+                }
+
+                a:hover {
+                    background: var(--footer);
+                    color: ghostwhite;
+                }
+            }
+        }
+
+        #footer-epsilon {
+            /*padding: 0 5rem 0 5rem;*/
+
+            iframe {
+                position: relative;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                width: 85%;
+                height: 180px;
+            }
+        }
+
+        #footer-sigma-taf {
+            margin-right: 1rem;
+        }
+
+        #footer-epsilon a :link, #footer-epsilon a :visited {
+            color: var(--gamma_color);
+        }
+
+        @media screen and (max-width: 1300px) {
+            grid-template-columns: repeat(3, 33%);
+        }
+
+        @media screen and (max-width: 800px) {
+            grid-template-columns: repeat(2, 50%);
+        }
+
+        @media screen and (max-width: 500px) {
+            grid-template-columns: repeat(1, 100%);
+            .box {
+                text-align: center;
+            }
+        }
     }
-}
+    .credit {
+        font-size: 0.9rem;
+        text-align: center;
+        margin-top: 1rem;
+        padding-top: 2.5rem;
+        color: lightgray;
+        border-top: .2rem solid rgba(0, 0, 0, 0.3);
 
-footer .box-container .box #footer-sigma-taf{
-    margin: 5rem;
-}
-
-#footer-epsilon a :link, #footer-epsilon a :visited {
-    color: var(--gamma_color);
-}
-
-footer .credit {
-    font-size: 0.9rem;
-    text-align: center;
-    margin-top: 1rem;
-    padding-top: 2.5rem;
-    color: lightgray;
-    border-top: .2rem solid rgba(0, 0, 0, 0.2);
-}
-
-footer .credit .link{
-    color: #ff6e01;
+        .link {
+            color: var(--footer);
+        }
+    }
 }
 
 /* =================================================== DIALOG ====================================================== */
@@ -675,21 +713,21 @@ footer .credit .link{
 dialog {
     max-width: 30%;
     background-color: black;
-}
 
-dialog h3 {
-    text-align: center;
-}
+    h3 {
+        text-align: center;
+    }
 
-dialog p {
-    text-justify: inter-word;
-    text-transform: none;
-    color: var(--foreground);
-    font-size: 2rem;
-}
+    p {
+        text-justify: inter-word;
+        text-transform: none;
+        color: var(--foreground);
+        font-size: 2rem;
+    }
 
-dialog div {
-    text-align: right;
+    div {
+        text-align: right;
+    }
 }
 
 ::backdrop {

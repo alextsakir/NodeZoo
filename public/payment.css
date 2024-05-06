@@ -43,6 +43,12 @@
 .field-container input {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
+    margin-top: 3px;
+    padding: 15px;
+    font-size: 16px;
+    width: 100%;
+    border-radius: 3px;
+    border: 1px solid #dcdcdc;
 }
 
 .field-container {
@@ -65,14 +71,14 @@ label {
     font-size: 13px;
 }
 
-input {
-    margin-top: 3px;
-    padding: 15px;
-    font-size: 16px;
-    width: 100%;
-    border-radius: 3px;
-    border: 1px solid #dcdcdc;
-}
+/*input {*/
+/*    margin-top: 3px;*/
+/*    padding: 15px;*/
+/*    font-size: 16px;*/
+/*    width: 100%;*/
+/*    border-radius: 3px;*/
+/*    border: 1px solid #dcdcdc;*/
+/*}*/
 
 .ccicon {
     height: 38px;
