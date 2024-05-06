@@ -57,6 +57,9 @@ header {
     /*justify-content: center;*/
 }
 
+
+/* =================================================== HEADER ====================================================== */
+
 header a:hover{
     color: hsl(50, 89%, 48%);
 }
@@ -101,10 +104,15 @@ header .menu {
 }
 
 header #header-login-register-div {
-    float: right;
+    display: flex;
     width: 20%;
-    text-align: right;
     margin: auto;
+    margin-left: 1rem;
+    justify-content: space-between;
+
+    button {
+        width: 45%;
+    }
 }
 
 header a, header .menu {
@@ -113,9 +121,9 @@ header a, header .menu {
     text-decoration: none;
 }
 
-.button-div {
+/* .button-div {
 
-    margin: auto;
+    margin-left: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -123,10 +131,22 @@ header a, header .menu {
     button {
         width: 45%;
     }
-}
+} */
 
 main {
     /*display: flex;*/
+}
+
+/* =================================================== INDEX ====================================================== */
+
+.hero{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: url(/images/home.jpg) no-repeat;
+    background-size: cover;
+    background-position: top;
+
 }
 
 .form-container {
@@ -161,6 +181,9 @@ main {
 #register-credentials-user-type-fieldset {
     margin-top: 5rem;
 }
+
+
+/* =================================================== TICKETS ====================================================== */
 
 #tickets-container {
     text-align: center;
@@ -530,6 +553,7 @@ dialog {
 
 dialog h3 {
     text-align: center;
+    color: var(--foreground);
 }
 
 dialog p {
@@ -547,3 +571,67 @@ dialog div {
     background-image: linear-gradient(45deg, magenta, rebeccapurple, dodgerblue, green);
     opacity: 0.45;
 }
+
+/* =================================================== LOGIN FORM ====================================================== */
+
+#login-form {
+    display: block;
+    padding: 0%;
+
+    p {
+        text-align: center;
+        align-content: center;
+        margin: 0.8rem;
+    }
+
+    .remember {
+        display: flex;
+        margin: 0.5rem;
+        padding: 0;
+
+        input{
+            text-align: center;
+            align-content: center;
+            width: 1rem;
+            margin: 0;
+
+        }
+
+        label{
+            width: 100%;
+            text-align:left;
+            align-content: center;
+            margin-left: 0.5rem;
+            padding: 0;
+        }
+    }
+    .form-buttons{
+        display: flex;
+        margin-top: 5%;
+        button{
+            width: 45%;
+            margin-right: 5%;
+            margin-left: 5%;
+
+        }
+
+
+    }
+    
+    .close-btn-class{
+        display: flex; /* Use flexbox layout */
+        justify-content: flex-end;
+        .close-btn {
+            position: absolute;
+            top: 0px;
+            padding: 0;
+            text-align: center;
+            align-content: center;
+            width: 10%;
+            margin-left: auto;
+        }
+
+    }
+
+}
+

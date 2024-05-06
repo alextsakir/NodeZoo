@@ -1,14 +1,28 @@
-<form action="/auth/" class="form-class" id="login-form" method="POST">
-    <h3>Login form</h3>
-    <input type="email" name="email" placeholder="Enter your email" class="login-form-input">
-    <input type="password" name="password" placeholder="Enter your password" class="login-form-input">
-    <div class="remember">
-        <input type="checkbox" name="" id="remember-me">
-        <label for="remember-me">remember me</label>
-    </div>
+{{!-- LOGIN IS HANDLED IN HEADER PARTIAL BCS OF HANLDEBARS... LOGIN.HBS IS NOT DOING ANYTHING MUST BE DELETED --}}
 
-    <div class="form-buttons">
-        <button type="reset">clear</button>
-        <button type="submit">login</button>
-    </div>
-</form>
+<dialog class="form-popup" id="my-form">
+        <form action="/api/login" class="form-container" id="login-form" method="POST">
+        <h3>Login form</h3>
+        <button type="button" class="close-btn" >x</button>
+        <input type="email" name="email" placeholder="Enter your email" class="login-form-input">
+        <input type="password" name="password" placeholder="Enter your password" class="login-form-input">
+        <div class="remember">
+            <input type="checkbox" name="" id="remember-me">
+            <label for="remember-me">remember me</label>
+        </div>
+
+        <div class="form-buttons">
+            <button type="reset" id="login-form-reset">clear</button>
+            <button type="submit" id="login-form-submit">login</button>
+        </div>
+    </form>
+
+</dialog>
+
+
+<script type="text/javascript">
+    const login_dialog = document.getElementById("login-form");
+    document.getElementById("login-button").addEventListener("click", () => {login_dialog.showModal();});
+    document.getElementById("login-form-submit").addEventListener("click", () => {login_dialog.close();});
+    function keyPress (e) { if(e.key === "Escape") { login_dialog.close(); } }
+</script>
