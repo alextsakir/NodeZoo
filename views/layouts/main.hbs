@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="/favicon.ico">
 </head>
 <body>
-    <header class="">
+    <header>
         <div id="header-logo-div">
             <a href="/index/" class="logo"><i class="needs-margin fas fa-paw"></i>MY ZOO</a>
         </div>
@@ -27,9 +27,9 @@
             <button id="register-button" onclick="window.location.href='/register/';">Register</button>
         </div>
         <div id="header-mobile-navigation-div">
-            <!-- <a href="#home" class="active">Logo</a> -->
+            <!-- TODO ===================================================== <a href="#home" class="active">Logo</a> -->
             <div id="header-mobile-navigation-close-div">
-                <a class="icon" onclick="hamburger();"><i class="fa fa-times"></i></a>
+                <a class="icon" onclick="hamburger();"><i class="fa fa-times"></i></a> <!-- - CLOSE HAMBURGER MENU  -->
             </div>
             <a href="/index/">Home</a>
             <a href="/gallery/">Gallery</a>
@@ -42,11 +42,11 @@
             </div>
         </div>
         <div id="header-mobile-hamburger-div">
-            <a class="icon" onclick="hamburger();"><i class="fa fa-bars"></i></a>
+            <a class="icon" onclick="hamburger();"><i class="fa fa-bars"></i></a> <!-- ---- OPEN HAMBURGER MENU --- -->
         </div>
     </header>
     <script type="text/javascript">
-        // const header = document.querySelector("header"); // TODO ------------------------------------ no more needed
+        // const header = document.querySelector("header"); // TODO -------------------------------------------- unused
         // window.onscroll = function () {
         //     if (window.scrollY > header.offsetTop) header.classList.add("sticky-header");
         //     else header.classList.remove("sticky-header");
@@ -73,11 +73,41 @@
         </form>
     </dialog>
     <script type="text/javascript">
-        const login_dialog = document.getElementById("login-form-dialog");
-        document.getElementById("login-button").addEventListener("click", () => {login_dialog.showModal();});
-        document.getElementById("login-button-mobile").addEventListener("click", () => {login_dialog.showModal();});
-        document.getElementById("login-form-submit").addEventListener("click", () => {login_dialog.close();});
-        function keyPress (e) { if(e.key === "Escape") login_dialog.close();}
+        const loginDialog = document.getElementById("login-form-dialog");
+        document.getElementById("login-button").addEventListener("click", () => {loginDialog.showModal();});
+        document.getElementById("login-button-mobile").addEventListener("click", () => {loginDialog.showModal();});
+        document.getElementById("login-form-submit").addEventListener("click", () => {loginDialog.close();});
+        // function keyPress (e) {if (e.key === "Escape") login_dialog.close();}
+    </script>
+
+    <dialog id="cookie-consent-dialog">
+        <div id="cookie-consent-content">
+            <h2>Your Cookie Preferences</h2> <hr>
+            <p>This website uses cookies to give our users the best experience.
+                You can manage your settings below or find out by reading our <a href="#">Cookie Policy</a>.</p>
+        </div>
+        <div id="cookie-consent-selection" class="button-div">
+            <button name="accept-cookies" value="false" id="cookie-consent-deny-button">Use Necessary Only</button>
+            <button name="accept-cookies" value="true" id="cookie-consent-allow-button">Allow All Cookies</button>
+        </div>
+    </dialog>
+    <script type="text/javascript">
+        const loginDialog = document.getElementById("login-form-dialog");
+        const cookieDialog = document.getElementById("cookie-consent-dialog");
+
+        document.addEventListener("keydown", (event) => {
+            if (event.altKey === true) {
+                if (event.key === "C") cookieDialog.showModal();
+                if (event.key === "L") loginDialog.showModal();
+            }
+            if (event.key === "L") loginDialog.showModal();  // fixme ------------------------------------ NOT WORKING
+        })
+
+        function keyPress (e) {
+            if(e.key === "C") cookieDialog.showModal();
+            if(e.key === "L") cookieDialog.showModal();
+        }
+        document.getElementById("cookie-consent-deny-button").addEventListener("click", () => {cookieDialog.close();});
     </script>
 
     <main class="content">

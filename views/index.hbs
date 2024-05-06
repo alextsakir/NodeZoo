@@ -1,5 +1,10 @@
 <section class="hero">
     <h1>Welcome to our website</h1>
+    <button id="cookie-test-button">Cookies Policy Trial</button>
+    <script type="text/javascript">
+        const button = document.getElementById("cookie-test-button");
+        button.addEventListener("click", () => {document.getElementById("cookie-consent-dialog").showModal();});
+    </script>
 
     <div class="hero-image">
         <img src="/images/home.jpg" alt="to be completed">
