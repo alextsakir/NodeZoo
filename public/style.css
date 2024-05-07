@@ -17,7 +17,7 @@
 
 html {
     box-sizing: border-box;
-    font-family: "Cambria Math", sans-serif;
+    font-family: "Cambria Math", sans-serif; !important
     font-size: 12pt;
     margin: 0;
     padding: 0;
@@ -89,7 +89,10 @@ html {
 /* ===================================================== SCROLLBAR ================================================= */
 
 /*These are the vendor-prefixed properties offered by the relevant rendering engines:
--webkit for Chrome, Safari; -moz for Firefox, -o for Opera, -ms for Internet Explorer */
+-webkit for Chrome, Safari; -moz for Firefox, -o for Opera, -ms for Internet Explorer
+Blink is a browser engine developed as part of the free and open-source Chromium project.
+Blink is by far the most-used browser engine, due to the market share dominance of Google Chrome and the fact
+that many other browsers are based on the Chromium code. */
 
 /*Commonly used media breakpoints
 320px — 480px: Mobile devices
@@ -270,7 +273,6 @@ header {
 /* =================================================== INPUT ======================================================= */
 
 input {
-
     text-align: center;
     width: 100%;
     padding: 15px;
@@ -279,18 +281,36 @@ input {
     border-radius: 8px;
     background: var(--background-beta);
     color: var(--foreground);
+
+    &[type="date"] {
+        /*color: white;*/
+    }
+
+    &:hover {
+        background: var(--background-gamma);
+    }
+
+    &:focus {
+        background: var(--background-delta);
+        outline: none;
+    }
+
+    &:-webkit-autofill::first-line, /* -------- Chrome Issue 953689: Previously entered form values overrides styling*/
+    &:-webkit-autofill, &:-webkit-autofill:hover, &:-webkit-autofill:focus, &:-webkit-autofill:active {
+        -webkit-text-fill-color: yellow !important;
+        font-family: "Cambria Math", sans-serif; /*note -------------- NOT REDUNDANT, copying from Chromium bugs forum:
+        A flaw in how autocomplete preview text is handled that allows stored autocomplete data to be leaked
+        from the user's browser to a malicious webpage. The attack depended on changing the font-family of the
+        textarea and observing the impact on its scrollWidth property, then using this to infer the exact sequence
+        of characters present in the textarea. The specific exploit was patched by making the user agent stylesheet
+        specify a font-family with !important for textarea preview text, thus preventing it from being overridden.
+        However, the exploit can be trivially made to work again by simply modifying the font-family of the
+        ::first-line pseudo-element of the textarea instead of the textarea itself.*/
+
+        -webkit-box-shadow: 0 0 110px 300px var(--background-beta) inset !important; /*idiot Chrome autofill behavior*/
+        transition: background-color 500s ease-in-out 0s;
+    }
 }
-
-input:hover {
-    background: var(--background-gamma);
-}
-
-input:focus {
-    background: var(--background-delta);
-    outline: none;
-}
-
-
 
 .button-div {
     margin: auto;
@@ -318,13 +338,6 @@ input:focus {
     text-align: center;
     margin: auto;
     min-height: 60rem;
-}
-
-#register-form {
-    /*display: grid;*/
-    /*grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));*/
-    /*grid-template-columns: 70% 70%;*/
-    /*gap: 0.2rem;*/
 }
 
 #register-credentials-fieldset {

@@ -65,10 +65,10 @@ class Database {
     tickets = [
         new Ticket("Παιδικό", "Child", "child ticket", 5),
         new Ticket("Ενήλικας", "Adult", "adult ticket", 12),
-        new Ticket("ΑμΕΑ", "Disabled", "disabled ticket", 8)
-    ]
+        new Ticket("ΑμεΑ", "Disabled", "disabled ticket", 8)
+    ];
 
-    users = [    ]
+    users = [];
 
     saveSubscription(user) {
         // todo-- for now it only appends the users array of class Database
