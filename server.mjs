@@ -180,31 +180,41 @@ class API {
         console.log("got here");
         console.log(request.body);  // todo doesn't get birth date, user type and password -> update(by bobotas): it does now!!  nice
         let email = request.body.email;
+        let emailPattern =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // regular expression for email validation
+                                                                                //source: https://www.geeksforgeeks.org/javascript-program-to-validate-an-email-address/
+        let isValid_email = emailPattern.test(email);
         let enderedPassword = request.body.password;
         let c_enderedPassword = request.body.confirm_password;
 
-        if (enderedPassword == c_enderedPassword) {
-            const saltRounds =  10
-            bcrypt.hash(enderedPassword, saltRounds, function(err, hash) {
-                let user = new User(request.body.first_name,
-                                     request.body.last_name,
-                                     request.body.street,
-                                     request.body.town,
-                                     request.body.postal_code,
-                                     request.body.birthdate,
-                                     request.body.phone,
-                                     request.body.email,
-                                     hash)
-                database.saveSubscription(user); //
-            })
-
-
-            
-
+        if(isValid_email){
+            if (enderedPassword == c_enderedPassword) {
+                const saltRounds =  10
+                bcrypt.hash(enderedPassword, saltRounds, function(err, hash) {
+                    let user = new User(request.body.first_name,
+                                         request.body.last_name,
+                                         request.body.street,
+                                         request.body.town,
+                                         request.body.postal_code,
+                                         request.body.birthdate,
+                                         request.body.phone,
+                                         request.body.email,
+                                         hash)
+                    database.saveSubscription(user); //
+                })
+    
+    
+                
+    
+            } else {
+                // should say sth like: "Passwords dont match" ---TODO
+                response.redirect("/register");
+            }
         } else {
-            // should say sth like: "Passwords dont match" ---TODO
+            // should say sth like: "The email address you provided isnt valid" --TODO
             response.redirect("/register");
         }
+        
+       
 
         // console.log(email);
         // console.log(enderedPassword);
