@@ -132,6 +132,7 @@ header {
     position: fixed;
     top: 0;
     width: 100%;
+    z-index: 20;
     align-content: center;
     background: var(--alpha_color);
     display: flex;
@@ -153,7 +154,7 @@ header {
     }
 
     #header-logo-div, #header-menu-div, #header-login-register-div {
-        border: 0.1em dashed floralwhite;
+        /*border: 0.1em dashed floralwhite;*/
         margin: 5rem;
     }
 
