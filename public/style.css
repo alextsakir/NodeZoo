@@ -749,6 +749,70 @@ dialog {
     opacity: 0.45;
 }
 
+/*  =================================================== LOGIN-FORM ====================================================== */
+
+#login-form {
+    display: block;
+    padding: 0%;
+
+    p {
+        text-align: center;
+        align-content: center;
+        margin: 0.8rem;
+    }
+
+    .remember {
+        display: flex;
+        margin: 0.5rem;
+        padding: 0;
+
+        input{
+            text-align: center;
+            align-content: center;
+            width: 1rem;
+            margin: 0;
+
+        }
+
+        label{
+            width: 100%;
+            text-align:left;
+            align-content: center;
+            margin-left: 0.5rem;
+            padding: 0;
+        }
+    }
+    .form-buttons{
+        display: flex;
+        margin-top: 5%;
+        button{
+            width: 45%;
+            margin-right: 5%;
+            margin-left: 5%;
+
+        }
+
+
+    }
+    
+    .close-btn-class{
+        display: flex; /* Use flexbox layout */
+        justify-content: flex-end;
+        .close-btn {
+            position: absolute;
+            top: 0px;
+            padding: 0;
+            text-align: center;
+            align-content: center;
+            width: 7%;
+            margin-left: auto;
+            font-size: 1.2rem;
+        }
+
+    }
+
+}
+
 /*  =================================================== GALLERY ====================================================== */
 .gallery-title{
     text-align: center;

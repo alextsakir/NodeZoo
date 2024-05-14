@@ -60,6 +60,10 @@
 
     <dialog class="form-popup" id="login-form-dialog">
         <form action="/api/login" class="form-container" id="login-form" method="POST">
+            <div class="close-btn-class"> 
+            <button type="button" class="close-btn" id="close-btn" >x</button> 
+            </div>
+            <p>Login form</p>
             <input type="email" name="email" placeholder="Enter your email" class="login-form-input">
             <input type="password" name="password" placeholder="Enter your password" class="login-form-input">
             <div class="remember">
@@ -74,9 +78,11 @@
     </dialog>
     <script type="text/javascript">
         const loginDialog = document.getElementById("login-form-dialog");
+        const close_btn = document.getElementById("close-btn");
         document.getElementById("login-button").addEventListener("click", () => {loginDialog.showModal();});
         document.getElementById("login-button-mobile").addEventListener("click", () => {loginDialog.showModal();});
         document.getElementById("login-form-submit").addEventListener("click", () => {loginDialog.close();});
+        close_btn.addEventListener("click", () => {loginDialog.close(); console.log("close btn clicked")});
         // function keyPress (e) {if (e.key === "Escape") login_dialog.close();}
     </script>
 
