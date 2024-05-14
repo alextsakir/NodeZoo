@@ -117,7 +117,20 @@ function dashboard(request, response) {
 
 function gallery(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: gallery rendered");
-    response.render("gallery", {layout: "main", title: "Gallery"});
+    fs.readdir('images', (err, files) => {
+        if (err) {
+            console.error('Error reading images directory:', err);
+            response.status(500).send('Internal Server Error');
+        } else {
+            // Render the gallery page and pass the list of image files to it
+            let images = files.map(fileName => fileName.replace(/\.jpg$/, ''));
+            const imagesToRemove = ['gallery-1','gallery-2','gallery-3','gallery-4','home'];
+            images = images.filter(item => !imagesToRemove.includes(item));
+            console.log(images);
+            response.render('gallery', {layout: "main", title: "Gallery", images });
+        }
+    });
+    // response.render("gallery", {layout: "main", title: "Gallery"});
 }
 
 function login(request, response) {

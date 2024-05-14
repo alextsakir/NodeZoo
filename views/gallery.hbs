@@ -1,5 +1,10 @@
 
-    <h1>Gallery</h1>
-    <h1>Hello World!</h1>
-    <h2>Welcome to FlaskApp!</h2>
-    <h3>{{ utc_dt }}</h3>
+<h1 class="gallery-title">Gallery</h1>
+<div class="gallery">
+        {{#each images}}
+            <div class="gallery-item">
+                <img src="/images/{{this}}.jpg" alt="{{this}}">
+                <div class="image-label">{{this}}</div>
+            </div>
+        {{/each}}
+</div>

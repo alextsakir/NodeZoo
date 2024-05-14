@@ -748,3 +748,47 @@ dialog {
     background-image: linear-gradient(45deg, magenta, rebeccapurple, dodgerblue, green);
     opacity: 0.45;
 }
+
+/*  =================================================== GALLERY ====================================================== */
+.gallery-title{
+    text-align: center;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(200px, 1fr));
+    grid-gap: 25px;
+    justify-items: center;
+    padding: 1rem;
+}
+
+.gallery-item {
+position: relative;
+}
+
+.gallery-item img {
+width: 100%;
+height: auto;
+border-radius: 5px;
+}
+
+.image-label {
+position: absolute;
+bottom: 5px;
+left: 0;
+width: 100%;
+text-align: center;
+background-color: rgba(0, 0, 0, 0.7);
+color: #fff;
+font-size: 12px;
+padding: 5px;
+border-bottom-left-radius: 5px;
+border-bottom-right-radius: 5px;
+}
+
+@media screen and (max-width: 1000px) {
+    .gallery{
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+   }
+
+}
