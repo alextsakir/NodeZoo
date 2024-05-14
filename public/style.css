@@ -848,11 +848,14 @@ dialog {
     position: relative;
     border: none;
     border-radius: 20px;
+    border: 2px solid transparent; /* Initially set a transparent border */
+    transition: border-color 0.3s ease; /* Add transition effect for smooth change */
 
 }
 
 .gallery-item:hover {
     cursor: pointer;
+    border-color: var(--gamma_color);
 
 }
 
