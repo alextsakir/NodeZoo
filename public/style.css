@@ -271,6 +271,24 @@ header {
     }
 }
 
+/* INDEX */
+.hero{
+    display: flexbox;
+}
+
+.hero-image{
+    position: inherit;
+}
+
+.hero-image img{
+    width: 100%;
+    height: auto;
+}
+
+
+
+
+
 /* =================================================== INPUT ======================================================= */
 
 input {
