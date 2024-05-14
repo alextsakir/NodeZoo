@@ -57,7 +57,8 @@
             else mobileNavigation.style.display = "block";
         }
         // ---------------------------------------- HIGHLIGHT CURRENT TAB ---------------------------------------------
-        const pathName = window.location.pathname, tabs = document.getElementsByClassName("header-tab");
+        let pathName = window.location.pathname, tabs = document.getElementsByClassName("header-tab");
+        if (pathName === "/") pathName = "/index/";
         for (let tab of document.getElementsByClassName("header-tab"))
             if (tab.href.includes(pathName)) tab.style.textDecoration="underline";  // -------------- match current url
     </script>

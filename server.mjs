@@ -169,7 +169,7 @@ router.route("/contact").get(contact);
 router.route("/dashboard").get(dashboard);
 router.route("/gallery").get(gallery);
 router.route("/hello").get((request, response) => response.send("Hello World!"));
-router.route("/home").get(index);
+router.route("/home").get(index);  // -------------------------------------------------------------------------- unused
 router.route("/index").get(index);
 router.route("/login").get(login);
 router.route("/payment").get(payment);
