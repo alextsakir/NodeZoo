@@ -3,6 +3,7 @@
 
 "use strict";
 
+import db from "better-sqlite3";
 import express from "express";
 import {engine} from "express-handlebars";
 import bcrypt from "bcrypt";
@@ -17,6 +18,7 @@ const Locale = Object.freeze({EN: Symbol("ENGLISH"), GR: Symbol("GREEK")});
 const DEBUG_FUNCTION_CALL = true; const LOCALE = Locale.EN;
 
 const application = express();
+const sql = new db("model/storage.sqlite", {fileMustExist: true});
 // application.use(express.static(path.join(__dirname, "public")));
 // todo ------------------- __dirname is available only in CommonJS, in ES we have to set it manually, I'll do it later
 application.use(express.static("public")); // -------------------------------------------------- static files directory
@@ -102,7 +104,21 @@ function about(request, response) {
 
 function animals(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: animals rendered");
-    response.render("animals", {layout: "main", title: "Animals"});
+        fs.readdir('images', (err, files) => {
+        if (err) {
+            console.error('Error reading images directory:', err);
+            response.status(500).send('Internal Server Error');
+        } else {
+            // Render the gallery page and pass the list of image files to it
+            let images = files.map(fileName => fileName.replace(/\.jpg$/, ''));
+            const imagesToRemove = ['gallery-1','gallery-2','gallery-3','gallery-4','home'];
+            images = images.filter(item => !imagesToRemove.includes(item));
+            // console.log(images);
+            let animals = sql.prepare("select name, description from animal").all();
+            // console.log(animals);
+            response.render('animals', {layout: "main", title: "Animals", animals });
+        }
+    });
 }
 
 function contact(request, response) {
@@ -117,20 +133,6 @@ function dashboard(request, response) {
 
 function gallery(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: gallery rendered");
-    fs.readdir('images', (err, files) => {
-        if (err) {
-            console.error('Error reading images directory:', err);
-            response.status(500).send('Internal Server Error');
-        } else {
-            // Render the gallery page and pass the list of image files to it
-            let images = files.map(fileName => fileName.replace(/\.jpg$/, ''));
-            const imagesToRemove = ['gallery-1','gallery-2','gallery-3','gallery-4','home'];
-            images = images.filter(item => !imagesToRemove.includes(item));
-            console.log(images);
-            response.render('gallery', {layout: "main", title: "Gallery", images });
-        }
-    });
-    // response.render("gallery", {layout: "main", title: "Gallery"});
 }
 
 function login(request, response) {
@@ -176,9 +178,13 @@ router.route("/registered").get(registered);
 router.route("/tickets").get(tickets);
 
 // ==================================================== API ===========================================================
-// =============================================== POST METHODS =======================================================
 
 class API {
+
+    static animalDescription(request, response) {
+        if (DEBUG_FUNCTION_CALL === true) console.log("API animal description");
+        console.log(request.body);
+    }
 
     static login(request, response) {
         if (DEBUG_FUNCTION_CALL === true) console.log("API login");
@@ -196,13 +202,13 @@ class API {
         let emailPattern =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // regular expression for email validation
                                                                                 //source: https://www.geeksforgeeks.org/javascript-program-to-validate-an-email-address/
         let isValid_email = emailPattern.test(email);
-        let enderedPassword = request.body.password;
+        let enteredPassword = request.body.password;
         let c_enderedPassword = request.body.confirm_password;
 
         if(isValid_email){
-            if (enderedPassword == c_enderedPassword) {
+            if (enteredPassword === c_enderedPassword) {
                 const saltRounds =  10
-                bcrypt.hash(enderedPassword, saltRounds, function(err, hash) {
+                bcrypt.hash(enteredPassword, saltRounds, function(err, hash) {
                     let user = new User(request.body.first_name,
                                          request.body.last_name,
                                          request.body.street,
@@ -252,6 +258,7 @@ class API {
     }
 }
 
+router.route("/api/animal-description").get(API.animalDescription);
 router.route("/api/login").post(API.login);
 router.route("/api/register").post(API.register);
 router.route("/api/subscribe").post(API.subscribe);

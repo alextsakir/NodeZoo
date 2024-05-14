@@ -150,7 +150,8 @@ header {
     }
 
     .active-tab, .active-tab-mobile {
-        color: var(--foreground);
+        /*color: var(--foreground);*/
+        color: black;
     }
 
     #header-logo-div, #header-menu-div, #header-login-register-div {
@@ -842,6 +843,30 @@ dialog {
     grid-gap: 25px;
     justify-items: center;
     padding: 1rem;
+
+    .animal-dialog {
+        text-align: center;
+        div {
+            width: 100%;
+            text-align: right;
+            a {
+                color: var(--gamma_color);
+                transition: 500ms linear;
+            }
+            a:hover {
+                color: hsl(50, 89%, 38%);
+            }
+        }
+        h2, p {
+            color: var(--foreground);
+        }
+        p {
+            font-size: 0.9rem;
+        }
+        img {
+            width: 60%;
+        }
+    }
 }
 
 .gallery-item {

@@ -15,11 +15,11 @@
         </div>
         <div id="header-menu-div">
             <nav class="header-menu">
-                <a href="/index/">Home</a>
-                <a href="/gallery/">Gallery</a>
-                <a href="/tickets/">Tickets</a>
-                <a href="/animals/">Animals</a>
-                <a href="/about/">About</a>
+                <a href="/index/" class="header-tab">Home</a>
+                <!-- <a href="/gallery/">Gallery</a>-->
+                <a href="/tickets/" class="header-tab">Tickets</a>
+                <a href="/animals/" class="header-tab">Animals</a>
+                <a href="/about/" class="header-tab">About</a>
             </nav>
         </div>
         <div class="button-div" id="header-login-register-div">
@@ -32,7 +32,7 @@
                 <a class="icon" onclick="hamburger();"><i class="fa fa-times"></i></a> <!-- - CLOSE HAMBURGER MENU  -->
             </div>
             <a href="/index/">Home</a>
-            <a href="/gallery/">Gallery</a>
+            <!-- <a href="/gallery/">Gallery</a>-->
             <a href="/tickets/">Tickets</a>
             <a href="/animals/">Animals</a>
             <a href="/about/">About</a>
@@ -56,12 +56,24 @@
             if (mobileNavigation.style.display === "block") mobileNavigation.style.display = "none";
             else mobileNavigation.style.display = "block";
         }
+        let tabs = document.getElementsByClassName("header-tab");
+        function changeActive(event) {
+            console.log("change active tab");
+            for (let index = 0; index < tabs.length; index++) {
+                tabs[index].className = tabs[index].className.replace(" active-tab", "");
+            }
+            event.currentTarget.className += " active-tab";
+        }
+        for (let tab of tabs) {
+            tab.addEventListener("click", changeActive)
+        }
     </script>
 
     <dialog class="form-popup" id="login-form-dialog">
         <form action="/api/login" class="form-container" id="login-form" method="POST">
             <div class="close-btn-class"> 
-            <button type="button" class="close-btn" id="close-btn" >x</button> 
+<!--            <button type="button" class="close-btn" id="close-btn" >x</button>-->
+                <a id="close-btn"><i class="fa fa-times"></i></a>
             </div>
             <p>Login form</p>
             <input type="email" name="email" placeholder="Enter your email" class="login-form-input">

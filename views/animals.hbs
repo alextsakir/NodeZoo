@@ -1,8 +1,44 @@
 
-    <h4>animals panel</h4>
+<h1 class="gallery-title">Animals</h1>
+<div class="gallery">
+    <dialog class="animal-dialog">
+        <div><a class="close"><i class="fa fa-times"></i></a></div>
+        <h2></h2>
+        <img alt="" src="">
+        <p></p>
+    </dialog>
     <script>
+        let divisionCollection, division, dialog;
+    </script>
+    {{#each animals}}
+        <div class="gallery-item">
+            <img src="/images/{{this.name}}.jpg" alt="{{this.name}}">
+            <div class="image-label">{{this.name}}</div>
+        </div>
+        <script>
+            divisionCollection = document.getElementsByClassName("gallery-item");
+            division = divisionCollection[divisionCollection.length - 1];
+            console.log(division);
+            dialog = document.querySelector(".animal-dialog");
+            division.addEventListener("click", () => {
+                console.log("hi");
+                dialog.querySelector("h2").innerHTML = "{{this.name}}";
+                dialog.querySelector("img").src = "/images/{{this.name}}.jpg";
+                dialog.querySelector("img").alt = "{{this.name}}";
+                dialog.querySelector("p").innerHTML = "{{this.description}}";
+
+                // fetch("/api/animalDescription/", {method: "GET"})
+                dialog.showModal();
+            });
+            dialog.querySelector("div").addEventListener("click", () => {dialog.close();});
+
+        </script>
+    {{/each}}
+</div>
+
+<script>
     function play() {
     const audio = new Audio("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3");
     audio.play();
-}
-    </script>
+    }
+</script>
