@@ -254,7 +254,7 @@ class API {
     static ticketsSelected(request, response) {
         if (DEBUG_FUNCTION_CALL === true) console.log("API tickets");
         console.log(request.body);
-        response.redirect("/payment");
+        response.redirect(302, "/payment");
     }
 }
 
