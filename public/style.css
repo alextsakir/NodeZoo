@@ -838,20 +838,29 @@ dialog {
 
 .gallery {
     display: grid;
-    grid-template-columns: repeat(4, minmax(200px, 1fr));
+    grid-template-columns: repeat(6, minmax(200px, 1fr));
     grid-gap: 25px;
     justify-items: center;
     padding: 1rem;
 }
 
 .gallery-item {
-position: relative;
+    position: relative;
+    border: none;
+    border-radius: 20px;
+
+}
+
+.gallery-item:hover {
+    cursor: pointer;
+
 }
 
 .gallery-item img {
-width: 100%;
-height: auto;
-border-radius: 5px;
+    width: 100%;
+    height: auto;
+        border-radius: 20px;
+
 }
 
 .image-label {
@@ -864,11 +873,11 @@ background-color: rgba(0, 0, 0, 0.7);
 color: #fff;
 font-size: 12px;
 padding: 5px;
-border-bottom-left-radius: 5px;
-border-bottom-right-radius: 5px;
+border-bottom-left-radius: 20px;
+border-bottom-right-radius: 20px;
 }
 
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 1500px) {
     .gallery{
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
    }

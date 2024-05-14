@@ -98,15 +98,15 @@
         </div>
     </dialog>
     <script type="text/javascript">
-        const loginDialog = document.getElementById("login-form-dialog");
+        const loginDialogNew = document.getElementById("login-form-dialog");
         const cookieDialog = document.getElementById("cookie-consent-dialog");
 
         document.addEventListener("keydown", (event) => {
             if (event.altKey === true) {
                 if (event.key === "C") cookieDialog.showModal();
-                if (event.key === "L") loginDialog.showModal();
+                if (event.key === "L") loginDialogNew.showModal();
             }
-            if (event.key === "L") loginDialog.showModal();  // fixme ------------------------------------ NOT WORKING
+            if (event.key === "L") loginDialogNew.showModal();  // fixme --------------------------------- NOT WORKING
         })
 
         function keyPress (e) {
@@ -163,9 +163,13 @@
                     </div>
                 </dialog>
                 <script type="text/javascript">
-                    const dialog = document.getElementById("accessibility-dialog");
-                    document.getElementById("accessibility").addEventListener("click", () => {dialog.showModal();});
-                    document.getElementById("close-accessibility").addEventListener("click", () => {dialog.close();});
+                    const accessibilityDialog = document.getElementById("accessibility-dialog");
+                    document.getElementById("accessibility").addEventListener("click", () => {
+                        accessibilityDialog.showModal();
+                    });
+                    document.getElementById("close-accessibility").addEventListener("click", () => {
+                        accessibilityDialog.close();
+                    });
                 </script>
             </div>
 
