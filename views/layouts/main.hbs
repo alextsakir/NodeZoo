@@ -56,17 +56,10 @@
             if (mobileNavigation.style.display === "block") mobileNavigation.style.display = "none";
             else mobileNavigation.style.display = "block";
         }
-        let tabs = document.getElementsByClassName("header-tab");
-        function changeActive(event) {
-            console.log("change active tab");
-            for (let index = 0; index < tabs.length; index++) {
-                tabs[index].className = tabs[index].className.replace(" active-tab", "");
-            }
-            event.currentTarget.className += " active-tab";
-        }
-        for (let tab of tabs) {
-            tab.addEventListener("click", changeActive)
-        }
+        // ---------------------------------------- HIGHLIGHT CURRENT TAB ---------------------------------------------
+        const pathName = window.location.pathname, tabs = document.getElementsByClassName("header-tab");
+        for (let tab of document.getElementsByClassName("header-tab"))
+            if (tab.href.includes(pathName)) tab.style.textDecoration="underline";  // -------------- match current url
     </script>
 
     <dialog class="form-popup" id="login-form-dialog">
