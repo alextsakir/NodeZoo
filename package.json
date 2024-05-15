@@ -10,6 +10,7 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^10.0.0",
+    "connect-sqlite3": "^0.9.15",
     "cookie-parser": "^1.4.6",
     "express": "^4.19.2",
     "express-handlebars": "^7.1.2",

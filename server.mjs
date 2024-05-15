@@ -5,6 +5,7 @@
 
 import cookieParser from "cookie-parser";
 import db from "better-sqlite3";
+import sqliteStore from 'connect-sqlite3';
 import express from "express";
 import {engine} from "express-handlebars";
 import bcrypt from "bcrypt";
@@ -33,11 +34,14 @@ application.engine("hbs", engine({extname: "hbs"}));
 application.set("view engine", "hbs"); // todo ------------------------------------------------- do we need both lines?
 const router = express.Router();
 application.use(router);  // forgot to write it, I was crying for an hour
+application.use(passport.initialize());
+const sqliteStoreSession = sqliteStore(session);
 application.use(session({
     secret: "secret",
     saveUninitialized: false,
     cookie: {maxAge: 1000 * 60 * 60 * 24},
-    resave: false
+    resave: false,
+    store: new sqliteStoreSession({db: 'session.sqlite',dir: './model/sessions'})
 }));
 const PORT = process.env.PORT || "3000"; // env file to store db credentials and port
 
@@ -94,21 +98,27 @@ class Database {
 const database = new Database();
 
 passport.use(new LocalStrategy({
-      email: "email",
-      password: "password"
+    usernameField: "email",
+    passwordField: "password"
     },
     (email, password, done) => {
         const user = database.users.find(user => user.email === email);
         console.log("Local Strategy");
         console.log(user);
-        return done(null, user);
+        // return done(null, user, {message: 'Authorized'});
         if (!user) {
             return done(null, false, { message: 'Incorrect username.' });
         }
-        if (user.password !== password) {
-            return done(null, false, { message: 'Incorrect password.' });
-        }
-        return done(null, user);
+        bcrypt.compare(password, user.password, (err, result) => {
+            if (err) {
+                return done(err);
+            }
+            if (!result) {
+                console.log("Incorrect password.");
+                return done(null, false, { message: 'Incorrect password.' });
+            }
+            return done(null, user);
+        });
     }
 ));
 
@@ -141,7 +151,7 @@ function about(request, response) {
 }
 
 function animals(request, response) {
-    if (DEBUG_FUNCTION_CALL === true) console.log("router: animals rendered");
+    if (DEBUG_FUNCTION_CALL === true) console.log("router: animals rendered"); console.log(request.session);
         fs.readdir('images', (err, files) => {
         if (err) {
             console.error('Error reading images directory:', err);
@@ -237,7 +247,7 @@ class API {
         // https://medium.com/@jasondotparse/add-user-authentication-to-your-node-expressjs-application-using-bcrypt-81bb0f618ab3
         if (DEBUG_FUNCTION_CALL === true) console.log("API register");
         console.log("got here");
-        console.log(request.body);  // todo doesn't get birth date, user type and password -> update(by bobotas): it does now!!  nice
+        // console.log(request.body);  // todo doesn't get birth date, user type and password -> update(by bobotas): it does now!!  nice
         let email = request.body.email;
         let emailPattern =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // regular expression for email validation
                                                                                 //source: https://www.geeksforgeeks.org/javascript-program-to-validate-an-email-address/
@@ -278,7 +288,8 @@ class API {
     static subscribe(request, response) {
         if (DEBUG_FUNCTION_CALL === true) console.log("API subscribe");
         console.log(request.body);
-        response.redirect(request.route);
+        response.status(204).send();
+        // response.redirect(request.route);
         // response.sendStatus(200);
     }
 
@@ -290,21 +301,38 @@ class API {
         else response.send(404);
     }
 }
-let alpha = passport.authenticate("local", {
-        successRedirect: '/index',
-        failureRedirect: '/login'
-        // failureFlash: true
-    })
+// let alpha = passport.authenticate("local", {
+//         successRedirect: '/index',
+//         failureRedirect: '/login'
+//         // failureFlash: true
+//     })
 
 router.route("/api/animal-description").get(API.animalDescription);
 // router.route("/api/login").post(API.login);
-application.post("/api/login", function (request, response) {
-    console.log(request.body);
-    alpha(request, response);
-});
+
 router.route("/api/register").post(API.register);
 router.route("/api/subscribe").post(API.subscribe);
 router.route("/api/tickets-selected").post(API.ticketsSelected);
+application.post("/api/login", function (request, response, next) {
+    passport.authenticate("local", function (err, user, next) {
+        keepSessionInfo: true;
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return  response.status(204).send();
+            ; // ή επιστροφή μηνύματος λάθους
+        }
+        request.login(user, function (err) {
+            if (err) {
+                return next(err);
+            }
+            console.log("You logged in");
+            console.log("SESSION: ", request.session);
+            return response.status(204).send(); // ή οποιαδήποτε άλλη διαδρομή θέλετε να ανακατευθύνετε τον χρήστη
+        });
+    })(request, response, next);
+});
 
 // ================================================== RUN APP =========================================================
 
