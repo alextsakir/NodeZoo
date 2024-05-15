@@ -3,6 +3,7 @@
 
 "use strict";
 
+import cookieParser from "cookie-parser";
 import db from "better-sqlite3";
 import express from "express";
 import {engine} from "express-handlebars";
@@ -11,6 +12,7 @@ import fs from "fs";
 import http from "http";
 import fetch from "node-fetch"; // has to be npm installed
 import path from "path";
+import session from "express-session";
 
 // ================================================ CONFIGURATION =====================================================
 
@@ -23,6 +25,7 @@ const sql = new db("model/storage.sqlite", {fileMustExist: true});
 // todo ------------------- __dirname is available only in CommonJS, in ES we have to set it manually, I'll do it later
 application.use(express.static("public")); // -------------------------------------------------- static files directory
 application.use("/images", express.static("images")); // --------------------------------------------- images directory
+application.use(cookieParser());
 application.use(express.json()); // ------------------------------------ parse incoming JSON data in the request bodies
 application.use(express.urlencoded({extended: true})); // ------------------- specify library to parse URL-encoded data
 application.engine("hbs", engine({extname: "hbs"}));
@@ -30,7 +33,16 @@ application.engine("hbs", engine({extname: "hbs"}));
 application.set("view engine", "hbs"); // todo ------------------------------------------------- do we need both lines?
 const router = express.Router();
 application.use(router);  // forgot to write it, I was crying for an hour
+application.use(session({
+    secret: "secret",
+    saveUninitialized: false,
+    cookie: {maxAge: 1000 * 60 * 60 * 24},
+    resave: false
+}));
 const PORT = process.env.PORT || "3000"; // env file to store db credentials and port
+
+import passport from "passport";
+import {Strategy as LocalStrategy} from "passport-local";
 
 // ================================================== DATABASE ========================================================
 
@@ -46,7 +58,7 @@ class Ticket {
     }
 }
 
-class User{
+class User {
     constructor(firstname, lastname, address, city, postal_code, birthdate, telephone, email, password) {
         this.firstname = firstname;
         this.lastname = lastname;
@@ -55,11 +67,9 @@ class User{
         this.postal_code = postal_code;
         this.birthdate = birthdate;
         this.telephone = telephone;
-        this.email = email;
+        this.email = email;  // Primary Key
         this.password = password;
     }
-
-    
 }
 
 class Database {
@@ -83,11 +93,39 @@ class Database {
 
 const database = new Database();
 
+passport.use(new LocalStrategy({
+      email: "email",
+      password: "password"
+    },
+    (email, password, done) => {
+        const user = database.users.find(user => user.email === email);
+        console.log("Local Strategy");
+        console.log(user);
+        return done(null, user);
+        if (!user) {
+            return done(null, false, { message: 'Incorrect username.' });
+        }
+        if (user.password !== password) {
+            return done(null, false, { message: 'Incorrect password.' });
+        }
+        return done(null, user);
+    }
+));
+
+passport.serializeUser((user, done) => {
+    done(null, user.email);
+});
+passport.deserializeUser((email, done) => {
+    const user = database.users.find(user => user.email === email);
+    done(null, user);
+});
+
 // =================================================== ROUTER =========================================================
 // ================================================ GET METHODS =======================================================
 
 function index(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: index rendered");
+    console.log("SESSION: ", request.session);
     response.render("index", {layout: "main", title: "Patras Zoo"});
     // ------------------------------------------------------------- with layout you can change the Handlebars template
 }
@@ -189,7 +227,9 @@ class API {
     static login(request, response) {
         if (DEBUG_FUNCTION_CALL === true) console.log("API login");
         console.log(request.body);
-        response.redirect(request.route);
+
+        // if (request.body)
+        response.status(204).send();
         // todo --------------------------------------------------- there must be a response, not just a OK status code
     }
 
@@ -220,10 +260,6 @@ class API {
                                          hash)
                     database.saveSubscription(user); //
                 })
-    
-    
-                
-    
             } else {
                 // should say sth like: "Passwords dont match" ---TODO
                 response.redirect("/register");
@@ -232,13 +268,8 @@ class API {
             // should say sth like: "The email address you provided isnt valid" --TODO
             response.redirect("/register");
         }
-        
-       
-
         // console.log(email);
         // console.log(enderedPassword);
-
-
         //-------------------------------------------------
         // database.saveSubscription(request.body["email"]);
         response.redirect("/registered");
@@ -254,12 +285,23 @@ class API {
     static ticketsSelected(request, response) {
         if (DEBUG_FUNCTION_CALL === true) console.log("API tickets");
         console.log(request.body);
-        response.redirect(302, "/payment");
+        if (request.isAuthenticated())
+            response.redirect(302, "/payment");
+        else response.send(404);
     }
 }
+let alpha = passport.authenticate("local", {
+        successRedirect: '/index',
+        failureRedirect: '/login'
+        // failureFlash: true
+    })
 
 router.route("/api/animal-description").get(API.animalDescription);
-router.route("/api/login").post(API.login);
+// router.route("/api/login").post(API.login);
+application.post("/api/login", function (request, response) {
+    console.log(request.body);
+    alpha(request, response);
+});
 router.route("/api/register").post(API.register);
 router.route("/api/subscribe").post(API.subscribe);
 router.route("/api/tickets-selected").post(API.ticketsSelected);

@@ -18,10 +18,8 @@
         <script type="text/javascript">
             divisionCollection = document.getElementsByClassName("animal");
             division = divisionCollection[divisionCollection.length - 1];
-            // console.log(division);
             dialog = document.querySelector(".animal-dialog");
             division.addEventListener("click", () => {
-                // console.log("hi");
                 dialog.querySelector("h2").innerHTML = "{{this.name}}";
                 dialog.querySelector("img").src = "/images/{{this.name}}.jpg";
                 dialog.querySelector("img").alt = "{{this.name}}";
