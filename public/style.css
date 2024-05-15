@@ -769,6 +769,7 @@ dialog {
 
     a:hover {
         color: hsl(50, 89%, 38%);
+        cursor: pointer;
     }
 
     .remember {
