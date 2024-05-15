@@ -1,44 +1,55 @@
 
-<h1 class="gallery-title">Animals</h1>
-<div class="gallery">
+<h1 class="animals-title">Animals</h1>
+<div class="animals">
     <dialog class="animal-dialog">
         <div><a class="close"><i class="fa fa-times"></i></a></div>
         <h2></h2>
         <img alt="" src="">
         <p></p>
     </dialog>
-    <script>
+    <script type="text/javascript">
         let divisionCollection, division, dialog;
     </script>
     {{#each animals}}
-        <div class="gallery-item">
-            <img src="/images/{{this.name}}.jpg" alt="{{this.name}}">
-            <div class="image-label">{{this.name}}</div>
+        <div class="animal">
+            <img class="image" src="/images/{{this.name}}.jpg" alt="{{this.name}}">
+            <div class="animal-label">{{this.name}}</div>
         </div>
-        <script>
-            divisionCollection = document.getElementsByClassName("gallery-item");
+        <script type="text/javascript">
+            divisionCollection = document.getElementsByClassName("animal");
             division = divisionCollection[divisionCollection.length - 1];
-            console.log(division);
+            // console.log(division);
             dialog = document.querySelector(".animal-dialog");
             division.addEventListener("click", () => {
-                console.log("hi");
+                // console.log("hi");
                 dialog.querySelector("h2").innerHTML = "{{this.name}}";
                 dialog.querySelector("img").src = "/images/{{this.name}}.jpg";
                 dialog.querySelector("img").alt = "{{this.name}}";
                 dialog.querySelector("p").innerHTML = "{{this.description}}";
-
-                // fetch("/api/animalDescription/", {method: "GET"})
                 dialog.showModal();
             });
             dialog.querySelector("div").addEventListener("click", () => {dialog.close();});
-
         </script>
     {{/each}}
 </div>
+<script type="text/javascript">
+    animals = document.getElementsByClassName("animal");
 
-<script>
+    for (let animal of animals) {
+        animal.addEventListener("mouseenter", () => {
+            for (let darkened of animals) {
+                if (darkened.id !== animal.id) {
+                    darkened.style.opacity = "0.2";
+                }
+            }
+        });
+    }
+
+</script>
+
+<script type="text/javascript">
     function play() {
-    const audio = new Audio("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3");
-    audio.play();
+        const audio = new Audio("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3");
+        audio.play();
     }
 </script>

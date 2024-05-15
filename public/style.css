@@ -26,7 +26,6 @@ html {
     scroll-behavior: smooth;
     color: var(--gamma_color);
     text-decoration: none;
-    text-transform: capitalize;
     transition: 1s linear;
     max-width: 100%;
     overflow-x: hidden;
@@ -156,7 +155,6 @@ header {
 
     #header-logo-div, #header-menu-div, #header-login-register-div {
         /*border: 0.1em dashed floralwhite;*/
-        margin: 5rem;
     }
 
     #header-logo-div {
@@ -176,7 +174,7 @@ header {
         /*float: left;*/
         margin: auto;
         padding: 0;
-        width: 50%;
+        width: 30%;
     }
 
     nav {
@@ -248,6 +246,9 @@ header {
 
     @media screen and (max-width: 1440px) { /* laptop screen? */
         background: ghostwhite; /* test */
+        #header-menu-div {
+            width: 45%;
+        }
     }
 
     @media screen and (max-width: 1000px) {
@@ -266,29 +267,17 @@ header {
             display: block;
         }
     }
-
-    @media screen and (max-width: 700px) {
-
-    }
 }
 
 /* =================================================== INDEX ======================================================= */
-.hero{
-    display: flexbox;
-}
-
-.hero-image{
+.hero-image {
     position: inherit;
+
+    img {
+        width: 100%;
+        height: auto;
+    }
 }
-
-.hero-image img{
-    width: 100%;
-    height: auto;
-}
-
-
-
-
 
 /* =================================================== INPUT ======================================================= */
 
@@ -427,36 +416,31 @@ input {
         color: yellow;
         text-align: center;
     }
-
 }
 
+form {
 
+    .remember {
+        text-align: right;
+        padding-top: 1em;
+    }
 
+    label {
+        color: lightsteelblue;
+    }
 
-form .remember {
-    text-align: right;
-    padding-top: 1em;
-}
+    button {
+        padding: 16px 20px;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 10px;
+        opacity: 0.8;
+    }
 
-form label {
-    color: lightsteelblue;
-}
-
-form button {
-    padding: 16px 20px;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    margin-bottom: 10px;
-    opacity: 0.8;
-}
-
-form button .cancel {
-    background-color: red; /* ------------------------------------- does not exist yet ----------------------------- */
-}
-
-form button :hover {
-    opacity: 1;
+    button .cancel {
+        background-color: red; /* ----------------------------------- does not exist yet --------------------------- */
+    }
 }
 
 select {
@@ -539,26 +523,23 @@ select {
     to {opacity: 1}
 }
 
-.footer {
-    align-content: center;
-}
-
 .form-class {
     width: max-content;
     border-color: black;
     height: 30em;
     align-content: center;
     margin: auto;
-}
 
-.form-class h3 {
-    margin: auto;
-    padding-bottom: 2em;
-    text-align: center;
-}
-.form-class .remember {
-    text-align: right;
-    padding-top: 1em;
+    h3 {
+        margin: auto;
+        padding-bottom: 2em;
+        text-align: center;
+    }
+
+    .remember {
+        text-align: right;
+        padding-top: 1em;
+    }
 }
 
 ::placeholder {
@@ -587,7 +568,7 @@ button {
 }
 
 button:hover {
-    background-color: hsl(122, 14%, 66%);
+    background-color: hsl(122, 14%, 76%);
     
 }
 
@@ -606,6 +587,7 @@ footer {
     padding-left: 1rem;
     padding-right: 1rem;
     padding-bottom: 1.5rem;
+    text-transform: capitalize;
 
     .box-container {
         display: grid;
@@ -772,7 +754,7 @@ dialog {
 
 #login-form {
     display: block;
-    padding: 0%;
+    padding: 0;
 
     p {
         text-align: center;
@@ -780,20 +762,28 @@ dialog {
         margin: 0.8rem;
     }
 
+    a {
+        color: var(--gamma_color);
+        transition: 500ms linear;
+    }
+
+    a:hover {
+        color: hsl(50, 89%, 38%);
+    }
+
     .remember {
         display: flex;
         margin: 0.5rem;
         padding: 0;
 
-        input{
+        input {
             text-align: center;
             align-content: center;
             width: 1rem;
             margin: 0;
-
         }
 
-        label{
+        label {
             width: 100%;
             text-align:left;
             align-content: center;
@@ -801,25 +791,24 @@ dialog {
             padding: 0;
         }
     }
-    .form-buttons{
+
+    .form-buttons {
         display: flex;
         margin-top: 5%;
         button{
             width: 45%;
             margin-right: 5%;
             margin-left: 5%;
-
         }
-
-
     }
     
-    .close-btn-class{
+    .close-btn-class {
         display: flex; /* Use flexbox layout */
         justify-content: flex-end;
+
         .close-btn {
             position: absolute;
-            top: 0px;
+            top: 0;
             padding: 0;
             text-align: center;
             align-content: center;
@@ -827,17 +816,16 @@ dialog {
             margin-left: auto;
             font-size: 1.2rem;
         }
-
     }
-
 }
 
-/*  =================================================== GALLERY ====================================================== */
-.gallery-title{
+/*  =================================================== GALLERY ==================================================== */
+
+.animals-title {
     text-align: center;
 }
 
-.gallery {
+.animals {
     display: grid;
     grid-template-columns: repeat(6, minmax(200px, 1fr));
     grid-gap: 25px;
@@ -869,45 +857,40 @@ dialog {
     }
 }
 
-.gallery-item {
+.animal {
     position: relative;
-    border: none;
     border-radius: 20px;
     border: 2px solid transparent; /* Initially set a transparent border */
     transition: border-color 0.3s ease; /* Add transition effect for smooth change */
 
-}
+    &:hover {
+        cursor: pointer;
+        border-color: var(--gamma_color);
+    }
 
-.gallery-item:hover {
-    cursor: pointer;
-    border-color: var(--gamma_color);
-
-}
-
-.gallery-item img {
-    width: 100%;
-    height: auto;
+    & img {
+        width: 100%;
+        height: auto;
         border-radius: 20px;
+    }
 
-}
-
-.image-label {
-position: absolute;
-bottom: 5px;
-left: 0;
-width: 100%;
-text-align: center;
-background-color: rgba(0, 0, 0, 0.7);
-color: #fff;
-font-size: 12px;
-padding: 5px;
-border-bottom-left-radius: 20px;
-border-bottom-right-radius: 20px;
+    .animal-label {
+        position: absolute;
+        bottom: 5px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        font-size: 12px;
+        padding: 5px;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+    }
 }
 
 @media screen and (max-width: 1500px) {
-    .gallery{
+    .animals {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
    }
-
 }
