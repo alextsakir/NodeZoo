@@ -1,46 +1,52 @@
 <div id="register-form-container">
-<form action="/api/register" class="form-class" id="register-form" method="POST">
-    <fieldset id="register-credentials-fieldset">
-        <legend>New user registration</legend>
-        <label for="name">Full Name</label>
-        <div id="name">
-            <input type="text" id="first_name" name="first_name" placeholder="First name">
-            <input type="text" id="last_name" name="last_name" placeholder="Last name"> <br>
-        </div>
+    <form action="/api/register" class="form-class" id="register-form" method="POST">
+        <fieldset id="register-credentials-fieldset">
+            <legend>New user registration</legend>
+            <label for="name">Full Name</label>
+            <div id="name">
+                <input type="text" id="first_name" name="firstname" placeholder="First name">
+                <input type="text" id="last_name" name="lastname" placeholder="Last name"> <br>
+            </div>
 
-        <label for="address">Address</label>
-        <div id="address">
-            <input type="text" id="street" name="street" placeholder="Street and Number"> <br>
-            <input type="text" id="town" name="town" placeholder="City">
-            <input type="text" id="postal_code" name="postal_code" placeholder="Postal Code"> <br>
-        </div>
-        <div> <label for="date_picker">Birthdate</label>
-            <input type="date" id="date_picker" name="birthdate" value="1965-01-01" min="1900-01-01" max="2015-12-31">
-        </div>
-        <label for="contact">Contact</label>
-        <div id="contact">
-            <input type="text" id="phone" name="phone" placeholder="Telephone">
-            <input type="email" id="email" name="email" placeholder="Email"> <br>
-        </div>
+            <label for="address">Address</label>
+            <div id="address">
+                <input type="text" id="street" name="address" placeholder="Street and Number"> <br>
+                <input type="text" id="town" name="town" placeholder="City">
+                <input type="text" id="postal_code" name="postal_code" placeholder="Postal Code"> <br>
+            </div>
+            <div> <label for="date_picker">Birthdate</label>
+                <input type="date" id="date_picker" name="birthdate" value="1965-01-01" min="1900-01-01" max="2015-12-31">
+            </div>
+            <label for="contact">Contact</label>
+            <div id="contact">
+                <input type="text" id="phone" name="phone" placeholder="Telephone">
+                <input type="email" id="email" name="email" placeholder="Email"> <br>
+            </div>
 
-        <label for="password">Password</label>
-        <div id="password_">
-            <input type="password" placeholder="Password" id="password" name="password">
-            <input type="password" placeholder="Confirm Password" id="confirm_password" name="confirm_password" > <br>
-        </div>
-    </fieldset>
-    <fieldset id="register-credentials-user-type-fieldset" style="display: none">
-        <label for="user_type">User Type</label>
-        <select id="user_type" name="user_type">
-            <option>Accountant</option>      <option>Administrator</option>        <option>Cleaner</option>
-            <option>Customer</option>        <option>Employee</option>             <option>Guard</option>
-            <option>Secretary</option>       <option>Supplier</option>             <option>Veterinary</option>
-        </select>
-        <br>
-    </fieldset>
+            <label for="password">Password</label>
+            <div id="password_">
+                <input type="password" placeholder="Password" id="password" name="password">
+                <input type="password" placeholder="Confirm Password" id="confirm_password" name="confirm_password"> <br>
+            </div>
+        </fieldset>
+        <fieldset id="register-credentials-user-type-fieldset" style="display: none">
+            <label for="user_type">User Type</label>
+            <select id="user_type" name="user_type">
+                <option>Accountant</option>      <option>Administrator</option>        <option>Cleaner</option>
+                <option>Customer</option>        <option>Employee</option>             <option>Guard</option>
+                <option>Secretary</option>       <option>Supplier</option>             <option>Veterinary</option>
+            </select>
+            <br>
+        </fieldset>
 
-    <span class="form-buttons button-div">
-        <button type="reset" >Clear</button><button type="submit" >Register</button>
-    </span>
-</form>
+        <span class="form-buttons button-div">
+            <button type="reset" id="register-reset" >Clear</button>
+            <button id="register-submit" type="submit" >Register</button>
+        </span>
+    </form>
+    <script type="text/javascript">
+        // todo check if email is valid, at char ....
+
+        let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    </script>
 </div>

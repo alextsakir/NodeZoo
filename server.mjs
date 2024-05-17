@@ -10,10 +10,12 @@ import express from "express";
 import {engine} from "express-handlebars";
 import bcrypt from "bcrypt";
 import fs from "fs";
-import http from "http";
-import fetch from "node-fetch"; // has to be npm installed
-import path from "path";
+// import http from "http";
+// import fetch from "node-fetch"; // has to be npm installed
+import passport from "passport";
+// import path from "path";
 import session from "express-session";
+import {Strategy as LocalStrategy} from "passport-local";
 
 // ================================================ CONFIGURATION =====================================================
 
@@ -45,9 +47,6 @@ application.use(session({
 }));
 const PORT = process.env.PORT || "3000"; // env file to store db credentials and port
 
-import passport from "passport";
-import {Strategy as LocalStrategy} from "passport-local";
-
 // ================================================== DATABASE ========================================================
 
 class Ticket {
@@ -63,14 +62,14 @@ class Ticket {
 }
 
 class User {
-    constructor(firstname, lastname, address, city, postal_code, birthdate, telephone, email, password) {
+    constructor(firstname, lastname, address, town, postal_code, birthdate, phone, email, password) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.address = address;
-        this.city = city;
+        this.town = town;
         this.postal_code = postal_code;
         this.birthdate = birthdate;
-        this.telephone = telephone;
+        this.phone = phone;
         this.email = email;  // Primary Key
         this.password = password;
     }
@@ -91,7 +90,29 @@ class Database {
         this.users.push(user);
         console.log("The users are: ");
         console.log(this.users);
+    }
 
+    exists(email, callback) {
+        const statement = sql.prepare("select email from user where email = ?")
+        let result;
+        try {
+            let result = statement.all(email);
+            console.log("DATABASE EMAIL EXISTS", email, "\nRESULT", result);
+            callback(null, result.length === 1);
+        } catch (error) {
+            callback(error, null);
+        }
+    }
+
+    saveNewUser(user) {
+        const statement = sql.prepare("insert into user (firstname, lastname, address, town, postal_code, " +
+              "birthdate, phone, email, password) values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        try {
+            statement.run(user.firstname, user.lastname, user.address, user.town, user.postal_code,
+                user.birthdate, user.phone, user.email, user.password);
+        } catch (error) {
+            console.error(error);
+        }
     }
 }
 
@@ -243,44 +264,80 @@ class API {
         // todo --------------------------------------------------- there must be a response, not just a OK status code
     }
 
-    static register(request, response) {
+    // router.post('/sign_up', (req, res, next) => {
+    // database.checkIfUserExists(req.body.email, (err, result) => {
+    //     if (result && !err) {
+    //         req.session.alert_message = 'User already exists';
+    //         res.redirect(req.get('referer'));
+    //     }
+    //     else {
+    //         next();
+    //     }
+    //     if (err && !result) {
+    //         console.log(err);
+    //         req.session.alert_message = err;
+    //         res.redirect(req.get('referer'));
+    //     }
+    //     else {
+    //         next();
+    //     }
+    // });
+    // },
+    // (req, res) => {
+    // database.addUser(req.body, (err, result) => {
+    //     if (err) {
+    //         console.log(err);
+    //         res.redirect(req.get('referer'));
+    //     }
+    //     else {
+    //         req.session.signedIn = true;
+    //         req.session.email = req.body.email;
+    //         req.session.alert_message = 'You have successfully signed up';
+    //         res.redirect(req.get('referer'));
+    //     }
+    // });
+    // });
+
+    static register(request, response, next) {
+        // checks if email already exists
         // https://medium.com/@jasondotparse/add-user-authentication-to-your-node-expressjs-application-using-bcrypt-81bb0f618ab3
         if (DEBUG_FUNCTION_CALL === true) console.log("API register");
-        console.log("got here");
         // console.log(request.body);  // todo doesn't get birth date, user type and password -> update(by bobotas): it does now!!  nice
         let email = request.body.email;
-        let emailPattern =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // regular expression for email validation
-                                                                                //source: https://www.geeksforgeeks.org/javascript-program-to-validate-an-email-address/
-        let isValid_email = emailPattern.test(email);
-        let enteredPassword = request.body.password;
-        let c_enderedPassword = request.body.confirm_password;
+        // let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // regular expression for email validation
+                                                                               //source: https://www.geeksforgeeks.org/javascript-program-to-validate-an-email-address/
+        // let isValid_email = emailPattern.test(email);
 
-        if(isValid_email){
-            if (enteredPassword === c_enderedPassword) {
-                const saltRounds =  10
-                bcrypt.hash(enteredPassword, saltRounds, function(err, hash) {
-                    let user = new User(request.body.first_name,
-                                         request.body.last_name,
-                                         request.body.street,
-                                         request.body.town,
-                                         request.body.postal_code,
-                                         request.body.birthdate,
-                                         request.body.phone,
-                                         request.body.email,
-                                         hash)
-                    database.saveSubscription(user); //
-                })
-            } else {
-                // should say sth like: "Passwords dont match" ---TODO
-                response.redirect("/register");
-            }
+        database.exists(email, function (error, result) {
+            if (result && !error) {
+                response.sendStatus(412);  // todo tell frontend that user already exists
+            } else next();
+
+        });
+    }
+
+    static registerPlus(request, response) {
+        // checks if password and password confirmation are the same
+        // let enteredPassword = request.body.password;
+        // let c_enderedPassword = request.body.confirm_password;
+        if (request.body.password === request.body.confirm_password) {
+            const saltRounds =  10;
+            bcrypt.hash(request.body.password, saltRounds, function(err, hash) {
+                let user = new User(request.body.firstname,
+                                     request.body.lastname,
+                                     request.body.address,
+                                     request.body.town,
+                                     request.body.postal_code,
+                                     request.body.birthdate,
+                                     request.body.phone,
+                                     request.body.email,
+                                     hash)
+                database.saveNewUser(user); //
+            })
         } else {
-            // should say sth like: "The email address you provided isnt valid" --TODO
-            response.redirect("/register");
+            response.sendStatus(413);  // todo tell frontend that passwords don't match
         }
-        // console.log(email);
-        // console.log(enderedPassword);
-        //-------------------------------------------------
+
         // database.saveSubscription(request.body["email"]);
         response.redirect("/registered");
     }
@@ -310,7 +367,7 @@ class API {
 router.route("/api/animal-description").get(API.animalDescription);
 // router.route("/api/login").post(API.login);
 
-router.route("/api/register").post(API.register);
+router.route("/api/register").post(API.register, API.registerPlus);
 router.route("/api/subscribe").post(API.subscribe);
 router.route("/api/tickets-selected").post(API.ticketsSelected);
 application.post("/api/login", function (request, response, next) {
@@ -321,7 +378,7 @@ application.post("/api/login", function (request, response, next) {
         }
         if (!user) {
             return  response.status(204).send();
-            ; // ή επιστροφή μηνύματος λάθους
+            // ή επιστροφή μηνύματος λάθους
         }
         request.login(user, function (err) {
             if (err) {
@@ -329,6 +386,7 @@ application.post("/api/login", function (request, response, next) {
             }
             console.log("You logged in");
             console.log("SESSION: ", request.session);
+            console.log("REFERER: ", request.get("referer"));
             return response.status(204).send(); // ή οποιαδήποτε άλλη διαδρομή θέλετε να ανακατευθύνετε τον χρήστη
         });
     })(request, response, next);
