@@ -36,8 +36,22 @@ application.engine("hbs", engine({extname: "hbs"}));
 application.set("view engine", "hbs"); // todo ------------------------------------------------- do we need both lines?
 const router = express.Router();
 application.use(router);  // forgot to write it, I was crying for an hour
+
+passport.serializeUser((email, done) => {
+    console.log("serializeUser");
+    done(null, email);
+});
+
+passport.deserializeUser((email, done) => {
+    console.log("deserializeUser");
+    database.exists(email, done(null, email));
+});
+// application.use(passport.authenticate('session'));
+
 application.use(passport.initialize());
 const sqliteStoreSession = sqliteStore(session);
+
+
 application.use(session({
     secret: "secret",
     saveUninitialized: false,
@@ -45,6 +59,7 @@ application.use(session({
     resave: false,
     store: new sqliteStoreSession({db: 'session.sqlite',dir: './model/sessions'})
 }));
+// application.use(passport.session());
 const PORT = process.env.PORT || "3000"; // env file to store db credentials and port
 
 // ================================================== DATABASE ========================================================
@@ -123,44 +138,30 @@ class Database {
 const database = new Database();
 
 passport.use(new LocalStrategy({
-    usernameField: "email",
-    passwordField: "password"
+    usernameField: "email", passwordField: "password", session: true, passReqToCallback: false,
     },
-    (email, password, done) => {
+    function verify(email, password, done) {
         console.log("LOCAL STRATEGY", email, password);
-        // return done(null, user, {message: 'Authorized'});
 
-        database.exists(email, function (error, result) {
-            if (result && !error) {
+        database.exists(email, function (error, exists) {
+            if (exists && !error) {
                 console.log("we are in database.exists, getPass returned this: ", database.getPass(email));
-                bcrypt.compare(password, database.getPass(email), (err, result) => {
-                    if (err) {
-                        return done(err);
-                    }
-                    if (!result) {
+                bcrypt.compare(password, database.getPass(email), (error, correct) => {
+                    if (error) {
+                        return done(error);
+                    } else if (!correct) {
                         console.log("Incorrect password.");
-                        return done(null, false, { message: 'Incorrect password.' });
+                        return done(null, false, {message: 'Incorrect password.'});
                     }
-                    return done(null, email);
+                    return done(null, email, {message: 'Authorized'});
                 });
+            } else if (!exists) {
+                console.log("No such username exists");
+                return done(null, false, {message: 'Incorrect username'});
             }
         });
-
-
-            // return done(null, false, { message: 'Incorrect username.' });
-
-
     }
 ));
-
-passport.serializeUser((email, done) => {
-    done(null, email);
-});
-
-passport.deserializeUser((email, done) => {
-    const user = database.users.find(user => user.email === email);
-    done(null, user);
-});
 
 // =================================================== ROUTER =========================================================
 // ================================================ GET METHODS =======================================================
@@ -266,14 +267,14 @@ class API {
         console.log(request.body);
     }
 
-    static login(request, response) {  // deprecated
-        if (DEBUG_FUNCTION_CALL === true) console.log("API login");
-        console.log(request.body);
-
-        // if (request.body)
-        response.status(204).send();
-        // todo --------------------------------------------------- there must be a response, not just a OK status code
-    }
+    // static login(request, response) {  // deprecated
+    //     if (DEBUG_FUNCTION_CALL === true) console.log("API login");
+    //     console.log(request.body);
+    //
+    //     // if (request.body)
+    //     response.status(204).send();
+    //     // todo --------------------------------------------------- there must be a response, not just a OK status code
+    // }
 
     static register(request, response, next) {
         // checks if email already exists
@@ -335,43 +336,36 @@ class API {
         else response.send(404);
     }
 }
-// let alpha = passport.authenticate("local", {
-//         successRedirect: '/index',
-//         failureRedirect: '/login'
-//         // failureFlash: true
-//     })
 
 router.route("/api/animal-description").get(API.animalDescription);
 // router.route("/api/login").post(API.login);
-
 router.route("/api/register").post(API.register, API.registerPlus);
 router.route("/api/subscribe").post(API.subscribe);
 router.route("/api/tickets-selected").post(API.ticketsSelected);
-application.post("/api/login", function (request, response, next) {
-    passport.authenticate("local", function (error, user, next) {
-        // keepSessionInfo: true;
-        if (DEBUG_FUNCTION_CALL === true) console.log("API login");
-        console.log(request.body);
-        if (error) {
-            // return next(err);
-            throw error;
-        }
-        if (!user) {
-            return  response.status(204).send();
-            // ή επιστροφή μηνύματος λάθους
-        }
-        request.login(user, function (error) {
-            if (error) {
-                throw error;
-            }
-            console.log("You logged in");
-            console.log("SESSION: ", request.session);
-            console.log("REFERER: ", request.get("referer"));
-            // response.session.signed = true;
-            return response.sendStatus(200) // ή οποιαδήποτε άλλη διαδρομή θέλετε να ανακατευθύνετε τον χρήστη
-        });
-    })(request, response, next);
+// application.post("/api/login", passport.authenticate("local", {}), function (error, user, next) {
+application.post("/api/login", passport.authenticate("local", {failureMessage: true, badRequestMessage: 'Please enter your account credentials to login.'}),
+    function (request, response) {
+    if (DEBUG_FUNCTION_CALL === true) console.log("API login");
+    console.log("AUTHENTICATION - REQUEST USER: ", request.user);
+    console.log(request.body);
+
+    if (request.isAuthenticated(request, response)) {
+        console.log("IS AUTHENTICATED");
+        response.redirect(request.get("referer"));
+    } else {
+        console.log("YOU ARE NOT LOGGED IN");
+        response.status(204).send();
+    }
+    console.log("SESSION: ", request.session);
 });
+
+application.post("/api/logout", function(req, res, next) {  // fixme
+    req.logout(function(err) {
+        if (err) { return next(err); }
+        res.redirect('/');
+    });
+});
+
 
 // ================================================== RUN APP =========================================================
 
