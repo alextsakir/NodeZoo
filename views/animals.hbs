@@ -34,11 +34,15 @@
     animals = document.querySelectorAll(".animal");
     for (let animal of animals) {
         animal.addEventListener("mouseenter", () => {
-            for (let darkened of animals) {
-                if (darkened.id !== animal.id) darkened.style.opacity = "0.2";
-            }
+            animal.querySelector("div").style.color = "yellow";
+            setTimeout(function() {
+                for (let darkened of animals) {
+                    if (darkened.id !== animal.id) darkened.style.opacity = "0.2";
+                }
+            }, 1500);
         });
         animal.addEventListener("mouseleave", () => {
+            animal.querySelector("div").style.color = "white";
             for (let darkened of animals) {
                 if (darkened.id !== animal.id) darkened.style.opacity = "1";
             }
