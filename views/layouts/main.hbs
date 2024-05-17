@@ -70,8 +70,8 @@
                 <a id="close-btn"><i class="fa fa-times"></i></a>
             </div>
             <p>Login form</p>
-            <input type="email" name="email" placeholder="Enter your email" class="login-form-input" required>
-            <input type="password" name="password" placeholder="Enter your password" class="login-form-input" required>
+            <input type="email" name="email" placeholder="Enter your email" class="login-form-input" id="login-form-email" required>
+            <input type="password" name="password" placeholder="Enter your password" class="login-form-input" id="login-form-password" required>
             <div class="remember">
                 <input type="checkbox" name="" class="remember-me">
                 <label for="remember-me">remember me</label>
@@ -87,9 +87,42 @@
         const close_btn = document.getElementById("close-btn");
         document.getElementById("login-button").addEventListener("click", () => {loginDialog.showModal();});
         document.getElementById("login-button-mobile").addEventListener("click", () => {loginDialog.showModal();});
-        document.getElementById("login-form-submit").addEventListener("click", () => {loginDialog.close();});
+        // document.getElementById("login-form-submit").addEventListener("click", () => {loginDialog.close();});
         close_btn.addEventListener("click", () => {loginDialog.close(); console.log("close btn clicked")});
-        // function keyPress (e) {if (e.key === "Escape") login_dialog.close();}
+
+        loginDialog.addEventListener("submit", (event) => {
+            event.preventDefault();
+            let email = document.getElementById("login-form-email");
+            let password = document.getElementById("login-form-password");
+            if (email.value === "" || password.value === "") {
+                alert("Ensure you input a value in both fields!");
+            } else {
+                console.log(`This form has a username of ${email.value}`);
+                fetch("/api/login", {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json, text/plain, */*", "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({email: email.value, password: password.value}),
+                    })
+                    .then((response) => {
+                        response.json();
+                        console.log(response);
+                        console.log(response.status, response.statusMessage);
+                        if (response.status === 200) {
+                            alert("200: you are logged in");
+                            loginDialog.close();
+                        } else email.value = ""; password.value = "";  // tell them to try again
+                    })
+                    .then((result) => {
+                        console.log(result);
+                    })
+                    .catch((error) => {
+                    console.log(error);
+                    });
+
+            }
+        });
     </script>
 
     <dialog id="cookie-consent-dialog">

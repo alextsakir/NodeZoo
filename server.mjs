@@ -104,6 +104,10 @@ class Database {
         }
     }
 
+    getPass(email) {
+        return sql.prepare("select password from user where email = ?").all(email)[0].password;
+    }
+
     saveNewUser(user) {
         const statement = sql.prepare("insert into user (firstname, lastname, address, town, postal_code, " +
               "birthdate, phone, email, password) values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -123,29 +127,36 @@ passport.use(new LocalStrategy({
     passwordField: "password"
     },
     (email, password, done) => {
-        const user = database.users.find(user => user.email === email);
-        console.log("Local Strategy");
-        console.log(user);
+        console.log("LOCAL STRATEGY", email, password);
         // return done(null, user, {message: 'Authorized'});
-        if (!user) {
-            return done(null, false, { message: 'Incorrect username.' });
-        }
-        bcrypt.compare(password, user.password, (err, result) => {
-            if (err) {
-                return done(err);
+
+        database.exists(email, function (error, result) {
+            if (result && !error) {
+                console.log("we are in database.exists, getPass returned this: ", database.getPass(email));
+                bcrypt.compare(password, database.getPass(email), (err, result) => {
+                    if (err) {
+                        return done(err);
+                    }
+                    if (!result) {
+                        console.log("Incorrect password.");
+                        return done(null, false, { message: 'Incorrect password.' });
+                    }
+                    return done(null, email);
+                });
             }
-            if (!result) {
-                console.log("Incorrect password.");
-                return done(null, false, { message: 'Incorrect password.' });
-            }
-            return done(null, user);
         });
+
+
+            // return done(null, false, { message: 'Incorrect username.' });
+
+
     }
 ));
 
-passport.serializeUser((user, done) => {
-    done(null, user.email);
+passport.serializeUser((email, done) => {
+    done(null, email);
 });
+
 passport.deserializeUser((email, done) => {
     const user = database.users.find(user => user.email === email);
     done(null, user);
@@ -255,7 +266,7 @@ class API {
         console.log(request.body);
     }
 
-    static login(request, response) {
+    static login(request, response) {  // deprecated
         if (DEBUG_FUNCTION_CALL === true) console.log("API login");
         console.log(request.body);
 
@@ -263,40 +274,6 @@ class API {
         response.status(204).send();
         // todo --------------------------------------------------- there must be a response, not just a OK status code
     }
-
-    // router.post('/sign_up', (req, res, next) => {
-    // database.checkIfUserExists(req.body.email, (err, result) => {
-    //     if (result && !err) {
-    //         req.session.alert_message = 'User already exists';
-    //         res.redirect(req.get('referer'));
-    //     }
-    //     else {
-    //         next();
-    //     }
-    //     if (err && !result) {
-    //         console.log(err);
-    //         req.session.alert_message = err;
-    //         res.redirect(req.get('referer'));
-    //     }
-    //     else {
-    //         next();
-    //     }
-    // });
-    // },
-    // (req, res) => {
-    // database.addUser(req.body, (err, result) => {
-    //     if (err) {
-    //         console.log(err);
-    //         res.redirect(req.get('referer'));
-    //     }
-    //     else {
-    //         req.session.signedIn = true;
-    //         req.session.email = req.body.email;
-    //         req.session.alert_message = 'You have successfully signed up';
-    //         res.redirect(req.get('referer'));
-    //     }
-    // });
-    // });
 
     static register(request, response, next) {
         // checks if email already exists
@@ -371,23 +348,27 @@ router.route("/api/register").post(API.register, API.registerPlus);
 router.route("/api/subscribe").post(API.subscribe);
 router.route("/api/tickets-selected").post(API.ticketsSelected);
 application.post("/api/login", function (request, response, next) {
-    passport.authenticate("local", function (err, user, next) {
-        keepSessionInfo: true;
-        if (err) {
-            return next(err);
+    passport.authenticate("local", function (error, user, next) {
+        // keepSessionInfo: true;
+        if (DEBUG_FUNCTION_CALL === true) console.log("API login");
+        console.log(request.body);
+        if (error) {
+            // return next(err);
+            throw error;
         }
         if (!user) {
             return  response.status(204).send();
             // ή επιστροφή μηνύματος λάθους
         }
-        request.login(user, function (err) {
-            if (err) {
-                return next(err);
+        request.login(user, function (error) {
+            if (error) {
+                throw error;
             }
             console.log("You logged in");
             console.log("SESSION: ", request.session);
             console.log("REFERER: ", request.get("referer"));
-            return response.status(204).send(); // ή οποιαδήποτε άλλη διαδρομή θέλετε να ανακατευθύνετε τον χρήστη
+            // response.session.signed = true;
+            return response.sendStatus(200) // ή οποιαδήποτε άλλη διαδρομή θέλετε να ανακατευθύνετε τον χρήστη
         });
     })(request, response, next);
 });
