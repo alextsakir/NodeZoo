@@ -107,7 +107,7 @@
             <input type="email" name="email" placeholder="Enter your email" class="login-form-input" id="login-form-email" required>
             <input type="password" name="password" placeholder="Enter your password" class="login-form-input" id="login-form-password" required>
             <div class="remember">
-                <input type="checkbox" name="" class="remember-me">
+                <input type="checkbox" name="" class="remember-me" id="remember-me">
                 <label for="remember-me">remember me</label>
             </div>
             <div class="form-buttons button-div">
@@ -118,12 +118,10 @@
     </dialog>
     <script type="text/javascript">
         const loginDialog = document.getElementById("login-form-dialog");
-        const close_btn = document.getElementById("close-btn");
+        const closeButton = document.getElementById("close-btn");
         document.getElementById("login-button").addEventListener("click", () => {loginDialog.showModal();});
         document.getElementById("login-button-mobile").addEventListener("click", () => {loginDialog.showModal();});
-        // document.getElementById("login-form-submit").addEventListener("click", () => {loginDialog.close();});
-        close_btn.addEventListener("click", () => {loginDialog.close(); console.log("close btn clicked")});
-
+        closeButton.addEventListener("click", () => {loginDialog.close(); console.log("close btn clicked")});
         loginDialog.addEventListener("submit", (event) => {
             event.preventDefault();
             let email = document.getElementById("login-form-email");
@@ -134,9 +132,7 @@
                 console.log(`This form has a username of ${email.value}`);
                 fetch("/api/login", {
                     method: "POST",
-                    headers: {
-                        Accept: "application/json, text/plain, */*", "Content-Type": "application/json",
-                    },
+                    headers: {Accept: "application/json, text/plain, */*", "Content-Type": "application/json"},
                     body: JSON.stringify({email: email.value, password: password.value}),
                     })
                     .then((response) => {
@@ -155,7 +151,6 @@
                     .catch((error) => {
                     console.log(error);
                     });
-
             }
         });
     </script>

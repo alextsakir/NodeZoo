@@ -34,8 +34,8 @@ application.use(express.urlencoded({extended: true})); // ------------------- sp
 application.engine("hbs", engine({extname: "hbs"}));
 // ---------------------------------------- specifies Handlebars extension to 'hbs', otherwise it would be *.handlebars
 application.set("view engine", "hbs"); // todo ------------------------------------------------- do we need both lines?
-const router = express.Router();
-application.use(router);  // forgot to write it, I was crying for an hour
+// const router = express.Router();
+// application.use(router);  // forgot to write it, I was crying for an hour
 
 const PORT = process.env.PORT || "3000";
 // passport.serializeUser((email, done) => {
@@ -163,32 +163,6 @@ class Database {
 
 const database = new Database();
 
-// passport.use(new LocalStrategy({
-//     usernameField: "email", passwordField: "password", session: true, passReqToCallback: false,
-//     },
-//     function verify(email, password, done) {
-//         console.log("LOCAL STRATEGY", email, password);
-
-//         database.exists(email, function (error, exists) {
-//             if (exists && !error) {
-//                 console.log("we are in database.exists, getPass returned this: ", database.getPass(email));
-//                 bcrypt.compare(password, database.getPass(email), (error, correct) => {
-//                     if (error) {
-//                         return done(error);
-//                     } else if (!correct) {
-//                         console.log("Incorrect password.");
-//                         return done(null, false, {message: 'Incorrect password.'});
-//                     }
-//                     return done(null, email, {message: 'Authorized'});
-//                 });
-//             } else if (!exists) {
-//                 console.log("No such username exists");
-//                 return done(null, false, {message: 'Incorrect username'});
-//             }
-//         });
-//     }
-// ));
-
 // =================================================== ROUTER =========================================================
 // ================================================ GET METHODS =======================================================
 
@@ -226,7 +200,7 @@ function animals(request, response) {
             // console.log(images);
             let animals = sql.prepare("select name, description from animal").all();
             // console.log(animals);
-            response.render('animals', {layout: "main", title: "Animals", animals, signedIn: request.session.signedIn});
+            response.render("animals", {layout: "main", title: "Animals", animals, signedIn: request.session.signedIn});
         }
     });
 }
@@ -274,18 +248,18 @@ function tickets(request, response) {
 
 application.get('/', index);  // preserve alphabetical order!
 application.get("/about", about);
-router.route("/animals").get(animals);
-router.route("/april").get(april);
-router.route("/contact").get(contact);
-router.route("/dashboard").get(dashboard);
-router.route("/gallery").get(gallery);
-router.route("/hello").get((request, response) => response.send("Hello World!"));
-router.route("/home").get(index);  // -------------------------------------------------------------------------- unused
+application.get("/animals", animals);
+application.get("/april", april);
+application.get("/contact", contact);
+application.get("/dashboard", dashboard);
+application.get("/gallery", gallery);
+application.get("/hello", (request, response) => response.send("Hello World!"));
+application.get("/home", index);  // -------------------------------------------------------------------------- unused
 application.get("/index", index);
-router.route("/login").get(login);
-router.route("/payment").get(payment);
-router.route("/register").get(register);
-router.route("/registered").get(registered);
+application.get("/login", login);
+application.get("/payment", payment);
+application.get("/register", register);
+application.get("/registered", registered);
 application.get("/tickets", tickets);
 
 // ==================================================== API ===========================================================
@@ -311,43 +285,35 @@ class API {
         // https://medium.com/@jasondotparse/add-user-authentication-to-your-node-expressjs-application-using-bcrypt-81bb0f618ab3
         if (DEBUG_FUNCTION_CALL === true) console.log("API register");
         // console.log(request.body);  // todo doesn't get birth date, user type and password -> update(by bobotas): it does now!!  nice
-        let email = request.body.email;
-        // let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // regular expression for email validation
-                                                                               //source: https://www.geeksforgeeks.org/javascript-program-to-validate-an-email-address/
-        // let isValid_email = emailPattern.test(email);
 
-        database.exists(email, function (error, result) {
+        console.log("EMAIL TO REGISTER", request.body.email);
+
+        database.exists(request.body.email, function (error, result) {
             if (result && !error) {
-                response.sendStatus(412);  // todo tell frontend that user already exists
-            } else next();
-
+                console.log("user already exists");
+                response.sendStatus(412);  // todo tell them that user already exists
+            } else {
+                if (request.body.password === request.body.confirm_password) {
+                    const saltRounds =  10;
+                    bcrypt.hash(request.body.password, saltRounds, function(err, hash) {
+                        let user = new User(request.body.firstname,
+                                            request.body.lastname,
+                                            request.body.address,
+                                            request.body.town,
+                                            request.body.postal_code,
+                                            request.body.birthdate,
+                                            request.body.phone,
+                                            request.body.email,
+                                            hash)
+                        database.saveNewUser(user); console.log(user.email, "IS PUT INTO DATABASE");
+                    })
+                } else {
+                    console.log("problem with password")
+                    response.sendStatus(413);  // tell them that passwords don't match
+                }
+                response.sendStatus(200); // tells them they successfully registered
+            }
         });
-    }
-
-    static registerPlus(request, response) {
-        // checks if password and password confirmation are the same
-        // let enteredPassword = request.body.password;
-        // let c_enderedPassword = request.body.confirm_password;
-        if (request.body.password === request.body.confirm_password) {
-            const saltRounds =  10;
-            bcrypt.hash(request.body.password, saltRounds, function(err, hash) {
-                let user = new User(request.body.firstname,
-                                     request.body.lastname,
-                                     request.body.address,
-                                     request.body.town,
-                                     request.body.postal_code,
-                                     request.body.birthdate,
-                                     request.body.phone,
-                                     request.body.email,
-                                     hash)
-                database.saveNewUser(user); //
-            })
-        } else {
-            response.sendStatus(413);  // todo tell frontend that passwords don't match
-        }
-
-        // database.saveSubscription(request.body["email"]);
-        response.redirect("/registered");
     }
 
     static subscribe(request, response) {
@@ -367,40 +333,20 @@ class API {
     }
 }
 
-router.route("/api/animal-description").get(API.animalDescription);
-// router.route("/api/login").post(API.login);
-router.route("/api/register").post(API.register, API.registerPlus);
-router.route("/api/subscribe").post(API.subscribe);
-router.route("/api/tickets-selected").post(API.ticketsSelected);
-// application.post("/api/login", passport.authenticate("local", {}), function (error, user, next) {
-// application.post("/api/login", passport.authenticate("local", {failureMessage: true, badRequestMessage: 'Please enter your account credentials to login.'}),
-//     function (request, response) {
-//     if (DEBUG_FUNCTION_CALL === true) console.log("API login");
-//     console.log("AUTHENTICATION - REQUEST USER: ", request.user);
-//     console.log(request.body);
-
-//     if (request.isAuthenticated(request, response)) {
-//         console.log("IS AUTHENTICATED");
-//         response.redirect(request.get("referer"));
-//     } else {
-//         console.log("YOU ARE NOT LOGGED IN");
-//         response.status(204).send();
-//     }
-//     console.log("SESSION: ", request.session);
-// });
-
+application.get("/api/animal-description", API.animalDescription);
+application.post("/api/register", API.register);
+application.post("/api/subscribe", API.subscribe);
+application.post("/api/tickets-selected", API.ticketsSelected);
 application.post("/api/login", (request, response) => {
         database.checkUser(request.body.email, request.body.password, (message, user) => {
             if (message) {
                 console.log(message);
                 response.redirect(request.get('referer'));
-            }
-            else {
+            } else {
                 if (!user) {
                     request.session.alert_message = 'Wrong email or password';
                     response.redirect('/')
-                }
-                else {
+                } else {
                     request.session.signedIn = true;
                     request.session.email = user.email;
                     // console.log("Success with session:"+ request.session);
@@ -410,6 +356,11 @@ application.post("/api/login", (request, response) => {
         })
     }
 );
+
+application.delete("/api/login", function(request, response, next) {
+    request.session.destroy();
+    response.sendStatus(200);
+});
 
 application.post("/api/logout", function(request, response, next) {
     request.session.destroy();

@@ -1,24 +1,24 @@
 <div id="register-form-container">
-    <form action="/api/register" class="form-class" id="register-form" method="POST">
+    <form enctype="multipart/form-data" class="form-class" id="register-form" method="POST">
         <fieldset id="register-credentials-fieldset">
             <legend>New user registration</legend>
-            <label for="name">Full Name</label>
-            <div id="name">
+            <label for="name-div">Full Name</label>
+            <div id="name-div">
                 <input type="text" id="first_name" name="firstname" placeholder="First name">
                 <input type="text" id="last_name" name="lastname" placeholder="Last name"> <br>
             </div>
 
-            <label for="address">Address</label>
-            <div id="address">
-                <input type="text" id="street" name="address" placeholder="Street and Number"> <br>
+            <label for="address-div">Address</label>
+            <div id="address-div">
+                <input type="text" id="address" name="address" placeholder="Street and Number"> <br>
                 <input type="text" id="town" name="town" placeholder="City">
                 <input type="text" id="postal_code" name="postal_code" placeholder="Postal Code"> <br>
             </div>
             <div> <label for="date_picker">Birthdate</label>
                 <input type="date" id="date_picker" name="birthdate" value="1965-01-01" min="1900-01-01" max="2015-12-31">
             </div>
-            <label for="contact">Contact</label>
-            <div id="contact">
+            <label for="contact-div">Contact</label>
+            <div id="contact-div">
                 <input type="text" id="phone" name="phone" placeholder="Telephone">
                 <input type="email" id="email" name="email" placeholder="Email"> <br>
             </div>
@@ -44,9 +44,58 @@
             <button id="register-submit" type="submit" >Register</button>
         </span>
     </form>
+    <dialog id="register-dialog">
+        <h1 id="register-dialog-h1"></h1><p id="register-dialog-p"></p><button id="register-dialog-button">OK</button>
+    </dialog>
     <script type="text/javascript">
-        // todo check if email is valid, at char ....
+        let registerForm = document.querySelector("#register-form");
+        successDialog = document.querySelector("#register-success");
 
-        let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        function openDialog(email) {
+            document.getElementById("register-dialog-h1").innerHTML = "Successfully registered";  // todo modify it to replace alerts
+            document.getElementById("register-dialog-p").innerHTML = "Username: " + email;
+            document.getElementById("register-dialog").showModal();
+            // setTimeout(function() {
+            //     success.close();
+            //     window.location.href = "/registered";
+            // }, 10000);
+        }
+
+        document.getElementById("register-dialog-button").addEventListener("click", () => {successDialog.close();});
+
+        registerForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            let email = document.querySelector("#email").value;  // note ---------------------------- keep it for later
+            // const data = new FormData(registerForm); --------------------------------------- it did not want to work
+            let response = fetch("/api/register", {
+                method: "POST",
+                headers: {Accept: "application/json, text/plain, */*", "Content-Type": "application/json"},
+                body: JSON.stringify({
+                    firstname: document.querySelector("#first_name").value,
+                    lastname: document.querySelector("#last_name").value,
+                    address: document.querySelector("#address").value,
+                    town: document.querySelector("#town").value,
+                    postal_code: document.querySelector("#postal_code").value,
+                    birthdate: document.querySelector("#date_picker").value,
+                    phone: document.querySelector("#phone").value,
+                    email: document.querySelector("#email").value,
+                    password: document.querySelector("#password").value,
+                    confirm_password: document.querySelector("#confirm_password").value,
+                })
+            }).then((response) => {
+                console.log("RESPONSE: ", response.status);
+                if (response.status === 200) {
+                    openDialog(email);
+                } else if (response.status === 400)
+                    alert("400 got by server");
+                else if (response.status === 413)
+                    alert("check your password dude");
+                else if (response.status === 412)
+                    alert("email already exists idk");
+            }).catch((error) => {console.log(error);});
+
+        });
+
+        let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;  // todo ---- auto tha to kanei o themis
     </script>
 </div>
