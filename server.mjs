@@ -16,6 +16,7 @@ import passport from "passport";
 // import path from "path";
 import session from "express-session";
 import {Strategy as LocalStrategy} from "passport-local";
+import { error } from "console";
 
 // ================================================ CONFIGURATION =====================================================
 
@@ -37,30 +38,33 @@ application.set("view engine", "hbs"); // todo ---------------------------------
 const router = express.Router();
 application.use(router);  // forgot to write it, I was crying for an hour
 
-passport.serializeUser((email, done) => {
-    console.log("serializeUser");
-    done(null, email);
-});
+const PORT = process.env.PORT || "3000";
+// passport.serializeUser((email, done) => {
+//     console.log("serializeUser");
+//     done(null, email);
+// });
 
-passport.deserializeUser((email, done) => {
-    console.log("deserializeUser");
-    database.exists(email, done(null, email));
-});
+// passport.deserializeUser((email, done) => {
+//     console.log("deserializeUser");
+//     database.exists(email, done(null, email));
+// });
 // application.use(passport.authenticate('session'));
+// application.use(passport.initialize());
 
-application.use(passport.initialize());
 const sqliteStoreSession = sqliteStore(session);
 
-
+application.set('trust proxy', 1);
 application.use(session({
     secret: "secret",
     saveUninitialized: false,
-    cookie: {maxAge: 1000 * 60 * 60 * 24},
     resave: false,
-    store: new sqliteStoreSession({db: 'session.sqlite',dir: './model/sessions'})
+    cookie: {maxAge: 1000 * 60 * 60 * 24}
+    // store: new sqliteStoreSession({db: 'session.sqlite',dir: './model/sessions'})
 }));
+
+
 // application.use(passport.session());
-const PORT = process.env.PORT || "3000"; // env file to store db credentials and port
+ // env file to store db credentials and port
 
 // ================================================== DATABASE ========================================================
 
@@ -118,6 +122,28 @@ class Database {
             callback(error, null);
         }
     }
+    checkUser(email, password, callback){
+        let user;
+
+        try{
+            const statement = sql.prepare(('Select * from USER where email = ?'));
+            user = statement.get(email);
+            if(user){
+                const match  = bcrypt.compareSync(password, user.password);
+                if (match){
+                    callback(null, user);
+                }
+                else {
+                    callback('Wrong Password', null);
+                }
+            } else {
+                callback('User not found', null);
+            }
+        }
+        catch (error) {
+            callback(error, null);
+        }
+    }
 
     getPass(email) {
         return sql.prepare("select password from user where email = ?").all(email)[0].password;
@@ -137,39 +163,39 @@ class Database {
 
 const database = new Database();
 
-passport.use(new LocalStrategy({
-    usernameField: "email", passwordField: "password", session: true, passReqToCallback: false,
-    },
-    function verify(email, password, done) {
-        console.log("LOCAL STRATEGY", email, password);
+// passport.use(new LocalStrategy({
+//     usernameField: "email", passwordField: "password", session: true, passReqToCallback: false,
+//     },
+//     function verify(email, password, done) {
+//         console.log("LOCAL STRATEGY", email, password);
 
-        database.exists(email, function (error, exists) {
-            if (exists && !error) {
-                console.log("we are in database.exists, getPass returned this: ", database.getPass(email));
-                bcrypt.compare(password, database.getPass(email), (error, correct) => {
-                    if (error) {
-                        return done(error);
-                    } else if (!correct) {
-                        console.log("Incorrect password.");
-                        return done(null, false, {message: 'Incorrect password.'});
-                    }
-                    return done(null, email, {message: 'Authorized'});
-                });
-            } else if (!exists) {
-                console.log("No such username exists");
-                return done(null, false, {message: 'Incorrect username'});
-            }
-        });
-    }
-));
+//         database.exists(email, function (error, exists) {
+//             if (exists && !error) {
+//                 console.log("we are in database.exists, getPass returned this: ", database.getPass(email));
+//                 bcrypt.compare(password, database.getPass(email), (error, correct) => {
+//                     if (error) {
+//                         return done(error);
+//                     } else if (!correct) {
+//                         console.log("Incorrect password.");
+//                         return done(null, false, {message: 'Incorrect password.'});
+//                     }
+//                     return done(null, email, {message: 'Authorized'});
+//                 });
+//             } else if (!exists) {
+//                 console.log("No such username exists");
+//                 return done(null, false, {message: 'Incorrect username'});
+//             }
+//         });
+//     }
+// ));
 
 // =================================================== ROUTER =========================================================
 // ================================================ GET METHODS =======================================================
 
 function index(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: index rendered");
-    console.log("SESSION: ", request.session);
     response.render("index", {layout: "main", title: "Patras Zoo"});
+    console.log("SESSION: ", request.session);
     // ------------------------------------------------------------- with layout you can change the Handlebars template
 }
 
@@ -239,11 +265,12 @@ function registered(request, response) {
 function tickets(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: tickets rendered");
     // console.log(database.tickets);
+    console.log("SESSION: ", request.session);
     response.render("tickets", {layout: "main", title: "Tickets", tickets: database.tickets});
 }
 
-router.route("/").get(index);  // preserve alphabetical order!
-router.route("/about").get(about);
+application.get('/', index);  // preserve alphabetical order!
+application.get("/about", about);
 router.route("/animals").get(animals);
 router.route("/april").get(april);
 router.route("/contact").get(contact);
@@ -251,12 +278,12 @@ router.route("/dashboard").get(dashboard);
 router.route("/gallery").get(gallery);
 router.route("/hello").get((request, response) => response.send("Hello World!"));
 router.route("/home").get(index);  // -------------------------------------------------------------------------- unused
-router.route("/index").get(index);
+application.get("/index", index);
 router.route("/login").get(login);
 router.route("/payment").get(payment);
 router.route("/register").get(register);
 router.route("/registered").get(registered);
-router.route("/tickets").get(tickets);
+application.get("/tickets", tickets);
 
 // ==================================================== API ===========================================================
 
@@ -343,21 +370,45 @@ router.route("/api/register").post(API.register, API.registerPlus);
 router.route("/api/subscribe").post(API.subscribe);
 router.route("/api/tickets-selected").post(API.ticketsSelected);
 // application.post("/api/login", passport.authenticate("local", {}), function (error, user, next) {
-application.post("/api/login", passport.authenticate("local", {failureMessage: true, badRequestMessage: 'Please enter your account credentials to login.'}),
-    function (request, response) {
-    if (DEBUG_FUNCTION_CALL === true) console.log("API login");
-    console.log("AUTHENTICATION - REQUEST USER: ", request.user);
-    console.log(request.body);
+// application.post("/api/login", passport.authenticate("local", {failureMessage: true, badRequestMessage: 'Please enter your account credentials to login.'}),
+//     function (request, response) {
+//     if (DEBUG_FUNCTION_CALL === true) console.log("API login");
+//     console.log("AUTHENTICATION - REQUEST USER: ", request.user);
+//     console.log(request.body);
 
-    if (request.isAuthenticated(request, response)) {
-        console.log("IS AUTHENTICATED");
-        response.redirect(request.get("referer"));
-    } else {
-        console.log("YOU ARE NOT LOGGED IN");
-        response.status(204).send();
+//     if (request.isAuthenticated(request, response)) {
+//         console.log("IS AUTHENTICATED");
+//         response.redirect(request.get("referer"));
+//     } else {
+//         console.log("YOU ARE NOT LOGGED IN");
+//         response.status(204).send();
+//     }
+//     console.log("SESSION: ", request.session);
+// });
+
+application.post("/api/login",
+    (request, response) => {
+        database.checkUser(request.body.email, request.body.password, (error, result) => {
+            if (error) {
+                console.log(error);
+                response.redirect(request.get('referer'));
+            }
+            else {
+                if (!result) {
+                    request.session.alert_message = 'Wrong email or password';
+                    response.redirect('/')
+                }
+                else {
+                    request.session.signedIn = true;
+                    request.session.email = result.email;
+                    // console.log("Succeess with session:"+ request.session);
+                    response.redirect(request.get('referer'));
+                }
+            }
+        })
     }
-    console.log("SESSION: ", request.session);
-});
+);
+
 
 application.post("/api/logout", function(req, res, next) {  // fixme
     req.logout(function(err) {
