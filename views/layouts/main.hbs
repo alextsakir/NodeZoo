@@ -20,11 +20,15 @@
                 <a href="/tickets/" class="header-tab">Tickets</a>
                 <a href="/animals/" class="header-tab">Animals</a>
                 <a href="/about/" class="header-tab">About</a>
+                {{signedIn}}
             </nav>
         </div>
         <div class="button-div" id="header-login-register-div">
             <button id="login-button">Log in</button>
             <button id="register-button" onclick="window.location.href='/register/';">Register</button>
+        </div>
+        <div class="button-div" id="header-logout-div">
+            <button id="logout-button" onclick="logout();">Log out</button>
         </div>
         <div id="header-mobile-navigation-div">
             <!-- TODO ===================================================== <a href="#home" class="active">Logo</a> -->
@@ -40,27 +44,57 @@
                 <button id="login-button-mobile">Log in</button>
                 <button id="register-button-mobile" onclick="window.location.href='/register/';">Register</button>
             </div>
+            <div class="button-div" id="header-logout-div-mobile">
+                <button id="logout-button-mobile" onclick="logout();">Log out</button>
+            </div>
         </div>
         <div id="header-mobile-hamburger-div">
             <a class="icon" onclick="hamburger();"><i class="fa fa-bars"></i></a> <!-- ---- OPEN HAMBURGER MENU --- -->
         </div>
     </header>
     <script type="text/javascript">
-        // const header = document.querySelector("header"); // TODO -------------------------------------------- unused
-        // window.onscroll = function () {
-        //     if (window.scrollY > header.offsetTop) header.classList.add("sticky-header");
-        //     else header.classList.remove("sticky-header");
-        // }
         function hamburger() {  // --------------------------------- opens and closes hamburger menu for mobile devices
             let mobileNavigation = document.getElementById("header-mobile-navigation-div");
             if (mobileNavigation.style.display === "block") mobileNavigation.style.display = "none";
             else mobileNavigation.style.display = "block";
+        }
+        function logout() {
+            fetch("/api/logout", {
+            method: "POST",
+            headers: {
+                Accept: "application/json, text/plain, */*", "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
+            })
+            .then((response) => {
+                response.json();
+                console.log(response.status, response.statusMessage);
+                if (response.status === 200) {
+                    alert("200: you are logged out");
+                    location.reload();
+                }
+            }).catch((error) => {
+            console.log(error);
+            });
         }
         // ---------------------------------------- HIGHLIGHT CURRENT TAB ---------------------------------------------
         let pathName = window.location.pathname, tabs = document.getElementsByClassName("header-tab");
         if (pathName === "/") pathName = "/index/";
         for (let tab of document.getElementsByClassName("header-tab"))
             if (tab.href.includes(pathName)) tab.style.textDecoration="underline";  // -------------- match current url
+
+        {{#unless signedIn}}
+        document.getElementById("header-login-register-div").style.display = "block";
+        document.getElementById("header-login-register-div-mobile").style.display = "block";
+        document.getElementById("header-logout-div").style.display = "none";
+        document.getElementById("header-logout-div-mobile").style.display = "none";
+        {{else}}
+        document.getElementById("header-login-register-div").style.display = "none";
+        document.getElementById("header-login-register-div-mobile").style.display = "none";
+        document.getElementById("header-logout-div").style.display = "block";
+        document.getElementById("header-logout-div-mobile").style.display = "block";
+        {{/unless}}
+
     </script>
 
     <dialog class="form-popup" id="login-form-dialog">
@@ -112,6 +146,7 @@
                         if (response.status === 200) {
                             alert("200: you are logged in");
                             loginDialog.close();
+                            location.reload();
                         } else email.value = ""; password.value = "";  // tell them to try again
                     })
                     .then((result) => {

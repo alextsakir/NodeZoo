@@ -16,7 +16,6 @@ import passport from "passport";
 // import path from "path";
 import session from "express-session";
 import {Strategy as LocalStrategy} from "passport-local";
-import { error } from "console";
 
 // ================================================ CONFIGURATION =====================================================
 
@@ -122,10 +121,11 @@ class Database {
             callback(error, null);
         }
     }
-    checkUser(email, password, callback){
+
+    checkUser(email, password, callback) {
         let user;
 
-        try{
+        try {
             const statement = sql.prepare(('Select * from USER where email = ?'));
             user = statement.get(email);
             if(user){
@@ -194,19 +194,22 @@ const database = new Database();
 
 function index(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: index rendered");
-    response.render("index", {layout: "main", title: "Patras Zoo"});
+    if (request.session.signedIn === undefined)
+        request.session.signedIn = false;
+
+    response.render("index", {layout: "main", title: "Patras Zoo", signedIn: request.session.signedIn});
     console.log("SESSION: ", request.session);
     // ------------------------------------------------------------- with layout you can change the Handlebars template
 }
 
 function april(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: april rendered");
-    response.render("april", {layout: "main", title: "April"});
+    response.render("april", {layout: "main", title: "April", signedIn: request.session.signedIn});
 }
 
 function about(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: about rendered");
-    response.render("about", {layout: "main", title: "About"});
+    response.render("about", {layout: "main", title: "About", signedIn: request.session.signedIn});
 }
 
 function animals(request, response) {
@@ -223,19 +226,19 @@ function animals(request, response) {
             // console.log(images);
             let animals = sql.prepare("select name, description from animal").all();
             // console.log(animals);
-            response.render('animals', {layout: "main", title: "Animals", animals });
+            response.render('animals', {layout: "main", title: "Animals", animals, signedIn: request.session.signedIn});
         }
     });
 }
 
 function contact(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: contact rendered");
-    response.render("contact", {layout: "main", title: "Contact"});
+    response.render("contact", {layout: "main", title: "Contact", signedIn: request.session.signedIn});
 }
 
 function dashboard(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: dashboard rendered");
-    response.render("dashboard", {layout: "main", title: "Dashboard"});
+    response.render("dashboard", {layout: "main", title: "Dashboard", signedIn: request.session.signedIn});
 }
 
 function gallery(request, response) {
@@ -244,29 +247,29 @@ function gallery(request, response) {
 
 function login(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: login rendered");
-    response.render("login", {layout: "main", title: "Login"});
+    response.render("login", {layout: "main", title: "Login", signedIn: request.session.signedIn});
 }
 
 function payment(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: payment rendered");
-    response.render("payment", {layout: "main", title: "Payment"}); // https://codepen.io/quinlo/pen/YONMEa
+    response.render("payment", {layout: "main", title: "Payment", signedIn: request.session.signedIn}); // https://codepen.io/quinlo/pen/YONMEa
 }
 
 function register(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: register rendered");
-    response.render("register", {layout: "main", title: "Register"});
+    response.render("register", {layout: "main", title: "Register", signedIn: request.session.signedIn});
 }
 
 function registered(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: registered rendered");
-    response.render("registered", {layout: "main", title: "Registered"});
+    response.render("registered", {layout: "main", title: "Registered", signedIn: request.session.signedIn});
 }
 
 function tickets(request, response) {
     if (DEBUG_FUNCTION_CALL === true) console.log("router: tickets rendered");
     // console.log(database.tickets);
     console.log("SESSION: ", request.session);
-    response.render("tickets", {layout: "main", title: "Tickets", tickets: database.tickets});
+    response.render("tickets", {layout: "main", title: "Tickets", tickets: database.tickets, signedIn: request.session.signedIn});
 }
 
 application.get('/', index);  // preserve alphabetical order!
@@ -386,22 +389,21 @@ router.route("/api/tickets-selected").post(API.ticketsSelected);
 //     console.log("SESSION: ", request.session);
 // });
 
-application.post("/api/login",
-    (request, response) => {
-        database.checkUser(request.body.email, request.body.password, (error, result) => {
-            if (error) {
-                console.log(error);
+application.post("/api/login", (request, response) => {
+        database.checkUser(request.body.email, request.body.password, (message, user) => {
+            if (message) {
+                console.log(message);
                 response.redirect(request.get('referer'));
             }
             else {
-                if (!result) {
+                if (!user) {
                     request.session.alert_message = 'Wrong email or password';
                     response.redirect('/')
                 }
                 else {
                     request.session.signedIn = true;
-                    request.session.email = result.email;
-                    // console.log("Succeess with session:"+ request.session);
+                    request.session.email = user.email;
+                    // console.log("Success with session:"+ request.session);
                     response.redirect(request.get('referer'));
                 }
             }
@@ -409,14 +411,10 @@ application.post("/api/login",
     }
 );
 
-
-application.post("/api/logout", function(req, res, next) {  // fixme
-    req.logout(function(err) {
-        if (err) { return next(err); }
-        res.redirect('/');
-    });
+application.post("/api/logout", function(request, response, next) {
+    request.session.destroy();
+    response.sendStatus(200);
 });
-
 
 // ================================================== RUN APP =========================================================
 
