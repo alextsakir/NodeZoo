@@ -186,7 +186,7 @@ header {
         }
     }
 
-    #header-login-register-div {
+    #header-login-register-div, #header-logout-div {
         float: right;
         width: 20%;
         text-align: right;
@@ -259,8 +259,8 @@ header {
             text-align: center;
         }
 
-        #header-menu-div, #header-login-register-div {
-            display: none;
+        #header-menu-div, #header-login-register-div, #header-logout-div {
+            display: none !important;
         }
 
         #header-mobile-hamburger-div {
