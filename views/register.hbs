@@ -45,15 +45,15 @@
         </span>
     </form>
     <dialog id="register-dialog">
-        <h1 id="register-dialog-h1"></h1><p id="register-dialog-p"></p><button id="register-dialog-button">OK</button>
+        <h3 id="register-dialog-h3"></h3><p id="register-dialog-p"></p><button id="register-dialog-button">OK</button>
     </dialog>
     <script type="text/javascript">
         let registerForm = document.querySelector("#register-form");
-        successDialog = document.querySelector("#register-success");
+        registerDialog = document.querySelector("#register-dialog");
 
-        function openDialog(email) {
-            document.getElementById("register-dialog-h1").innerHTML = "Successfully registered";  // todo modify it to replace alerts
-            document.getElementById("register-dialog-p").innerHTML = "Username: " + email;
+        function openDialog(h3, p) {
+            document.getElementById("register-dialog-h3").innerHTML = h3;  // todo modify it to replace alerts
+            document.getElementById("register-dialog-p").innerHTML = p;
             document.getElementById("register-dialog").showModal();
             // setTimeout(function() {
             //     success.close();
@@ -61,12 +61,15 @@
             // }, 10000);
         }
 
-        document.getElementById("register-dialog-button").addEventListener("click", () => {successDialog.close();});
+        document.getElementById("register-dialog-button").addEventListener("click", () => {
+            registerDialog.close(); window.location.href = "/";
+        });
 
         registerForm.addEventListener("submit", (event) => {
             event.preventDefault();
-            let email = document.querySelector("#email").value;  // note ---------------------------- keep it for later
+            let email = document.querySelector("#email").value;  // note ---------------------------- keep it for later            
             // const data = new FormData(registerForm); --------------------------------------- it did not want to work
+            
             let response = fetch("/api/register", {
                 method: "POST",
                 headers: {Accept: "application/json, text/plain, */*", "Content-Type": "application/json"},
@@ -85,17 +88,19 @@
             }).then((response) => {
                 console.log("RESPONSE: ", response.status);
                 if (response.status === 200) {
-                    openDialog(email);
+                    openDialog("User successfully registered", "Email: " + email);
                 } else if (response.status === 400)
                     alert("400 got by server");
                 else if (response.status === 413)
-                    alert("check your password dude");
+                    openDialog("Problem with password", "Password and confirmation don't match.");
                 else if (response.status === 412)
-                    alert("email already exists idk");
+                    openDialog("Problem with email", "Email already exists.");
+
+
+                    
             }).catch((error) => {console.log(error);});
 
         });
 
-        let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;  // todo ---- auto tha to kanei o themis
     </script>
 </div>

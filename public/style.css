@@ -731,6 +731,7 @@ dialog {
 
     h3 {
         text-align: center;
+        color: var(--foreground);
     }
 
     p {
@@ -743,6 +744,9 @@ dialog {
     div {
         text-align: right;
     }
+    button {
+        width: 30%;
+    }
 }
 
 ::backdrop {
@@ -752,7 +756,7 @@ dialog {
 
 /*  =================================================== LOGIN-FORM ====================================================== */
 
-#login-form {
+#login-form{
     display: block;
     padding: 0;
 
@@ -819,6 +823,10 @@ dialog {
         }
     }
 }
+
+
+
+
 
 /*  =================================================== GALLERY ==================================================== */
 
