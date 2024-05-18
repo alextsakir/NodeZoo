@@ -96,7 +96,32 @@
         {{/unless}}
 
     </script>
-
+    <dialog id="information-dialog">
+        <h3 id="information-dialog-h3"></h3>
+        <p id="information-dialog-p"></p>
+        <button id="information-dialog-button-ok">OK</button>
+    </dialog>
+    <script type="text/javascript">
+        informarionDialog = document.querySelector("#information-dialog");
+        function openDialog(h3, p, buttonAct) {
+            document.getElementById("information-dialog-h3").innerHTML = h3;
+            document.getElementById("information-dialog-p").innerHTML = p;
+            document.getElementById("information-dialog-button-ok").addEventListener("click", buttonAct);
+            document.getElementById("information-dialog").showModal();
+        }
+        function toIndex() {
+            informarionDialog.close(); window.location.href = "/";
+        }
+        function toLogin() {
+            informarionDialog.close(); document.querySelector("#login-form-dialog").showModal();
+        }
+        function toPayUs () {
+            informarionDialog.close(); window.location.href = "/payment";
+        }
+        function simpleClose () {
+            informarionDialog.close();
+        }
+    </script>
     <dialog class="form-popup" id="login-form-dialog">
         <form action="/api/login" class="form-container" id="login-form" method="POST">
             <div class="close-btn-class"> 
@@ -104,8 +129,10 @@
                 <a id="close-btn"><i class="fa fa-times"></i></a>
             </div>
             <p>Login form</p>
-            <input type="email" name="email" placeholder="Enter your email" class="login-form-input" id="login-form-email" required>
-            <input type="password" name="password" placeholder="Enter your password" class="login-form-input" id="login-form-password" required>
+            <input type="email" name="email" placeholder="Enter your email"
+                   class="login-form-input" id="login-form-email" required>
+            <input type="password" name="password" placeholder="Enter your password"
+                   class="login-form-input" id="login-form-password" required>
             <div class="remember">
                 <input type="checkbox" name="" class="remember-me" id="remember-me">
                 <label for="remember-me">remember me</label>
@@ -117,6 +144,7 @@
         </form>
     </dialog>
     <script type="text/javascript">
+        let wantToPay = false;
         const loginDialog = document.getElementById("login-form-dialog");
         const closeButton = document.getElementById("close-btn");
         document.getElementById("login-button").addEventListener("click", () => {loginDialog.showModal();});
@@ -127,13 +155,13 @@
             let email = document.getElementById("login-form-email");
             let password = document.getElementById("login-form-password");
             if (email.value === "" || password.value === "") {
-                alert("Ensure you input a value in both fields!");
+                alert("Ensure you provide a value in both fields!");
             } else {
                 console.log(`This form has a username of ${email.value}`);
                 fetch("/api/login", {
                     method: "POST",
                     headers: {Accept: "application/json, text/plain, */*", "Content-Type": "application/json"},
-                    body: JSON.stringify({email: email.value, password: password.value}),
+                    body: JSON.stringify({email: email.value, password: password.value, wantToPay: wantToPay}),
                     })
                     .then((response) => {
                         response.json();
@@ -143,7 +171,13 @@
                             alert("200: you are logged in");
                             loginDialog.close();
                             location.reload();
-                        } else email.value = ""; password.value = "";  // tell them to try again
+                        } else if (response.status === 202) {
+                            loginDialog.close();
+                            window.location.href = "/payment/";
+                        } else if (response.status === 205) {
+                            email.value = "";
+                            password.value = "";  // tell them to try again
+                        }
                     })
                     .then((result) => {
                         console.log(result);

@@ -115,7 +115,7 @@ class Database {
         let result;
         try {
             let result = statement.all(email);
-            console.log("DATABASE EMAIL EXISTS", email, "\nRESULT", result);
+            console.log("DATABASE EMAIL EXISTS", email, "\t\t\tRESULT", result.length === 1);
             callback(null, result.length === 1);
         } catch (error) {
             callback(error, null);
@@ -319,7 +319,7 @@ class API {
     static subscribe(request, response) {
         if (DEBUG_FUNCTION_CALL === true) console.log("API subscribe");
         console.log(request.body);
-        response.status(204).send();
+        response.sendStatus(204);  // fixme show dialog here
         // response.redirect(request.route);
         // response.sendStatus(200);
     }
@@ -327,9 +327,9 @@ class API {
     static ticketsSelected(request, response) {
         if (DEBUG_FUNCTION_CALL === true) console.log("API tickets");
         console.log(request.body);
-        if (request.isAuthenticated())
-            response.redirect(302, "/payment");
-        else response.send(404);
+        if (request.session.signedIn)
+            response.sendStatus(200);
+        else response.sendStatus(300);
     }
 }
 
@@ -338,26 +338,28 @@ application.post("/api/register", API.register);
 application.post("/api/subscribe", API.subscribe);
 application.post("/api/tickets-selected", API.ticketsSelected);
 application.post("/api/login", (request, response) => {
-        database.checkUser(request.body.email, request.body.password, (message, user) => {
-            if (message) {
-                console.log(message);
-                response.redirect(request.get('referer'));
+    console.log(request.body.email, request.body.password, request.body.wantToPay);
+    database.checkUser(request.body.email, request.body.password, (message, user) => {
+        if (message) {
+            console.log(message);
+            // response.redirect(request.get('referer'));
+        } else {
+            if (!user) {
+                request.session.alert_message = 'Wrong email or password';
+                response.sendStatus(205);
             } else {
-                if (!user) {
-                    request.session.alert_message = 'Wrong email or password';
-                    response.redirect('/')
-                } else {
-                    request.session.signedIn = true;
-                    request.session.email = user.email;
-                    // console.log("Success with session:"+ request.session);
-                    response.redirect(request.get('referer'));
-                }
+                request.session.signedIn = true;
+                request.session.email = user.email;
+                // console.log("Success with session:"+ request.session);
+                if (request.body.wantToPay)
+                    response.sendStatus(202);
+                else response.sendStatus(200);
             }
-        })
-    }
-);
+        }
+    })
+});
 
-application.delete("/api/login", function(request, response, next) {
+application.delete("/api/login", function(request, response, next) {  // fixme
     request.session.destroy();
     response.sendStatus(200);
 });

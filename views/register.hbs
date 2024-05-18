@@ -44,27 +44,9 @@
             <button id="register-submit" type="submit" >Register</button>
         </span>
     </form>
-    <dialog id="register-dialog">
-        <h3 id="register-dialog-h3"></h3><p id="register-dialog-p"></p><button id="register-dialog-button">OK</button>
-    </dialog>
+
     <script type="text/javascript">
         let registerForm = document.querySelector("#register-form");
-        registerDialog = document.querySelector("#register-dialog");
-
-        function openDialog(h3, p) {
-            document.getElementById("register-dialog-h3").innerHTML = h3;  // todo modify it to replace alerts
-            document.getElementById("register-dialog-p").innerHTML = p;
-            document.getElementById("register-dialog").showModal();
-            // setTimeout(function() {
-            //     success.close();
-            //     window.location.href = "/registered";
-            // }, 10000);
-        }
-
-        document.getElementById("register-dialog-button").addEventListener("click", () => {
-            registerDialog.close(); window.location.href = "/";
-        });
-
         registerForm.addEventListener("submit", (event) => {
             event.preventDefault();
             let email = document.querySelector("#email").value;  // note ---------------------------- keep it for later            
@@ -88,16 +70,13 @@
             }).then((response) => {
                 console.log("RESPONSE: ", response.status);
                 if (response.status === 200) {
-                    openDialog("User successfully registered", "Email: " + email);
+                    openDialog("User successfully registered", "Email: " + email, toIndex);
                 } else if (response.status === 400)
                     alert("400 got by server");
                 else if (response.status === 413)
-                    openDialog("Problem with password", "Password and confirmation don't match.");
+                    openDialog("Problem with password", "Password and confirmation don't match.", simpleClose);
                 else if (response.status === 412)
-                    openDialog("Problem with email", "Email already exists.");
-
-
-                    
+                    openDialog("Problem with email", "Email already exists.", simpleClose);
             }).catch((error) => {console.log(error);});
 
         });

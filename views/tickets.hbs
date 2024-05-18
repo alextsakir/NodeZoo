@@ -11,13 +11,18 @@
                 </div>
                 <div class="quantity">
                     <span class="ticket-selector">
-                        <button type="button" aria-label="decrease quantity" class="minus-ticket-selector" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Click and hold to remove faster..." title="">
+                        <button type="button" aria-label="decrease quantity" class="minus-ticket-selector"
+                                data-toggle="popover" data-trigger="hover" data-placement="top"
+                                data-content="Click and hold to remove faster..." title="">
                         <i class="fa fa-minus" aria-hidden="true"></i>
                         </button>
                         <span class="selector-total">
-                            <input type="text" inputmode="numeric" pattern="^\d+$" value="0" id="{{name_EN}}" class="ticket-quantity-input" data-min="0" data-max="30">
+                            <input type="text" inputmode="numeric" pattern="^\d+$" value="0" id="{{name_EN}}"
+                                   class="ticket-quantity-input" data-min="0" data-max="30">
                         </span>
-                        <button type="button" aria-label="increase quantity" class="plus-ticket-selector" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Click and hold to add faster..." title="">
+                        <button type="button" aria-label="increase quantity" class="plus-ticket-selector"
+                                data-toggle="popover" data-trigger="hover" data-placement="top"
+                                data-content="Click and hold to add faster..." title="">
                             <i class="ticket-selector-icon ticket-selector-icon--plus fa fa-plus" aria-hidden="true"></i>
                         </button>
                     </span>
@@ -28,8 +33,10 @@
         </ul>
         <div id="cat-total">
             <div class="button-div" id="ticket-list-actions">
-                <button id="clear-ticket-selection" type="button">Clear selection <i class="fa fa-times" aria-hidden="true"></i></button>
-                <button id="submit-tickets-button" type="button" class="fill me" data-analytics-event="click">Select your session<i class="fa fa-chevron-right"></i> </button>
+                <button id="clear-ticket-selection" type="button">Clear selection
+                    <i class="fa fa-times" aria-hidden="true"></i></button>
+                <button id="submit-tickets-button" type="button" class="fill me"
+                        >Select your session<i class="fa fa-chevron-right"></i> </button>
             </div>
         </div>
     </form>
@@ -101,13 +108,6 @@
     let confirmationOK = document.querySelector("#ticket-dialog-ok");
     confirmationOK.addEventListener("click", function () {
         console.log("sending data...");
-        // let xhr = new XMLHttpRequest();
-        // xhr.open("POST", "/api/tickets-selected", true);
-        // xhr.setRequestHeader("Content-Type", "application/json");
-        // xhr.onreadystatechange = function () {
-        //     if (xhr.status === 200) console.log(this.responseText);
-        // };
-        // xhr.send(JSON.stringify(selectedData));
         fetch("/api/tickets-selected", {
             method: "POST", 
             headers: {
@@ -116,16 +116,15 @@
             body: JSON.stringify(selectedData)
         })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            console.log(response.status);
+            if (response.ok) {
+                openDialog("Successful entry", "proceed to safe payment environment", toPayUs);
+            } else if (response.status === 300) {
+                console.log("about to login");
+                wantToPay = true;
+                openDialog("Login required", "please log in", toLogin);
             }
-            //console.log(response.text());
             return response.text();
-        })
-        .then(responseText => {
-            //console.log("Server response:", responseText);
-            // Handle successful response here
-            window.location.href = '/payment';
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
