@@ -4,11 +4,8 @@
 "use strict";
 
 import cookieParser from "cookie-parser";
-// import sqliteStore from 'connect-sqlite3';
 import express from "express";
 import {engine} from "express-handlebars";
-// import fetch from "node-fetch"; // has to be npm installed
-// import path from "path";
 import router from "./routes/router.mjs";
 import session from "express-session";
 
@@ -26,39 +23,18 @@ application.use(express.urlencoded({extended: true})); // ------------------- sp
 application.engine("hbs", engine({extname: "hbs"}));
 // ---------------------------------------- specifies Handlebars extension to 'hbs', otherwise it would be *.handlebars
 application.set("view engine", "hbs"); // todo ------------------------------------------------- do we need both lines?
-
-// passport.serializeUser((email, done) => {
-//     console.log("serializeUser");
-//     done(null, email);
-// });
-
-// passport.deserializeUser((email, done) => {
-//     console.log("deserializeUser");
-//     database.exists(email, done(null, email));
-// });
-// application.use(passport.authenticate('session'));
-// application.use(passport.initialize());
-
-// const sqliteStoreSession = sqliteStore(session);
-
 application.set('trust proxy', 1);
 application.use(session({
     secret: "secret",
     saveUninitialized: false,
     resave: false,
-    // cookie: {maxAge: 1000 * 60 * 60 * 24}
     cookie: {expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)}  // expire in one week
-    // store: new sqliteStoreSession({db: 'session.sqlite',dir: './model/sessions'})
 }));
 
 application.use(router);  // forgot to write it, I was crying for an hour
 // note for themis ------------------------- --> https://github.com/expressjs/session/issues/772#issuecomment-660560711
 // note tl;dr ------------------------------- --> you have to link router object to the app after session configuration
 const PORT = process.env.PORT || "3000";
-
-// note by Wind Tech Support - May 19, 2024.
-// const filename = fileURLToPath(import.meta.url);
-// const dirname = path.dirname(__filename);
 
 // ================================================== RUN APP =========================================================
 

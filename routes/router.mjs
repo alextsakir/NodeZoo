@@ -39,9 +39,9 @@ function animals(request, response) {
         } else {
             // Render the gallery page and pass the list of image files to it
             // let images = files.map(fileName => fileName.replace(/\.jpg$/, ''));
-            // const imagesToRemove = ['gallery-1','gallery-2','gallery-3','gallery-4','home'];  // fixme --- for themis
+            // const imagesToRemove = ['gallery-1','gallery-2','gallery-3','gallery-4','home'];  // fixme -- for themis
             // images = images.filter(item => !imagesToRemove.includes(item));  // fixme ----------------------- UNUSED
-            let animals = database.animals;
+            // let animals = database.animals;
             response.render("animals", {layout: "main", title: "Animals", animals: database.animals, signedIn: request.session.signedIn});
         }
     });
@@ -213,7 +213,7 @@ router.route("/api/login").post((request, response) => {
             // response.redirect(request.get('referer'));
         } else {
             if (!user) {
-                request.session.alert_message = 'Wrong email or password';
+                request.session.alert_message = 'Wrong email or password';  // fixme
                 response.sendStatus(205);
             } else {
                 request.session.signedIn = true;
@@ -227,7 +227,7 @@ router.route("/api/login").post((request, response) => {
 });
 router.route("/api/login").delete((request, response, next) => {
     if (DEBUG_API_CALL) console.log("API log out");
-    if (request.session) {
+    if (request.session.signedIn) {
         if (DEBUG_API_CALL) console.log(request.session.email, "is logging out");
         request.session.destroy();
         response.sendStatus(200);
