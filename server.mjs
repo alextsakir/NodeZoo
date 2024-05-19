@@ -60,9 +60,6 @@ const PORT = process.env.PORT || "3000";
 // const filename = fileURLToPath(import.meta.url);
 // const dirname = path.dirname(__filename);
 
-// application.use(passport.session());
- // env file to store db credentials and port
-
 // ================================================== RUN APP =========================================================
 
 const server = application.listen(PORT, () => {console.log(`Server running on http://127.0.0.1:${PORT}`)});
