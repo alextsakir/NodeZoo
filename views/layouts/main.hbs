@@ -20,7 +20,7 @@
                 <a href="/tickets/" class="header-tab">Tickets</a>
                 <a href="/animals/" class="header-tab">Animals</a>
                 <a href="/about/" class="header-tab">About</a>
-                {{signedIn}}
+                <span style="color: red;">{{signedIn}} remove</span>
             </nav>
         </div>
         <div class="button-div" id="header-login-register-div">
@@ -59,11 +59,8 @@
             else mobileNavigation.style.display = "block";
         }
         function logout() {
-            fetch("/api/logout", {
-            method: "POST",
-            headers: {
-                Accept: "application/json, text/plain, */*", "Content-Type": "application/json",
-            },
+            fetch("/api/login", {
+            method: "DELETE", headers: {Accept: "application/json, text/plain, */*", "Content-Type": "application/json"},
             body: JSON.stringify({}),
             })
             .then((response) => {
