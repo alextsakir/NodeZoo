@@ -34,10 +34,7 @@ application.use(express.urlencoded({extended: true})); // ------------------- sp
 application.engine("hbs", engine({extname: "hbs"}));
 // ---------------------------------------- specifies Handlebars extension to 'hbs', otherwise it would be *.handlebars
 application.set("view engine", "hbs"); // todo ------------------------------------------------- do we need both lines?
-// const router = express.Router();
-// application.use(router);  // forgot to write it, I was crying for an hour
 
-const PORT = process.env.PORT || "3000";
 // passport.serializeUser((email, done) => {
 //     console.log("serializeUser");
 //     done(null, email);
@@ -57,11 +54,18 @@ application.use(session({
     secret: "secret",
     saveUninitialized: false,
     resave: false,
-    cookie: {maxAge: 1000 * 60 * 60 * 24}
+    // cookie: {maxAge: 1000 * 60 * 60 * 24}
+    cookie: {expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)}  // expire in one week
     // store: new sqliteStoreSession({db: 'session.sqlite',dir: './model/sessions'})
 }));
 
-// Wind Tech Support — Today at 3:03 PM
+const router = express.Router();
+application.use(router);  // forgot to write it, I was crying for an hour
+// note for themis --> https://githubcom/expressjs/session/issues/772#issuecomment-660560711
+
+const PORT = process.env.PORT || "3000";
+
+// note by Wind Tech Support - May 19, 2024.
 // const filename = fileURLToPath(import.meta.url);
 // const dirname = path.dirname(__filename);
 
