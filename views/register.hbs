@@ -69,6 +69,7 @@
                 })
             }).then((response) => {
                 console.log("RESPONSE: ", response.status);
+                console.log("COOKIE: ", document.cookie);
                 if (response.status === 200) {
                     openDialog("User successfully registered", "Email: " + email, toIndex);
                 } else if (response.status === 400)

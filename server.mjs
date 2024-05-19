@@ -61,6 +61,9 @@ application.use(session({
     // store: new sqliteStoreSession({db: 'session.sqlite',dir: './model/sessions'})
 }));
 
+// Wind Tech Support — Today at 3:03 PM
+// const filename = fileURLToPath(import.meta.url);
+// const dirname = path.dirname(__filename);
 
 // application.use(passport.session());
  // env file to store db credentials and port
