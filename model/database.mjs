@@ -46,7 +46,6 @@ class Database {
     * @return {Array} objects containing a name and a description property.
     */
     get animals() {
-        this.connection.close();
         return this.connection.prepare("select name, description from animal").all();
     }
 
@@ -129,6 +128,7 @@ class Database {
     saveSubscription(email, callback) {
         this.exists(email, (error, result) => {
             if (error) callback(error, false);
+            else if (result) callback(null, false);
             else if (!result) {
                 this.connection.prepare("insert into user (email) values (?)").run(email);
                 callback(null, true);

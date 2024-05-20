@@ -7,31 +7,89 @@ const router = express.Router();
 const DEBUG_ROUTE_CALL = true;
 const DEBUG_API_CALL = true;
 
+// class counter extends Function {
+//     log = [];
+//     constructor(request, response, next) {
+//         console.log("counter called");
+//         super();
+//         this.log.push(request);
+//         console.log("request count:", this.log.length);
+//         // response.sendStatus(429);
+//         next(request, response);
+//     }
+// }
+
+// function counter(request, response, next) {
+//     this.log.push(request);
+//     console.log("request count:", this.log.length);
+//     // response.sendStatus(429);
+//     next(request, response);
+// }
+// counter.log = [];
+
+// let counter = (function () {
+//
+//     let counter = function (request, response, next) {
+//         this.log = [];
+//         this.log.push(request);
+//         console.log("request count:", this.log.length);
+//         // response.sendStatus(429);
+//         next(request, response);
+//     }
+//
+//     counter.greet = function () {
+//         console.log("Hello!");
+//     }
+//
+//     counter.prototype = {
+//         greet: function () {
+//             console.log('Hello, my name is ' + this.log);
+//         }
+//     };
+//     return counter;
+// })();
+
+// function counter(target, key, descriptor) {
+//     const originalMethod = descriptor.value;
+//     descriptor.value = function (...args) {
+//         console.log(`Before ${key} is called`);
+//         const result = originalMethod.apply(this, args);
+//         console.log(`After ${key} is called`);
+//         return result;
+//     };
+//     return descriptor;
+// }
+
 // ==================================================== ROUTE =========================================================
 
 /**
 * ROUTE functions render pages.
 */
 class ROUTE {
-    
+
+    static counter (request, response, next) {
+        console.log(request.socket.remoteAddress);
+    }
+
     static index(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: index rendered");
         if (request.session.signedIn === undefined)
-            request.session.signedIn = false;
-
+            request.session.signedIn = false;  // todo ------------------------------------------------- is it useless?
         console.log("SESSION: ", request.session);
-        response.render("index", {layout: "main", title: "Patras Zoo", signedIn: request.session.signedIn});
-        // --------------------------------------------------------- with layout you can change the Handlebars template
+        response.render("index", {layout: "main", title: "Patras Zoo", signedIn: request.session.signedIn,
+            admin: request.session.admin});  // -------------------- with layout you can change the Handlebars template
     }
     
     static april(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: april rendered");
-        response.render("april", {layout: "main", title: "April", signedIn: request.session.signedIn});
+        response.render("april", {layout: "main", title: "April", signedIn: request.session.signedIn,
+            admin: request.session.admin});
     }
     
     static about(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: about rendered");
-        response.render("about", {layout: "main", title: "About", signedIn: request.session.signedIn});
+        response.render("about", {layout: "main", title: "About", signedIn: request.session.signedIn,
+            admin: request.session.admin});
     }
     
     static animals(request, response) {
@@ -49,7 +107,7 @@ class ROUTE {
                 // let animals = database.animals;
                 response.render("animals", {
                     layout: "main", title: "Animals", animals: database.animals,
-                    signedIn: request.session.signedIn
+                    signedIn: request.session.signedIn, admin: request.session.admin
                 });
             }
         });
@@ -57,40 +115,45 @@ class ROUTE {
     
     static contact(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: contact rendered");
-        response.render("contact", {layout: "main", title: "Contact", signedIn: request.session.signedIn});
+        response.render("contact", {layout: "main", title: "Contact", signedIn: request.session.signedIn,
+            admin: request.session.admin});
     }
     
     static dashboard(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: dashboard rendered");
         response.render("dashboard", {
             layout: "main", title: "Dashboard",
-            signedIn: request.session.signedIn, email: request.session.email
+            signedIn: request.session.signedIn, email: request.session.email, admin: request.session.admin
         });
     }
     
     static gallery(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: gallery rendered");
+        response.sendStatus(404);
     }
     
     static login(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: login rendered");
-        response.render("login", {layout: "main", title: "Login", signedIn: request.session.signedIn});
+        response.render("login", {layout: "main", title: "Login", signedIn: request.session.signedIn,
+            admin: request.session.admin});
     }
     
     static payment(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: payment rendered");
-        response.render("payment", {layout: "main", title: "Payment", signedIn: request.session.signedIn});
-        // note SOURCE: https://codepen.io/quinlo/pen/YONMEa
+        response.render("payment", {layout: "main", title: "Payment", signedIn: request.session.signedIn,
+            admin: request.session.admin});  // note SOURCE: https://codepen.io/quinlo/pen/YONMEa
     }
     
     static register(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: register rendered");
-        response.render("register", {layout: "main", title: "Register", signedIn: request.session.signedIn});
+        response.render("register", {layout: "main", title: "Register",
+            signedIn: request.session.signedIn, admin: request.session.admin});
     }
     
     static registered(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: registered rendered");
-        response.render("registered", {layout: "main", title: "Registered", signedIn: request.session.signedIn});
+        response.render("registered", {layout: "main", title: "Registered",
+            signedIn: request.session.signedIn, admin: request.session.admin});
     }
     
     static test(request, response) {
@@ -103,7 +166,7 @@ class ROUTE {
         console.log("SESSION: ", request.session);
         response.render("tickets", {
             layout: "main", title: "Tickets", tickets: database.tickets,
-            signedIn: request.session.signedIn
+            signedIn: request.session.signedIn, admin: request.session.admin
         });
     }
 }
@@ -145,11 +208,13 @@ class API {
                 if (DEBUG_API_CALL) console.log(message);
             } else {
                 if (!user) {
-                    request.session.alert_message = 'Wrong email or password';  // fixme --------- themis to be removed
-                    response.sendStatus(205);
+                    console.log("wrong email or password")
+                    response.sendStatus(406);
                 } else {
                     request.session.signedIn = true;
                     request.session.email = user.email;
+                    if (user.email === "alexandros.tsakiridis2@gmail.com")
+                        request.session.admin = true;
                     if (DEBUG_API_CALL) console.log("Success with session", request.session);  // fixme it doesn't work
                     if (request.body.wantToPay) response.sendStatus(202);
                     else response.sendStatus(200);
@@ -205,6 +270,7 @@ class API {
         if (DEBUG_API_CALL) console.log(request.body, request.body.email);
         database.saveSubscription(request.body.email, (error, result) => {
             if (error) response.sendStatus(400);
+            else if (!result) response.sendStatus(406);
             else if (result) response.sendStatus(200);
         });
     }
@@ -229,16 +295,21 @@ class API {
         response.contentType("application/pdf");
         response.send(fs.readFileSync("./public/Back_In_The_USSR.pdf"));
     }
+    static notAllowed(request, response) {
+        if (DEBUG_API_CALL) console.log("API document");
+        response.sendStatus(405);
+    }
 }
 
-router.route("/api/animal-description").get(API.animalDescription);  // note UNUSED
-router.route("/api/register").post(API.register);
-router.route("/api/subscribe").post(API.subscribe);
-router.route("/api/subscribers").get(API.subscribers);
-router.route("/api/tickets-selected").post(API.ticketsSelected);
-router.route("/api/login").post(API.login).delete(API.logout);  // they are now API static methods
-router.route("/api/document").get(API.document);
+router.route("/api/animal-description").get(API.animalDescription).post(API.notAllowed);  // note -------------- UNUSED
+router.route("/api/register").get(API.notAllowed).post(API.register);
+router.route("/api/subscribe").get(API.notAllowed).post(API.subscribe);
+router.route("/api/subscribers").get(API.subscribers).post(API.notAllowed);
+router.route("/api/tickets-selected").get(API.notAllowed).post(API.ticketsSelected);
+router.route("/api/login").get(API.notAllowed).post(API.login).delete(API.logout);
+router.route("/api/document").get(API.document).post(API.notAllowed);
+router.route("/api/").get(API.notAllowed).post(API.notAllowed);
 
 export default router;
-// note: We can specify a default export in each module, so it won't have to be imported within braces
-// note: https://developer.mozilla.org/en-US/docs/web/javascript/reference/statements/export#description
+// note: ---------------- We can specify a default export in each module, so it won't have to be imported within braces
+// note: -------------- https://developer.mozilla.org/en-US/docs/web/javascript/reference/statements/export#description
