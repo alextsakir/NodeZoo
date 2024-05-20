@@ -288,8 +288,20 @@ class API {
     static ticketsSelected(request, response) {
         if (DEBUG_API_CALL) console.log("API tickets selected");
         if (DEBUG_API_CALL) console.log(request.body);
+
         if (request.session.signedIn) {
             response.sendStatus(200);
+            console.log(database.ticketTypes);
+            // let shipping = {};
+            // let tickets = {};
+
+            // for (ticket of database.ticketTypes){
+            //     if (ticket.name) === kati {
+
+            //     }
+            // }
+            // createInvoice(invoice, path); TODO
+
         } else response.sendStatus(300);
     }
 

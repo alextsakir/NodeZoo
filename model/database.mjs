@@ -1,5 +1,6 @@
 import db from "better-sqlite3";
 import bcrypt from "bcrypt";
+import { stat } from "fs";
 
 const Locale = Object.freeze({EN: Symbol("ENGLISH"), GR: Symbol("GREEK")});
 const LOCALE = Locale.EN;
@@ -107,6 +108,23 @@ class Database {
         return this.connection.prepare("select lastname from user where email = ?").all(email)[0].lastname;
     }
 
+    address(email) {
+        return this.connection.prepare("select address from user where email = ?").all(email)[0].address;
+    }
+
+    town(email) {
+        return this.connection.prepare("select town from user where email = ?").all(email)[0].town;
+    }
+
+    postal_code(email) {
+        return this.connection.prepare("select postal_code from user where email = ?").all(email)[0].postal_code;
+    }
+
+    price(ticket){
+        return this.connection.prepare("select price from ticketType where name = ?").all(ticket)[0].price;
+    }
+    
+
     /**
     * Saves a new user in the namesake table, unless it already exists.
     * @param {User} user to save.
@@ -162,8 +180,30 @@ class Database {
     get ticketTypes() {
         return this.connection.prepare("select name, description, price from ticketType").all();
     }
-}
 
+    createInvoiceDict(ticket, email) {
+        const statement = this.connection.prepare(("select name, description, price from ticketType where name = ?"));
+        let invoice = {};
+        try {
+            ticket_info = statement.run(ticket);
+
+        } catch(err){
+            console.log("Error when creating Invoice: " + err);
+        }
+        invoice = {
+            shipping: {
+                name: this.firstName(email) + this.lastName(email),
+                address: this.address(email),
+                town: this.town(email) + this.postal_code(email)
+            },
+
+            tickets: {
+                // TODO
+            }
+
+        }
+    }
+}
 export const database = new Database();
 
 
