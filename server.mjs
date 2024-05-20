@@ -23,7 +23,7 @@ application.use(express.urlencoded({extended: true})); // ------------------- sp
 application.engine("hbs", engine({extname: "hbs"}));
 // ---------------------------------------- specifies Handlebars extension to 'hbs', otherwise it would be *.handlebars
 application.set("view engine", "hbs"); // todo ------------------------------------------------- do we need both lines?
-application.set('trust proxy', 1);
+application.set("trust proxy", 1);
 application.use(session({
     secret: "secret",
     saveUninitialized: false,

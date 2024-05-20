@@ -14,7 +14,7 @@ export class Ticket {
     name() {
         if (LOCALE.valueOf() === Locale.GR.valueOf()) return this.name_GR;
         else if (LOCALE.valueOf() === Locale.EN.valueOf()) return this.name_EN;
-        else console.error("Please set a Locale")
+        else console.error("Please set a Locale");
     }
 }
 
@@ -46,6 +46,7 @@ class Database {
     * @return {Array} objects containing a name and a description property.
     */
     get animals() {
+        this.connection.close();
         return this.connection.prepare("select name, description from animal").all();
     }
 
@@ -54,7 +55,7 @@ class Database {
     * @param {String} email the email to search for.
     * @return {String} password.
     */
-    getPass(email) {
+    getPassword(email) {
         return this.connection.prepare("select password from user where email = ?").all(email)[0].password;
     }
 
@@ -90,10 +91,8 @@ class Database {
     * @param {function[error: Error, result: boolean]} callback to be called after.
     */
     exists(email, callback) {
-        const statement = this.connection.prepare("select email from user where email = ?")
-        let result;
         try {
-            let result = statement.all(email);
+            let result = this.connection.prepare("select email from user where email = ?").all(email);
             console.log("DATABASE EMAIL EXISTS", email, "\t\t\tRESULT", result.length === 1);
             callback(null, result.length === 1);
         } catch (error) {
