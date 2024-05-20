@@ -911,6 +911,7 @@ dialog {
 }
 
 #dashboard {
+    padding: 5rem 0;
     #dashboard-greet {
         text-align: center;
     }

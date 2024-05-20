@@ -8,11 +8,11 @@ import express from "express";
 import {engine} from "express-handlebars";
 import router from "./routes/router.mjs";
 import session from "express-session";
+import {database} from "./model/database.mjs";
 
 // ================================================ CONFIGURATION =====================================================
 
 const application = express();
-// const sql = new db("model/storage.sqlite", {fileMustExist: true});
 // application.use(express.static(path.join(__dirname, "public")));
 // todo ------------------- __dirname is available only in CommonJS, in ES we have to set it manually, I'll do it later
 application.use(express.static("public")); // -------------------------------------------------- static files directory
@@ -39,3 +39,12 @@ const PORT = process.env.PORT || "3000";
 // ================================================== RUN APP =========================================================
 
 const server = application.listen(PORT, () => {console.log(`Server running on http://127.0.0.1:${PORT}`)});
+
+process.on("SIGTERM", () => {
+    console.info("SIGTERM signal received: closing server");
+    database.connection.close();
+    server.close((error) => {
+        console.log("server closed");
+        process.exit(error ? 1 : 0);
+    })
+})

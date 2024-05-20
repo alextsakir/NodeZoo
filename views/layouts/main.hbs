@@ -9,6 +9,27 @@
     <link rel="shortcut icon" href="/favicon.ico">
 </head>
 <body>
+    <dialog id="information-dialog">
+        <h3 id="information-dialog-h3"></h3>
+        <p id="information-dialog-p"></p>
+        <div class="button-div"><button id="information-dialog-button-ok">OK</button></div>
+    </dialog>
+    <script type="text/javascript">
+        informationDialog = document.querySelector("#information-dialog");
+        if (window.location.href.includes("dashboard"))
+            informationDialog.addEventListener("cancel", (event) => {event.preventDefault();});
+        function openDialog(title, message, callback) {
+            document.getElementById("information-dialog-h3").innerHTML = title;
+            document.getElementById("information-dialog-p").innerHTML = message;
+            document.getElementById("information-dialog-button-ok").addEventListener("click", callback);
+            document.getElementById("information-dialog").showModal();
+        }
+        function toIndex() {informationDialog.close(); window.location.href = "/";}
+        function toLogin() {informationDialog.close(); document.querySelector("#login-form-dialog").showModal();}
+        function toPayUs() {informationDialog.close(); window.location.href = "/payment";}
+        function simpleClose() {informationDialog.close();}
+    </script>
+
     <header>
         <div id="header-logo-div">
             <a href="/" class="logo"><i class="fas fa-paw"></i>MY ZOO</a>
@@ -31,7 +52,6 @@
             <button id="logout-button" onclick="logout();">Log out</button>
         </div>
         <div id="header-mobile-navigation-div">
-            <!-- TODO ===================================================== <a href="#home" class="active">Logo</a> -->
             <div id="header-mobile-navigation-close-div">
                 <a class="icon" onclick="hamburger();"><i class="fa fa-times"></i></a> <!-- - CLOSE HAMBURGER MENU  -->
             </div>
@@ -60,18 +80,10 @@
         }
         function logout() {
             fetch("/api/login", {
-                method: "DELETE",
-                headers: {Accept: "application/json, text/plain, */*", "Content-Type": "application/json"}
+                method: "DELETE", headers: {Accept: "*/*", "Content-Type": "application/json"}
             }).then((response) => {
-                response.json();
-                console.log(response.status, response.statusMessage);
-                if (response.status === 200) {
-                    alert("200: you are logged out");  // fixme ----------------------------------------- to be removed
-                    location.reload();
-                }
-            }).catch((error) => {
-            console.log(error);
-            });
+                if (response.status === 200) openDialog("You are logged out", "", () => {location.reload();});
+            }).catch((error) => {console.log(error);});
         }
         // ---------------------------------------- HIGHLIGHT CURRENT TAB ---------------------------------------------
         let pathName = window.location.pathname, tabs = document.getElementsByClassName("header-tab");
@@ -90,41 +102,15 @@
         document.getElementById("header-logout-div").style.display = "block";
         document.getElementById("header-logout-div-mobile").style.display = "block";
         {{/unless}}
+    </script>
 
-    </script>
-    <dialog id="information-dialog">
-        <h3 id="information-dialog-h3"></h3>
-        <p id="information-dialog-p"></p>
-        <button id="information-dialog-button-ok">OK</button>
-    </dialog>
-    <script type="text/javascript">
-        informarionDialog = document.querySelector("#information-dialog");
-        function openDialog(h3, p, buttonAct) {
-            document.getElementById("information-dialog-h3").innerHTML = h3;
-            document.getElementById("information-dialog-p").innerHTML = p;
-            document.getElementById("information-dialog-button-ok").addEventListener("click", buttonAct);
-            document.getElementById("information-dialog").showModal();
-        }
-        function toIndex() {
-            informarionDialog.close(); window.location.href = "/";
-        }
-        function toLogin() {
-            informarionDialog.close(); document.querySelector("#login-form-dialog").showModal();
-        }
-        function toPayUs () {
-            informarionDialog.close(); window.location.href = "/payment";
-        }
-        function simpleClose () {
-            informarionDialog.close();
-        }
-    </script>
     <dialog class="form-popup" id="login-form-dialog">
         <form action="/api/login" class="form-container" id="login-form" method="POST">
-            <div class="close-btn-class"> 
-<!--            <button type="button" class="close-btn" id="close-btn" >x</button>-->
+            <div class="close-btn-class">
                 <a id="close-btn"><i class="fa fa-times"></i></a>
             </div>
             <p>Login form</p>
+            <i id="login-form-warning" style="color: red; visibility: hidden;">Incorrect email or password!</i>
             <input type="email" name="email" placeholder="Enter your email"
                    class="login-form-input" id="login-form-email" required>
             <input type="password" name="password" placeholder="Enter your password"
@@ -140,43 +126,64 @@
         </form>
     </dialog>
     <script type="text/javascript">
-        let wantToPay = false;
-        const loginDialog = document.getElementById("login-form-dialog");
-        const closeButton = document.getElementById("close-btn");
-        document.getElementById("login-button").addEventListener("click", () => {loginDialog.showModal();});
-        document.getElementById("login-button-mobile").addEventListener("click", () => {loginDialog.showModal();});
-        closeButton.addEventListener("click", () => {loginDialog.close(); console.log("close btn clicked")});
+        let wantToPay = false, loginDialog = document.getElementById("login-form-dialog"),
+                closeButton = document.getElementById("close-btn"),
+                loginWarning = document.querySelector("#login-form-warning"),
+                email = document.getElementById("login-form-email"),
+                password = document.getElementById("login-form-password");
+
+        document.getElementById("login-button").addEventListener("click", () => {
+            loginWarning.style.visibility = "hidden";
+            email.value = "";
+            password.value = "";
+            loginDialog.showModal();
+        });
+        document.getElementById("login-button-mobile").addEventListener("click", () => {
+            loginWarning.style.visibility = "hidden";
+            email.value = "";
+            password.value = "";
+            loginDialog.showModal();
+        });
+        closeButton.addEventListener("click", () => {
+            if (window.location.href.includes("dashboard")) openDialog("What are you doing?", "Please login", toLogin);
+            else loginDialog.close();
+        });
+        if (window.location.href.includes("dashboard"))
+            loginDialog.addEventListener("cancel", (event) => {
+                event.preventDefault();
+                if (Math.random() > 0.9) openDialog("Come on", "LOGIN", toLogin);
+            });
         loginDialog.addEventListener("submit", (event) => {
             event.preventDefault();
-            let email = document.getElementById("login-form-email");
-            let password = document.getElementById("login-form-password");
-            if (email.value === "" || password.value === "") {
-                alert("Ensure you provide a value in both fields!");
-            } else {
-                console.log(`This form has a username of ${email.value}`);
+            if (email.value !== "" && password.value !== "") {
+                console.log(`${email.value} is trying to log in`);
                 fetch("/api/login", {
                     method: "POST",
-                    headers: {Accept: "application/json, text/plain, */*", "Content-Type": "application/json"},
+                    headers: {Accept: "*/*", "Content-Type": "application/json"},
                     body: JSON.stringify({email: email.value, password: password.value, wantToPay: wantToPay}),
                     })
                     .then((response) => {
-                        response.json();
-                        console.log(response);
-                        console.log(response.status, response.statusMessage);
+                        // response.json();
+                        // console.log(response);
+                        console.log(response.status);
                         if (response.status === 200) {
-                            alert("200: you are logged in");
-                            loginDialog.close();
-                            location.reload();
+                            openDialog("You are logged in", "", () => {
+                                simpleClose();
+                                loginDialog.close();
+                                location.reload();
+                            });
                         } else if (response.status === 202) {
                             loginDialog.close();
                             window.location.href = "/payment/";
-                        } else if (response.status === 205) {
+                        } else if (response.status === 406) {
+                            console.log("login failure");
+                            loginWarning.style.visibility = "visible";
                             email.value = "";
                             password.value = "";  // tell them to try again
                         }
                     })
                     .then((result) => {
-                        console.log(result);
+                        console.log("RESULT", result);
                     })
                     .catch((error) => {
                     console.log(error);
@@ -197,15 +204,15 @@
         </div>
     </dialog>
     <script type="text/javascript">
-        const loginDialogNew = document.getElementById("login-form-dialog");
+        // const loginDialogNew = document.getElementById("login-form-dialog");
         const cookieDialog = document.getElementById("cookie-consent-dialog");
 
         document.addEventListener("keydown", (event) => {
             if (event.altKey === true) {
                 if (event.key === "C") cookieDialog.showModal();
-                if (event.key === "L") loginDialogNew.showModal();
+                if (event.key === "L") loginDialog.showModal();
             }
-            if (event.key === "L") loginDialogNew.showModal();  // fixme --------------------------------- NOT WORKING
+            if (event.key === "L") loginDialog.showModal();  // fixme --------------------------------- NOT WORKING
         })
 
         function keyPress (e) {
@@ -218,6 +225,17 @@
     <main class="content">
         {{{body}}}
     </main>
+
+    <section id="admin-to-dashboard" style="text-align: center; padding: 3rem;">
+        <button style="padding: 1rem;" onclick="window.location.href='/dashboard/';">Administration Dashboard</button>
+    </section>
+    <script>
+        {{#if admin}}
+            console.log("admin.connected");
+            let toDashboard = document.querySelector("#admin-to-dashboard");
+            toDashboard.style.visible = (!window.location.href.includes("dashboard"));
+        {{/if}}
+    </script>
 
     <footer>
         <div class="box-container">
@@ -283,16 +301,32 @@
 
             <div class="box" id="footer-sigma-taf">
                 <h3>newsletter</h3>
-                <form action="/api/subscribe/" id="subscribe-form" method="POST">
+                <form id="subscribe-form">
                     <label for="subscribe-form-input">subscribe for latest updates</label>
-                    <input type="email" name="email" placeholder="Your Email"
+                    <input type="email" name="email" placeholder="your email"
                            class="subscribe-input" id="subscribe-form-input">
                     <button type="submit" id="subscribe-button">Subscribe</button>
                 </form>
                 <script type="text/javascript">
-                    document.getElementById("subscribe-button").addEventListener("click", () => {
-                        // document.getElementById("subscribe-form-input").reset(); it is the default behavior!
-                        console.log("subscribed");});
+                    document.querySelector("#subscribe-form").addEventListener("submit", (event) => {
+                        event.preventDefault();
+                        let email = document.getElementById("subscribe-form-input");
+                        console.log(`Subscribing with email ${email.value}`);
+                        fetch("/api/subscribe", {
+                            method: "POST", headers: {Accept: "*/*", "Content-Type": "application/json"},
+                            body: JSON.stringify({email: email.value}),
+                            }).then((response) => {
+                                if (response.status === 200) {
+                                    openDialog("You have subscribed successfully", "Have a nice day!", simpleClose);
+                                    email.value = "";
+                                } else if (response.status === 406) {
+                                    openDialog("Email exists", "Don't worry, you're already receiving our updates.",
+                                            simpleClose);
+                                } else if (response.status === 400) {
+                                    openDialog("We are sorry", "A problem occurred.", simpleClose);
+                                }
+                            }).then((result) => {}).catch((error) => {console.log(error);});
+                    });
                 </script>
                 <div class="share">
                     <a href="https://www.facebook.com/groups/pacmansplayground" class="fab fa-facebook-f"></a>
