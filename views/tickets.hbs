@@ -1,12 +1,27 @@
+<div id="tickets-date-container">
+    <h1>Select date --- fixme</h1>
+    <p>
+        todo: create a calculateQuantities() function,
+        check if they selected any tickets before pressing OK,
+        show selected date in confirmation dialog,
+        send selected date to the server in the selectedData object,
+        create a method in database to calculate the total cost,
+        lock login dialog before paying, as it was done for dashboard
+    </p>
+    <form id="ticket-date-selection-form">
+<!--        <label for="ticket-date">Select date</label>-->
+        <input type="date" id="ticket-date" name="birthdate" value="{{minDate}}" min="{{minDate}}" max="{{maxDate}}">
+    </form>
+</div>
+
 <div id="tickets-container">
-<!--    <form class="booking-form capture-add-to-cart" id="ticket-selection-form" action="/api/tickets-selected" method="POST">-->
-    <form class="booking-form capture-add-to-cart" id="ticket-selection-form">
+    <form id="ticket-selection-form">
         <h1>Buy your tickets here</h1>
         <ul id="choose-tickets" class="ticket-list">
             {{#each tickets}}
-            <li class="ticket" id="{{name_EN}}" style="clear: both;">
+            <li class="ticket" id="{{name}}" style="clear: both;">
                 <div class="text">
-                    <strong class="ticket-title"> {{ name_EN }} / {{ name_GR }} </strong>
+                    <strong class="ticket-title"> {{ name }} </strong>
                     <div class="price"> <span class="price-active"> € {{ price }} </span> </div>
                 </div>
                 <div class="quantity">
@@ -17,7 +32,7 @@
                         <i class="fa fa-minus" aria-hidden="true"></i>
                         </button>
                         <span class="selector-total">
-                            <input type="text" inputmode="numeric" pattern="^\d+$" value="0" id="{{name_EN}}"
+                            <input type="text" inputmode="numeric" pattern="^\d+$" value="0" id="{{name}}"
                                    class="ticket-quantity-input" data-min="0" data-max="30">
                         </span>
                         <button type="button" aria-label="increase quantity" class="plus-ticket-selector"
@@ -33,10 +48,9 @@
         </ul>
         <div id="cat-total">
             <div class="button-div" id="ticket-list-actions">
-                <button id="clear-ticket-selection" type="button">Clear selection
-                    <i class="fa fa-times" aria-hidden="true"></i></button>
+                <button id="clear-ticket-selection" type="button">Clear selection <i class="fa fa-times" aria-hidden="true"></i></button>
                 <button id="submit-tickets-button" type="button" class="fill me"
-                        >Select your session<i class="fa fa-chevron-right"></i> </button>
+                        >OK <i class="fa fa-chevron-right"></i> </button>
             </div>
         </div>
     </form>
@@ -53,7 +67,6 @@
 
 <script>
     let selectedData = {};
-
     let tickets = document.getElementsByTagName("li");
     // console.log(Array.from(tickets));
     Array.from(tickets).forEach(function (element) {
@@ -92,7 +105,7 @@
         confirmationDialog.showModal();
         console.log(selectedData);
         let paragraph = confirmationDialog.querySelector("p");
-
+        paragraph.innerHTML = "";
         for (const [key, value] of Object.entries(selectedData)) {
             paragraph.innerHTML += `${key} ${value}<br>`;
         }

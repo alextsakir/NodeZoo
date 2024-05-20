@@ -140,8 +140,10 @@ class ROUTE {
     
     static payment(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: payment rendered");
+        let cardName = request.session.email ? database.firstName(request.session.email)[0] + ". " +
+            database.lastName(request.session.email) : "YOUR NAME";
         response.render("payment", {layout: "main", title: "Payment", signedIn: request.session.signedIn,
-            admin: request.session.admin});  // note SOURCE: https://codepen.io/quinlo/pen/YONMEa
+            admin: request.session.admin, cardName: cardName});  // note SOURCE: https://codepen.io/quinlo/pen/YONMEa
     }
     
     static register(request, response) {
@@ -162,11 +164,12 @@ class ROUTE {
     
     static tickets(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: tickets rendered");
-        if (DEBUG_ROUTE_CALL) console.log(database.tickets);
-        console.log("SESSION: ", request.session);
+        let today = new Date(), yyyy = today.getFullYear();
+        let mm = String(today.getMonth() + 1).padStart(2, "0"), dd = String(today.getDate()).padStart(2, "0");
         response.render("tickets", {
-            layout: "main", title: "Tickets", tickets: database.tickets,
-            signedIn: request.session.signedIn, admin: request.session.admin
+            layout: "main", title: "Tickets", tickets: database.ticketTypes,
+            signedIn: request.session.signedIn, admin: request.session.admin,
+            minDate: yyyy + "-" + mm + "-" + dd, maxDate: (yyyy + 1) + "-" + mm + "-" + dd
         });
     }
 }
