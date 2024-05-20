@@ -35,7 +35,7 @@ export class User {
 class Database {
     connection = new db("model/storage.sqlite", {fileMustExist: true});
 
-    tickets = [
+    ticketsDISABLED = [
         new Ticket("Παιδικό", "Child", "child ticket", 5),
         new Ticket("Ενήλικας", "Adult", "adult ticket", 12),
         new Ticket("ΑμεΑ", "Disabled", "disabled ticket", 8)
@@ -99,6 +99,14 @@ class Database {
         }
     }
 
+    firstName(email) {
+        return this.connection.prepare("select firstname from user where email = ?").all(email)[0].firstname;
+    }
+
+    lastName(email) {
+        return this.connection.prepare("select lastname from user where email = ?").all(email)[0].lastname;
+    }
+
     /**
     * Saves a new user in the namesake table, unless it already exists.
     * @param {User} user to save.
@@ -151,9 +159,8 @@ class Database {
     * Returns an array of tickets stored in the namesake table.
     * @return {Array[Object]} of objects containing a name, description and a price property.
     */
-    get ticketsNew() {
-    // get tickets() {  fixme -------------------------------------------------------------- delete tickets array above
-        return []; // return this.connection.prepare("select name, description, price from ticket").all();
+    get ticketTypes() {
+        return this.connection.prepare("select name, description, price from ticketType").all();
     }
 }
 
