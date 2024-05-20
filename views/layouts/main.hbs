@@ -60,14 +60,13 @@
         }
         function logout() {
             fetch("/api/login", {
-            method: "DELETE", headers: {Accept: "application/json, text/plain, */*", "Content-Type": "application/json"},
-            body: JSON.stringify({}),
-            })
-            .then((response) => {
+                method: "DELETE",
+                headers: {Accept: "application/json, text/plain, */*", "Content-Type": "application/json"}
+            }).then((response) => {
                 response.json();
                 console.log(response.status, response.statusMessage);
                 if (response.status === 200) {
-                    alert("200: you are logged out");
+                    alert("200: you are logged out");  // fixme ----------------------------------------- to be removed
                     location.reload();
                 }
             }).catch((error) => {

@@ -1,15 +1,52 @@
-<section class="dashboard buttons">
-    <button>Create task</button>
-    <button>See tasks</button>
-    <button>Create user</button> <!-- goes to register page -->
-    <button>See users</button> <!-- goes to register page -->
-    <button>Make a booking</button>
-    <button>See bookings</button> <!-- see booked tickets -->
-    <button>Write note</button>
-    <button>See notes</button>
-    <button>Send notification email</button> <!-- for newsletter -->
-    <button>Animal statistics</button>
-    <button>Employee statistics</button>
+<section id="dashboard">
+    <div id="dashboard-greet"><p></p></div>
+    <div id="dashboard-buttons">
+        <button id="dashboard-create-task">Create task</button>
+        <button id="dashboard-see-tasks">See tasks</button>
+        <button id="dashboard-create-user">Create user</button> <!-- goes to register page -->
+        <button id="dashboard-see-users">See users</button>
 
-    {#    <button id="register-button" onclick="window.location.href='/register/';">Register</button> HINT #}
+        <button id="dashboard-make-booking">Make a booking</button>
+        <button id="dashboard-see-bookings">See bookings</button> <!-- see booked tickets -->
+        <button id="dashboard-write-note">Write note</button>
+        <button id="dashboard-see-notes" onclick="window.location.href='/api/document';">See notes</button>
+
+        <button id="dashboard-send-newsletter-email">Send newsletter</button>
+        <button id="dashboard-animal-statistics">Animal statistics</button>
+        <button id="dashboard-employee-statistics">Employee statistics</button>
+        <button id="dashboard-register" onclick="window.location.href='/register/';">Register</button>
+    </div>
 </section>
+<dialog id="dashboard-subscribers-dialog">
+    <h1>Newsletter recipients</h1>
+    <h3>address list</h3>
+    <p></p>
+    <i style="display: none; color: red;">Not Implemented</i>
+    <div class="button-div">
+        <a>Send mail</a>
+        <button>Close</button>
+    </div>
+</dialog>
+<script type="text/javascript">
+    {{#if signedIn}} document.querySelector("#dashboard-greet p").innerHTML = "Hello " + "{{email}}";  // ensure login
+    {{else}} loginDialog.showModal();
+    {{/if}}
+
+    let subscribersDialog = document.querySelector("#dashboard-subscribers-dialog");
+    subscribersDialog.querySelector("button").addEventListener("click", () => {subscribersDialog.close();});
+    document.querySelector("#dashboard-send-newsletter-email").addEventListener("click", () => {
+        fetch("/api/subscribers", {method: "GET", headers: {Accept: "application/json"}
+        }).then((response) =>
+            response.json()
+        ).then((data) => {
+            let anchor = subscribersDialog.querySelector("a");
+            anchor.href = "mailto:" + data.join() + "?subject=Patras Zoo Newsletter&body=Hello%20from%20our%20Zoo!";
+            let paragraph = subscribersDialog.querySelector("p");
+            paragraph.innerHTML = "";
+            for (let element of data) paragraph.innerHTML += `<div>${element}</div>`;
+        }).catch((error) => {
+        console.log(error);
+        });
+        subscribersDialog.showModal();
+    });
+</script>

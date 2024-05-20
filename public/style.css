@@ -729,6 +729,12 @@ dialog {
     max-width: 30%;
     background-color: black;
 
+    h1 {
+        text-align: center;
+        color: var(--gamma_color);
+        font-size: 1.5rem;
+    }
+
     h3 {
         text-align: center;
         color: var(--foreground);
@@ -902,4 +908,45 @@ dialog {
     .animals {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
    }
+}
+
+#dashboard {
+    #dashboard-greet {
+        text-align: center;
+    }
+
+    #dashboard-buttons {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(200px, 1fr));
+        grid-gap: 25px;
+        justify-items: center;
+        padding: 1rem;
+
+        button {
+            width: 100%;
+        }
+
+        @media screen and (max-width: 1500px) {
+            grid-template-columns: repeat(4, minmax(200px, 1fr));
+        }
+
+        @media screen and (max-width: 1000px) {
+            grid-template-columns: repeat(3, minmax(200px, 1fr));
+        }
+
+        @media screen and (max-width: 700px) {
+            grid-template-columns: repeat(2, minmax(200px, 1fr));
+        }
+
+        @media screen and (max-width: 475px) {
+            grid-template-columns: minmax(200px, 1fr);
+        }
+    }
+}
+
+#dashboard-subscribers-dialog p {
+    font-size: 1rem;
+    div {
+        text-align: left;
+    }
 }
