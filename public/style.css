@@ -414,6 +414,16 @@ input {
     }
 }
 
+.three-button-div {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    button {
+        width: 25%;
+    }
+}
+
 .form-container {
     max-width: 300px;
     padding: 10px;
