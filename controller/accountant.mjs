@@ -7,10 +7,10 @@ class Accountant {
 
     /**
     * Returns the seconds elapsed from Jan 1, 1970 (Epoch).
-    * @return {Number}
+    * @return {String}
     */
     generatePaymentID() {
-        return Math.round(Date.now() / 1000);
+        return Math.round(Date.now() / 1000).toString();
     }
 
     /**

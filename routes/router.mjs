@@ -220,7 +220,7 @@ class API {
                     if (user.email === "alexandros.tsakiridis2@gmail.com" || user.email === "themispan2002@gmail.com")
                         request.session.admin = true;
                     if (DEBUG_API_CALL) console.log("Success with session", request.session);  // fixme it doesn't work
-                    if (request.session.paymentID > 0) {  // paymentID
+                    if (request.session.paymentID) {
                         if (DEBUG_API_CALL) console.log("THEY WANT TO PAY, paymentID:", request.session.paymentID)
                         accountant.save(request.session.paymentID, request.session.email, null);
                         response.redirect("/payment");
@@ -243,6 +243,7 @@ class API {
     static payment(request, response) {
         if (DEBUG_API_CALL) console.log("API payment");
         console.log("PAYMENT ACCEPTED paymentID:", request.session.paymentID);  // payment is always successful for now
+        console.log(request.body.holder, request.body.number, request.body.expiration);
         console.log("PRINTING YOUR RECEIPT");
         accountant.invoice(request.session.paymentID);
         API.document(request, response);
@@ -301,7 +302,8 @@ class API {
         if (DEBUG_API_CALL) console.log("API tickets selected");
         if (DEBUG_API_CALL) console.log(request.session.email, request.body);
 
-        request.session.paymentID = accountant.generatePaymentID();
+        if (!request.session.paymentID || request.session.paymentID === "")
+            request.session.paymentID = accountant.generatePaymentID();  // ------ prevent making more payments at once
         if (request.session.signedIn) {
             accountant.save(request.session.paymentID, request.session.email, request.body);
             response.sendStatus(200);  // -------------------------------------- tell them to proceed to payment screen
