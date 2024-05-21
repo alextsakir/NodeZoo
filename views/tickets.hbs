@@ -58,6 +58,7 @@
 
 <dialog id="ticket-confirmation-dialog">
     <h1 id="ticket-confirmation-header">Are you sure for your choices?</h1>
+    <i id="ticket-confirmation-date"></i>
     <p id="ticket-confirmation-paragraph"></p>
     <span id="ticket-confirmation-buttons">
         <button id="ticket-dialog-ok">OK</button>
@@ -95,27 +96,31 @@
     let submitButton = document.querySelector("#submit-tickets-button");
     submitButton.addEventListener("click", function () {
         selectedData.date = document.querySelector("#ticket-date").value;
-        let ticketDivisions = document.querySelectorAll(".ticket");
+        let ticketDivisions = document.querySelectorAll(".ticket"), totalQuantity = 0;
         for (let ticket of ticketDivisions) {
             ticket.getElementsByTagName("span");
             let quantity = ticket.querySelector(".ticket-quantity-input");
-            let price = ticket.querySelector(".price");
-            if (quantity.value > 0){ 
-                selectedData[ticket.id] = quantity.value;
-                //selectedData["name"] = ticket.id;
-                //selectedData["quantity"] = quantity.value;
-                //selectedData["price"] = price.value;
+            // let price = ticket.querySelector(".price");
+            totalQuantity += quantity.value;
+            if (quantity.value > 0) selectedData[ticket.id] = quantity.value;
+        }
+        console.log("total", totalQuantity)
+        if (totalQuantity == 0) // it's ok with ==, don't worry
+            openDialog("No tickets selected", "Please select at least one ticket to continue", simpleClose);
+        else {
+            let confirmationDialog = document.querySelector("#ticket-confirmation-dialog");
+            console.log(selectedData);
+            let paragraph = confirmationDialog.querySelector("p"), date = confirmationDialog.querySelector("i");
+            paragraph.innerHTML = "";
+            for (const [key, value] of Object.entries(selectedData)) {
+                if (key === "date") {
+                    date.innerHTML = value.toString();
+                    continue;
+                }
+                paragraph.innerHTML += `${key} ${value}<br>`;
             }
+            confirmationDialog.showModal();
         }
-        let confirmationDialog = document.querySelector("#ticket-confirmation-dialog");
-        confirmationDialog.showModal();
-        console.log(selectedData);
-        let paragraph = confirmationDialog.querySelector("p");
-        paragraph.innerHTML = "";
-        for (const [key, value] of Object.entries(selectedData)) {
-            paragraph.innerHTML += `${key} ${value}<br>`;
-        }
-        // paragraph.innerHTML = selectedData.toString(); // ----------- todo
     });
 
     let confirmationBACK = document.querySelector("#ticket-dialog-back");
@@ -126,7 +131,6 @@
 
     let confirmationOK = document.querySelector("#ticket-dialog-ok");
     confirmationOK.addEventListener("click", function () {
-        console.log("sending data...");
         fetch("/api/tickets-selected", {
             method: "POST", 
             headers: {
@@ -137,13 +141,11 @@
         .then(response => {
             console.log(response.status);
             if (response.ok) {
-               // openDialog("Successful entry", "proceed to safe payment environment", toPayUs);
+               openDialog("Successful entry", "proceed to safe payment environment", toPayUs);
             } else if (response.status === 300) {
-                console.log("about to login");
-                wantToPay = true;
+                console.log("login required");
                 openDialog("Login required", "please log in", toLogin);
             }
-            return response.text();
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);

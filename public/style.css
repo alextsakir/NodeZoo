@@ -814,6 +814,7 @@ footer {
 dialog {
     max-width: 30%;
     background-color: black;
+    text-align: center;
 
     h1 {
         text-align: center;
@@ -824,6 +825,11 @@ dialog {
     h3 {
         text-align: center;
         color: var(--foreground);
+    }
+
+    i {
+        text-align: center;
+        color: cyan;
     }
 
     p {

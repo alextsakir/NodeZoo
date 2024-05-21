@@ -1,8 +1,9 @@
+import {accountant} from "../controller/accountant.mjs";
 import bcrypt from "bcrypt";
 import {database, User} from "../model/database.mjs";
 import express from "express";
 import fs from "fs";
-import createInvoice from "../controller/controller.mjs";
+import url from "url";
 
 const router = express.Router();
 const DEBUG_ROUTE_CALL = true;
@@ -68,7 +69,7 @@ const DEBUG_API_CALL = true;
 */
 class ROUTE {
 
-    static counter (request, response, next) {
+    static counter (request, response) {
         console.log(request.socket.remoteAddress);
     }
 
@@ -80,46 +81,32 @@ class ROUTE {
         response.render("index", {layout: "main", title: "Patras Zoo", signedIn: request.session.signedIn,
             admin: request.session.admin});  // -------------------- with layout you can change the Handlebars template
     }
-    
+
     static april(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: april rendered");
         response.render("april", {layout: "main", title: "April", signedIn: request.session.signedIn,
             admin: request.session.admin});
     }
-    
+
     static about(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: about rendered");
         response.render("about", {layout: "main", title: "About", signedIn: request.session.signedIn,
             admin: request.session.admin});
     }
-    
+
     static animals(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: animals rendered");
-        console.log(request.session);
-        fs.readdir('images', (err, files) => {  // fixme themis --------------------- there is no need for readdir call
-            if (err) {
-                console.error('Error reading images directory:', err);
-                response.sendStatus(500);
-            } else {
-                // Render the gallery page and pass the list of image files to it
-                // let images = files.map(fileName => fileName.replace(/\.jpg$/, ''));
-                // const imagesToRemove = ['gallery-1','gallery-2','gallery-3','gallery-4','home'];  // fixme -- themis
-                // images = images.filter(item => !imagesToRemove.includes(item));  // fixme ------------------- UNUSED
-                // let animals = database.animals;
-                response.render("animals", {
-                    layout: "main", title: "Animals", animals: database.animals,
-                    signedIn: request.session.signedIn, admin: request.session.admin
-                });
-            }
-        });
+        response.render("animals", {
+            layout: "main", title: "Animals", animals: database.animals,
+            signedIn: request.session.signedIn, admin: request.session.admin});
     }
-    
+
     static contact(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: contact rendered");
         response.render("contact", {layout: "main", title: "Contact", signedIn: request.session.signedIn,
             admin: request.session.admin});
     }
-    
+
     static dashboard(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: dashboard rendered");
         response.render("dashboard", {
@@ -127,42 +114,53 @@ class ROUTE {
             signedIn: request.session.signedIn, email: request.session.email, admin: request.session.admin
         });
     }
-    
+
     static gallery(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: gallery rendered");
         response.sendStatus(404);
     }
-    
+
+    static invoice(request, response) {
+        console.log(request.query.file);
+        response.contentType("application/pdf");
+        response.send(fs.readFileSync("./invoices/" + request.query.file.toString()));
+    }
+
     static login(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: login rendered");
         response.render("login", {layout: "main", title: "Login", signedIn: request.session.signedIn,
             admin: request.session.admin});
     }
-    
+
     static payment(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: payment rendered");
-        let cardName = request.session.email ? database.firstName(request.session.email)[0] + ". " +
-            database.lastName(request.session.email) : "YOUR NAME";
-        response.render("payment", {layout: "main", title: "Payment", signedIn: request.session.signedIn,
-            admin: request.session.admin, cardName: cardName});  // note SOURCE: https://codepen.io/quinlo/pen/YONMEa
+        if (!request.session.signedIn) response.redirect("index");
+        else {
+            let cardName = request.session.email ? database.firstName(request.session.email)[0] + ". " +
+                database.lastName(request.session.email) : "YOUR NAME";
+            response.render("payment", {
+                layout: "main", title: "Payment", signedIn: request.session.signedIn,
+                admin: request.session.admin, cardName: cardName
+            });  // note ------------------------------------------------- SOURCE: https://codepen.io/quinlo/pen/YONMEa
+        }
     }
-    
+
     static register(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: register rendered");
         response.render("register", {layout: "main", title: "Register",
             signedIn: request.session.signedIn, admin: request.session.admin});
     }
-    
+
     static registered(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: registered rendered");
         response.render("registered", {layout: "main", title: "Registered",
             signedIn: request.session.signedIn, admin: request.session.admin});
     }
-    
-    static test(request, response) {
+
+    static hello(request, response) {
         response.send("Hello World!");
     }
-    
+
     static tickets(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: tickets rendered");
         let today = new Date(), yyyy = today.getFullYear();
@@ -182,9 +180,10 @@ router.route("/april").get(ROUTE.april);
 router.route("/contact").get(ROUTE.contact);
 router.route("/dashboard").get(ROUTE.dashboard);
 router.route("/gallery").get(ROUTE.gallery);
-router.route("/hello").get(ROUTE.test);
+router.route("/hello").get(ROUTE.hello);
 router.route("/home").get(ROUTE.index);
 router.route("/index").get(ROUTE.index);
+router.route("/invoice/").get(ROUTE.invoice);
 router.route("/login").get(ROUTE.login);
 router.route("/payment").get(ROUTE.payment);
 router.route("/register").get(ROUTE.register);
@@ -198,12 +197,6 @@ router.route("/tickets").get(ROUTE.tickets);
 */
 class API {
 
-    static accountant(email, tickets) {
-        let invoice = {
-            // shipping
-        }
-    }
-
     static animalDescription(request, response) {
         if (DEBUG_API_CALL) console.log("API animal description");
         if (DEBUG_API_CALL) console.log(request.body);
@@ -212,42 +205,50 @@ class API {
 
     static login(request, response) {
         if (DEBUG_API_CALL) console.log("API login");
-        console.log(request.body.email, "with their password");
-        if (request.body.wantToPay) console.log("LOGIN TO PAY TICKETS", request.body.wantToPay, request.body.tickets);
+        if (DEBUG_API_CALL) console.log(request.body.email, "is trying to log in");
         database.checkUser(request.body.email, request.body.password, (message, user) => {
             if (message) {
                 if (DEBUG_API_CALL) console.log(message);
             } else {
                 if (!user) {
-                    console.log("wrong email or password")
+                    if (DEBUG_API_CALL) console.log("wrong email or password");
                     response.sendStatus(406);
                 } else {
+                    if (DEBUG_API_CALL) console.log("SUCCESSFUL LOGIN");
                     request.session.signedIn = true;
                     request.session.email = user.email;
-                    if (user.email === "alexandros.tsakiridis2@gmail.com")
+                    if (user.email === "alexandros.tsakiridis2@gmail.com" || user.email === "themispan2002@gmail.com")
                         request.session.admin = true;
                     if (DEBUG_API_CALL) console.log("Success with session", request.session);  // fixme it doesn't work
-                    if (request.body.wantToPay) {
-                        response.sendStatus(202);
-                        API.accountant(request.session.email, request.body.tickets);
-                    }
-                    else response.sendStatus(200);
+                    if (request.session.paymentID > 0) {  // paymentID
+                        if (DEBUG_API_CALL) console.log("THEY WANT TO PAY, paymentID:", request.session.paymentID)
+                        accountant.save(request.session.paymentID, request.session.email, null);
+                        response.redirect("/payment");
+                    } else response.sendStatus(200);  // --------------------------------------------- successful login
                 }
             }
         })
     }
 
-    static logout(request, response, next) {
+    static logout(request, response) {
         if (DEBUG_API_CALL) console.log("API log out");
         if (request.session.signedIn) {
             if (DEBUG_API_CALL) console.log(request.session.email, "is logging out");
             request.session.destroy();
             if (request.headers.referer === "/dashboard") response.redirect("/index");
-            response.sendStatus(200);
-        } else response.sendStatus(400);  // normally it should be unreachable
+            response.sendStatus(200);  // ----------------------------------------------------------- successful logout
+        } else response.sendStatus(400);  // ---------------------------------------- normally it should be unreachable
     }
 
-    static register(request, response, next) {
+    static payment(request, response) {
+        if (DEBUG_API_CALL) console.log("API payment");
+        console.log("PAYMENT ACCEPTED paymentID:", request.session.paymentID);  // payment is always successful for now
+        console.log("PRINTING YOUR RECEIPT");
+        accountant.invoice(request.session.paymentID);
+        API.document(request, response);
+    }
+
+    static register(request, response) {
         if (DEBUG_API_CALL) console.log("API register");
         if (DEBUG_API_CALL) console.log("EMAIL TO REGISTER", request.body.email);
         database.exists(request.body.email, function (error, result) {
@@ -298,19 +299,24 @@ class API {
 
     static ticketsSelected(request, response) {
         if (DEBUG_API_CALL) console.log("API tickets selected");
-        if (DEBUG_API_CALL) console.log(request.body); console.log(request.session.email);
+        if (DEBUG_API_CALL) console.log(request.session.email, request.body);
 
+        request.session.paymentID = accountant.generatePaymentID();
         if (request.session.signedIn) {
-            let invoice = database.ticketInvoice(request.session.email, request.body);
-            createInvoice(invoice, "./public/test_ticket.pdf");
-            response.sendStatus(200);
-        } else response.sendStatus(300);
+            accountant.save(request.session.paymentID, request.session.email, request.body);
+            response.sendStatus(200);  // -------------------------------------- tell them to proceed to payment screen
+        } else {
+            accountant.save(request.session.paymentID, null, request.body);
+            response.sendStatus(300);  // ----------------------------------------------------------- ask them to login
+        }
     }
 
-    static document(request, response) {
+    static document(request, response) {  // ------------------------------------------------------ send pdf to browser
         if (DEBUG_API_CALL) console.log("API document");
-        response.contentType("application/pdf");
-        response.send(fs.readFileSync("./public/Back_In_The_USSR.pdf"));
+        response.status(200).setHeader("Content-Type", "application/json");
+        response.end(JSON.stringify({file: request.session.paymentID + ".pdf"}));
+        request.session.paymentID = 0;  // --------------------------------- tickets are bought, remove ID from session
+        response.send();
     }
     static notAllowed(request, response) {
         if (DEBUG_API_CALL) console.log("API document");
@@ -321,10 +327,13 @@ class API {
 router.route("/api/animal-description").get(API.animalDescription).post(API.notAllowed);  // note -------------- UNUSED
 router.route("/api/register").get(API.notAllowed).post(API.register);
 router.route("/api/subscribe").get(API.notAllowed).post(API.subscribe);
+
 router.route("/api/subscribers").get(API.subscribers).post(API.notAllowed);
 router.route("/api/tickets-selected").get(API.notAllowed).post(API.ticketsSelected);
 router.route("/api/login").get(API.notAllowed).post(API.login).delete(API.logout);
-router.route("/api/document").get(API.document).post(API.notAllowed);
+
+router.route("/api/payment").get(API.payment).post(API.notAllowed);
+router.route("/api/document").get(API.notAllowed).post(API.notAllowed);
 router.route("/api/").get(API.notAllowed).post(API.notAllowed);
 
 export default router;

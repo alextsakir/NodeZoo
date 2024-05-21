@@ -1,6 +1,5 @@
 import db from "better-sqlite3";
 import bcrypt from "bcrypt";
-import { stat } from "fs";
 
 const Locale = Object.freeze({EN: Symbol("ENGLISH"), GR: Symbol("GREEK")});
 const LOCALE = Locale.EN;
@@ -34,19 +33,12 @@ export class User {
 }
 
 class Database {
+    DEBUG = false;
     connection = new db("model/storage.sqlite", {fileMustExist: true});
-
-    pendingPayments = [];
-
-    ticketsDISABLED = [
-        new Ticket("Παιδικό", "Child", "child ticket", 5),
-        new Ticket("Ενήλικας", "Adult", "adult ticket", 12),
-        new Ticket("ΑμεΑ", "Disabled", "disabled ticket", 8)
-    ];
 
     /**
     * Animals are stored in a table with their name, description.
-    * @return {Array} objects containing a name and a description property.
+    * @return {Array} objects containing a name and a description property
     */
     get animals() {
         return this.connection.prepare("select name, description from animal").all();
@@ -54,8 +46,8 @@ class Database {
 
     /**
     * Returns password for the provided email address.
-    * @param {String} email the email to search for.
-    * @return {String} password.
+    * @param {String} email the email to search for
+    * @return {String} password
     */
     getPassword(email) {
         return this.connection.prepare("select password from user where email = ?").all(email)[0].password;
@@ -65,15 +57,15 @@ class Database {
     * Checks if the provided password matches with the one in the database.
     * @param {String} email
     * @param {String} password
-    * @param {function[message: Union[String, Error], user: User]} callback to be called after.
+    * @param {function[message: Union[String, Error], user: User]} callback to be called after
+    * @return void
     */
     checkUser(email, password, callback) {  // fixme docstring
         let user;
         try {
-            const statement = this.connection.prepare(("select * from user where email = ?"));
-            user = statement.get(email);
+            user = this.connection.prepare(("select * from user where email = ?")).get(email);
             if (user) {
-                const match  = bcrypt.compareSync(password, user.password);
+                const match = bcrypt.compareSync(password, user.password);
                 if (match) {
                     callback(null, user);
                 } else {
@@ -89,13 +81,14 @@ class Database {
 
     /**
     * Checks if an email already exists in the table, it is primary key.
-    * @param {String} email to check.
-    * @param {function[error: Error, result: boolean]} callback to be called after.
+    * @param {String} email to check
+    * @param {function[error: Error, result: boolean]} callback to be called after
+    * @return void
     */
     exists(email, callback) {
         try {
             let result = this.connection.prepare("select email from user where email = ?").all(email);
-            console.log("DATABASE EMAIL EXISTS", email, "\t\t\tRESULT", result.length === 1);
+            if (this.DEBUG) console.log("DATABASE EMAIL EXISTS", email, "\t\t\tRESULT", result.length === 1);
             callback(null, result.length === 1);
         } catch (error) {
             callback(error, null);
@@ -125,11 +118,11 @@ class Database {
     price(ticket){
         return this.connection.prepare("select price from ticketType where name = ?").all(ticket)[0].price;
     }
-    
 
     /**
     * Saves a new user in the namesake table, unless it already exists.
-    * @param {User} user to save.
+    * @param {User} user to save
+    * @return void
     */
     saveNewUser(user) {
         this.exists(user.email, (error, result) => {
@@ -150,8 +143,9 @@ class Database {
     /**
     * Saves an email in user table, unless it already exists. Database differentiates between users and subscribers,
     * the former have passed all their credentials and the latter only their emails.
-    * @param {String} email the address we want to save.
-    * @param {function[error: Error, result: boolean]} callback to be called after.
+    * @param {String} email the address we want to save
+    * @param {function[error: Error, result: boolean]} callback to be called after
+    * @return void
     */
     saveSubscription(email, callback) {
         this.exists(email, (error, result) => {
@@ -166,7 +160,7 @@ class Database {
 
     /**
     * Subscribers are stored in user table, only with their email address.
-    * @return {Array[String]} of subscribers' emails.
+    * @return {Array[String]} newsletter emails
     */
     get subscribers() {
         let out = [];
@@ -176,49 +170,20 @@ class Database {
     }
 
     /**
-    * Returns an array of tickets stored in the namesake table.
-    * @return {Array[Object]} of objects containing a name, description and a price property.
+    * Returns description and price for the specified ticket name
+    * @param {String} name
+    * @return {Array[String]}
     */
-    get ticketTypes() {
-        return this.connection.prepare("select name, description, price from ticketType").all();
+    ticketInfo(name) {
+        return this.connection.prepare("select description, price from ticketType where name = ?").all(name)[0];
     }
 
     /**
-    * Returns an Invoice object with selected date, client credentials, tickets and total price.
-    * @param email String
-    * @param tickets Array[Object]
-    * @return {Object} Invoice
+    * Returns an array of tickets stored in the namesake table.
+    * @return {Array[Object]} of objects containing a name, description and a price property
     */
-    ticketInvoice(email, tickets) {
-        const statement = this.connection.prepare(("select name, description, price from ticketType where name = ?"));
-        let invoice = {};
-        invoice = {
-            date: "",
-            shipping: {
-                name: this.firstName(email) + " " + this.lastName(email), address: this.address(email),
-                town: this.town(email), country: "Greece", postal_code: this.postal_code(email), email: email
-            },
-            tickets: [],  // item, description, price, quantity, amount
-            total: 0
-        }
-        for (const [key, value] of Object.entries(tickets)) {
-            console.log(key);
-            if (key === "date") {
-                invoice.date = value;
-                continue;
-            }
-            let ticket_info;
-            try {
-                ticket_info = statement.all(key)[0];
-            } catch(err) {
-                console.log(`Could not select ${key} ticket type from database`);
-            }
-            invoice.tickets.push({item: key, description: ticket_info.description,
-                price: ticket_info.price, quantity: value, amount: ticket_info.price * value})
-            invoice.total += ticket_info.price * value;
-        }
-        // console.log(invoice);
-        return invoice;
+    get ticketTypes() {
+        return this.connection.prepare("select name, description, price from ticketType").all();
     }
 }
 export const database = new Database();

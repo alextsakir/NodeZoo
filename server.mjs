@@ -28,7 +28,7 @@ application.use(session({
     secret: "secret",
     saveUninitialized: false,
     resave: false,
-    cookie: {expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)}  // expire in one week
+    cookie: {expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)}  // ------------------------- expires in one week
 }));
 
 application.use(router);  // forgot to write it, I was crying for an hour
@@ -38,7 +38,7 @@ const PORT = process.env.PORT || "3000";
 
 // ================================================== RUN APP =========================================================
 
-const server = application.listen(PORT, () => {console.log(`Server running on http://127.0.0.1:${PORT}`)});
+const server = application.listen(PORT, () => {console.log(`Server running on http://127.0.0.1:${PORT}`)}); // ---- RUN
 
 process.on("SIGTERM", () => {
     console.info("SIGTERM signal received: closing server");

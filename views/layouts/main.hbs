@@ -41,7 +41,7 @@
                 <a href="/tickets/" class="header-tab">Tickets</a>
                 <a href="/animals/" class="header-tab">Animals</a>
                 <a href="/about/" class="header-tab">About</a>
-                <span style="color: red;">{{signedIn}} remove</span>
+<!--                <span style="color: red;">{{signedIn}} remove</span>-->
             </nav>
         </div>
         <div class="button-div" id="header-login-register-div">
@@ -126,22 +126,19 @@
         </form>
     </dialog>
     <script type="text/javascript">
-        let selectedData = {}, wantToPay = false, loginDialog = document.getElementById("login-form-dialog"),
+        let selectedData = {},
+                loginDialog = document.getElementById("login-form-dialog"),
                 closeButton = document.getElementById("close-btn"),
                 loginWarning = document.querySelector("#login-form-warning"),
                 email = document.getElementById("login-form-email"),
                 password = document.getElementById("login-form-password");
 
         document.getElementById("login-button").addEventListener("click", () => {
-            loginWarning.style.visibility = "hidden";
-            email.value = "";
-            password.value = "";
+            loginWarning.style.visibility = "hidden"; email.value = ""; password.value = "";
             loginDialog.showModal();
         });
         document.getElementById("login-button-mobile").addEventListener("click", () => {
-            loginWarning.style.visibility = "hidden";
-            email.value = "";
-            password.value = "";
+            loginWarning.style.visibility = "hidden"; email.value = ""; password.value = "";
             loginDialog.showModal();
         });
         closeButton.addEventListener("click", () => {
@@ -161,34 +158,20 @@
                     method: "POST",
                     headers: {Accept: "*/*", "Content-Type": "application/json"},
                     body: JSON.stringify({email: email.value, password: password.value,
-                        wantToPay: wantToPay, tickets: selectedData}),
-                    })
-                    .then((response) => {
-                        // response.json();
-                        // console.log(response);
-                        console.log(response.status);
-                        if (response.status === 200) {
-                            openDialog("You are logged in", "", () => {
-                                simpleClose();
-                                loginDialog.close();
-                                location.reload();
-                            });
-                        } else if (response.status === 202) {
-                            loginDialog.close();
-                            window.location.href = "/payment/";
-                        } else if (response.status === 406) {
-                            console.log("login failure");
-                            loginWarning.style.visibility = "visible";
-                            email.value = "";
-                            password.value = "";  // tell them to try again
-                        }
-                    })
-                    .then((result) => {
-                        console.log("RESULT", result);
-                    })
-                    .catch((error) => {
-                    console.log(error);
-                    });
+                    }),
+                }).then((response) => {
+                    console.log(response.status);
+                    if (response.status === 200) {
+                        openDialog("You are logged in", "", () => {
+                            simpleClose(); loginDialog.close(); location.reload();
+                        });
+                    } else if (response.status === 406) {
+                        console.log("login failure");
+                        loginWarning.style.visibility = "visible";
+                        email.value = "";
+                        password.value = "";  // tell them to try again
+                    }
+                }).catch((error) => {console.log(error);});
             }
         });
     </script>
@@ -264,7 +247,7 @@
 
             <div class="box" id="footer-delta">
                 <h3>quick links</h3>
-                <a href="/public#tickets" class="links"> <i class="fas fa-arrow-right"></i>tickets</a>
+                <a href="/public/" class="links"> <i class="fas fa-arrow-right"></i>tickets</a>
                 <a href="/about/" class="links"> <i class="fas fa-arrow-right"></i>about</a>
                 <a href="#" class="links" id="accessibility"> <i class="fas fa-arrow-right"></i>accessibility</a>
                 <dialog id="accessibility-dialog">

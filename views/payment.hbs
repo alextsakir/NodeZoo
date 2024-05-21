@@ -122,10 +122,21 @@
     </div>
 </div>
 <div class="button-div" style="width: 40%;">
-    <button onclick="window.location.href='/tickets/';">Abort</button>
-    <button>Proceed</button>
+    <button id="payment-abort" onclick="window.location.href='/tickets/';">Abort</button>
+    <button id="payment-proceed">Proceed</button>
 </div>
 <script>
+
+    document.querySelector("#payment-proceed").addEventListener("click", () => {
+        fetch("/api/payment", {
+                method: "GET", headers: {Accept: "application/json", "Content-Type": "application/json"}})
+                .then((response) => response.json())
+                .then((result) => {
+                console.log(result);
+                    window.open("/invoice/?file=" + result.file, "_blank");  // ------- open receipt in new browser tab
+            }).catch((error) => {console.log(error);});
+    });
+
     window.onload = function () {
 
     const name = document.getElementById('name');
