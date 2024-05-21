@@ -163,7 +163,8 @@
                     console.log(response.status);
                     if (response.status === 200) {
                         openDialog("You are logged in", "", () => {
-                            simpleClose(); loginDialog.close(); location.reload();
+                            simpleClose(); loginDialog.close();
+                            location.reload();
                         });
                     } else if (response.status === 406) {
                         console.log("login failure");
@@ -188,22 +189,20 @@
         </div>
     </dialog>
     <script type="text/javascript">
-        // const loginDialogNew = document.getElementById("login-form-dialog");
         const cookieDialog = document.getElementById("cookie-consent-dialog");
+        document.querySelector("#cookie-consent-dialog button").addEventListener("click", () => {cookieDialog.close();});
+        // document.getElementById("cookie-consent-allow-button").addEventListener("click", () => {cookieDialog.close();});
 
-        document.addEventListener("keydown", (event) => {
-            if (event.altKey === true) {
+        document.addEventListener("keydown", (event) => {  // note -------------------------- global keyboard shortcuts
+            if (event.altKey) {
                 if (event.key === "C") cookieDialog.showModal();
-                if (event.key === "L") loginDialog.showModal();
+                else if (event.key === "G" && window.location.href.includes("payment"))
+                    document.querySelector("#generatecard").dispatchEvent(new CustomEvent("click"));
+                else if (event.key === "L") loginDialog.showModal();
+                else if (event.key === "R") window.location.href = "/register";
             }
-            if (event.key === "L") loginDialog.showModal();  // fixme --------------------------------- NOT WORKING
         })
 
-        function keyPress (e) {
-            if(e.key === "C") cookieDialog.showModal();
-            if(e.key === "L") cookieDialog.showModal();
-        }
-        document.getElementById("cookie-consent-deny-button").addEventListener("click", () => {cookieDialog.close();});
     </script>
 
     <main class="content">

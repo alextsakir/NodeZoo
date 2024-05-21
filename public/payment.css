@@ -264,60 +264,60 @@ label {
 }
 
 /* BACK OF CARD */
-#cardback .st0 {
-    fill: none;
-    stroke: #0F0F0F;
-    stroke-miterlimit: 10;
-}
+/*#cardback .st0 {*/
+/*    fill: none;*/
+/*    stroke: #0F0F0F;*/
+/*    stroke-miterlimit: 10;*/
+/*}*/
 
-#cardback .st2 {
-    fill: #111111;
-}
+/*#cardback .st2 {*/
+/*    fill: #111111;*/
+/*}*/
 
-#cardback .st3 {
-    fill: #F2F2F2;
-}
+/*#cardback .st3 {*/
+/*    fill: #F2F2F2;*/
+/*}*/
 
-#cardback .st4 {
-    fill: #D8D2DB;
-}
+/*#cardback .st4 {*/
+/*    fill: #D8D2DB;*/
+/*}*/
 
-#cardback .st5 {
-    fill: #C4C4C4;
-}
+/*#cardback .st5 {*/
+/*    fill: #C4C4C4;*/
+/*}*/
 
-#cardback .st6 {
-    font-family: 'Source Code Pro', monospace;
-    font-weight: 400;
-}
+/*#cardback .st6 {*/
+/*    font-family: 'Source Code Pro', monospace;*/
+/*    font-weight: 400;*/
+/*}*/
 
-#cardback .st7 {
-    font-size: 27px;
-}
+/*#cardback .st7 {*/
+/*    font-size: 27px;*/
+/*}*/
 
-#cardback .st8 {
-    opacity: 0.6;
-}
+/*#cardback .st8 {*/
+/*    opacity: 0.6;*/
+/*}*/
 
-#cardback .st9 {
-    fill: #FFFFFF;
-}
+/*#cardback .st9 {*/
+/*    fill: #FFFFFF;*/
+/*}*/
 
-#cardback .st10 {
-    font-size: 24px;
-}
+/*#cardback .st10 {*/
+/*    font-size: 24px;*/
+/*}*/
 
-#cardback .st11 {
-    fill: #EAEAEA;
-}
+/*#cardback .st11 {*/
+/*    fill: #EAEAEA;*/
+/*}*/
 
-#cardback .st12 {
-    font-family: 'Rock Salt', cursive;
-}
+/*#cardback .st12 {*/
+/*    font-family: 'Rock Salt', cursive;*/
+/*}*/
 
-#cardback .st13 {
-    font-size: 37.769px;
-}
+/*#cardback .st13 {*/
+/*    font-size: 37.769px;*/
+/*}*/
 
 /* FLIP ANIMATION */
 .container {

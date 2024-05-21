@@ -92,7 +92,7 @@
     }
 
     document.querySelector("#clear-ticket-selection").addEventListener("click", clearQuantities);
-
+    let confirmationDialog = document.querySelector("#ticket-confirmation-dialog");
     let submitButton = document.querySelector("#submit-tickets-button");
     submitButton.addEventListener("click", function () {
         selectedData.date = document.querySelector("#ticket-date").value;
@@ -105,10 +105,9 @@
             if (quantity.value > 0) selectedData[ticket.id] = quantity.value;
         }
         console.log("total", totalQuantity)
-        if (totalQuantity == 0) // it's ok with ==, don't worry
+        if (totalQuantity == 0) // note == operator is intentional, don't change it
             openDialog("No tickets selected", "Please select at least one ticket to continue", simpleClose);
         else {
-            let confirmationDialog = document.querySelector("#ticket-confirmation-dialog");
             console.log(selectedData);
             let paragraph = confirmationDialog.querySelector("p"), date = confirmationDialog.querySelector("i");
             paragraph.innerHTML = "";
@@ -139,9 +138,11 @@
             body: JSON.stringify(selectedData)
         })
         .then(response => {
-            console.log(response.status);
             if (response.ok) {
-               openDialog("Successful entry", "proceed to safe payment environment", toPayUs);
+               openDialog("Successful entry", "proceed to safe payment environment", () => {
+                   confirmationDialog.close();
+                   toPayUs();
+               });
             } else if (response.status === 300) {
                 console.log("login required");
                 openDialog("Login required", "please log in", toLogin);
@@ -149,7 +150,6 @@
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
-            // Handle errors here
         });
 });
 
