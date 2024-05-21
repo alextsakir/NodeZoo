@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import {database, User} from "../model/database.mjs";
 import express from "express";
 import fs from "fs";
+import createInvoice from "../controller/controller.mjs";
 
 const router = express.Router();
 const DEBUG_ROUTE_CALL = true;
@@ -197,6 +198,12 @@ router.route("/tickets").get(ROUTE.tickets);
 */
 class API {
 
+    static accountant(email, tickets) {
+        let invoice = {
+            // shipping
+        }
+    }
+
     static animalDescription(request, response) {
         if (DEBUG_API_CALL) console.log("API animal description");
         if (DEBUG_API_CALL) console.log(request.body);
@@ -205,7 +212,8 @@ class API {
 
     static login(request, response) {
         if (DEBUG_API_CALL) console.log("API login");
-        console.log(request.body.email, request.body.password, request.body.wantToPay);
+        console.log(request.body.email, "with their password");
+        if (request.body.wantToPay) console.log("LOGIN TO PAY TICKETS", request.body.wantToPay, request.body.tickets);
         database.checkUser(request.body.email, request.body.password, (message, user) => {
             if (message) {
                 if (DEBUG_API_CALL) console.log(message);
@@ -219,7 +227,10 @@ class API {
                     if (user.email === "alexandros.tsakiridis2@gmail.com")
                         request.session.admin = true;
                     if (DEBUG_API_CALL) console.log("Success with session", request.session);  // fixme it doesn't work
-                    if (request.body.wantToPay) response.sendStatus(202);
+                    if (request.body.wantToPay) {
+                        response.sendStatus(202);
+                        API.accountant(request.session.email, request.body.tickets);
+                    }
                     else response.sendStatus(200);
                 }
             }
@@ -287,21 +298,12 @@ class API {
 
     static ticketsSelected(request, response) {
         if (DEBUG_API_CALL) console.log("API tickets selected");
-        if (DEBUG_API_CALL) console.log(request.body);
+        if (DEBUG_API_CALL) console.log(request.body); console.log(request.session.email);
 
         if (request.session.signedIn) {
+            let invoice = database.ticketInvoice(request.session.email, request.body);
+            createInvoice(invoice, "./public/test_ticket.pdf");
             response.sendStatus(200);
-            console.log(database.ticketTypes);
-            // let shipping = {};
-            // let tickets = {};
-
-            // for (ticket of database.ticketTypes){
-            //     if (ticket.name) === kati {
-
-            //     }
-            // }
-            // createInvoice(invoice, path); TODO
-
         } else response.sendStatus(300);
     }
 

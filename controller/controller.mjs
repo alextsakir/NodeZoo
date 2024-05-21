@@ -1,5 +1,5 @@
 import fs from "fs";
-import {PDFDocument} from "pdfkit";
+import PDFDocument from "pdfkit";
 
 
 
@@ -42,17 +42,12 @@ function generateCustomerInformation(doc, invoice) {
       .fontSize(10)
       .text("Invoice Number:", 50, customerInformationTop)
       .font("Helvetica-Bold")
-      .text(invoice.invoice_nr, 150, customerInformationTop)
+      .text("generate ticket code", 150, customerInformationTop)
       .font("Helvetica")
       .text("Invoice Date:", 50, customerInformationTop + 15)
       .text(formatDate(new Date()), 150, customerInformationTop + 15)
       .text("Balance Due:", 50, customerInformationTop + 30)
-      .text(
-        formatCurrency(invoice.subtotal - invoice.paid),
-        150,
-        customerInformationTop + 30
-      )
-  
+      .text(formatCurrency(invoice.total), 150, customerInformationTop + 30)
       .font("Helvetica-Bold")
       .text(invoice.shipping.name, 300, customerInformationTop)
       .font("Helvetica")
@@ -86,13 +81,12 @@ function generateInvoiceTable(doc, invoice) {
         generateTableRow(
             doc,
             position,
-            ticket,
+            ticket.item,
             ticket.description,
-            formatCurrency(ticket.amount / ticket.quantity),
+            ticket.price,
             ticket.quantity,
-            formatCurrency(ticket.amount)
+            ticket.amount
         );
-    
         generateHr(doc, position + 20);
     }
   
@@ -136,7 +130,7 @@ function generateFooter(doc) {
     doc
       .fontSize(10)
       .text(
-        "Payment is made in Zoo entrance. Thank you for your business.",
+        "Payment is made for Patras Zoo. Thank you for your business.",
         50,
         780,
         { align: "center", width: 500 }
@@ -171,7 +165,7 @@ function generateHr(doc, y) {
 }
   
 function formatCurrency(cents) {
-    return "€" + (cents / 100).toFixed(2);
+    return "€" + cents.toFixed(2);
 }
   
 function formatDate(date) {
@@ -181,7 +175,5 @@ function formatDate(date) {
   
     return year + "/" + month + "/" + day;
 }
-  
-module.exports = {
-    createInvoice
-  };
+
+export default createInvoice;

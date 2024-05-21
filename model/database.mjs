@@ -36,6 +36,8 @@ export class User {
 class Database {
     connection = new db("model/storage.sqlite", {fileMustExist: true});
 
+    pendingPayments = [];
+
     ticketsDISABLED = [
         new Ticket("Παιδικό", "Child", "child ticket", 5),
         new Ticket("Ενήλικας", "Adult", "adult ticket", 12),
@@ -181,27 +183,42 @@ class Database {
         return this.connection.prepare("select name, description, price from ticketType").all();
     }
 
-    createInvoiceDict(ticket, email) {
+    /**
+    * Returns an Invoice object with selected date, client credentials, tickets and total price.
+    * @param email String
+    * @param tickets Array[Object]
+    * @return {Object} Invoice
+    */
+    ticketInvoice(email, tickets) {
         const statement = this.connection.prepare(("select name, description, price from ticketType where name = ?"));
         let invoice = {};
-        try {
-            ticket_info = statement.run(ticket);
-
-        } catch(err){
-            console.log("Error when creating Invoice: " + err);
-        }
         invoice = {
+            date: "",
             shipping: {
-                name: this.firstName(email) + this.lastName(email),
-                address: this.address(email),
-                town: this.town(email) + this.postal_code(email)
+                name: this.firstName(email) + " " + this.lastName(email), address: this.address(email),
+                town: this.town(email), country: "Greece", postal_code: this.postal_code(email), email: email
             },
-
-            tickets: {
-                // TODO
-            }
-
+            tickets: [],  // item, description, price, quantity, amount
+            total: 0
         }
+        for (const [key, value] of Object.entries(tickets)) {
+            console.log(key);
+            if (key === "date") {
+                invoice.date = value;
+                continue;
+            }
+            let ticket_info;
+            try {
+                ticket_info = statement.all(key)[0];
+            } catch(err) {
+                console.log(`Could not select ${key} ticket type from database`);
+            }
+            invoice.tickets.push({item: key, description: ticket_info.description,
+                price: ticket_info.price, quantity: value, amount: ticket_info.price * value})
+            invoice.total += ticket_info.price * value;
+        }
+        // console.log(invoice);
+        return invoice;
     }
 }
 export const database = new Database();

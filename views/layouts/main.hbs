@@ -126,7 +126,7 @@
         </form>
     </dialog>
     <script type="text/javascript">
-        let wantToPay = false, loginDialog = document.getElementById("login-form-dialog"),
+        let selectedData = {}, wantToPay = false, loginDialog = document.getElementById("login-form-dialog"),
                 closeButton = document.getElementById("close-btn"),
                 loginWarning = document.querySelector("#login-form-warning"),
                 email = document.getElementById("login-form-email"),
@@ -160,7 +160,8 @@
                 fetch("/api/login", {
                     method: "POST",
                     headers: {Accept: "*/*", "Content-Type": "application/json"},
-                    body: JSON.stringify({email: email.value, password: password.value, wantToPay: wantToPay}),
+                    body: JSON.stringify({email: email.value, password: password.value,
+                        wantToPay: wantToPay, tickets: selectedData}),
                     })
                     .then((response) => {
                         // response.json();

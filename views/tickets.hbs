@@ -66,7 +66,6 @@
 </dialog>
 
 <script>
-    let selectedData = {};
     let tickets = document.getElementsByTagName("li");
     // console.log(Array.from(tickets));
     Array.from(tickets).forEach(function (element) {
@@ -95,6 +94,7 @@
 
     let submitButton = document.querySelector("#submit-tickets-button");
     submitButton.addEventListener("click", function () {
+        selectedData.date = document.querySelector("#ticket-date").value;
         let ticketDivisions = document.querySelectorAll(".ticket");
         for (let ticket of ticketDivisions) {
             ticket.getElementsByTagName("span");
