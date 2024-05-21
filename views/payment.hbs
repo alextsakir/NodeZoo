@@ -1,6 +1,6 @@
 <div class="payment-body"> <!-- -------------------- isolate stylesheet properties in here ------------------------ -->
     <div class="payment-title"><h1>Payment Information</h1></div>
-    <div class="container preload">
+    <div class="container preload"> <!-- ----------------- https://codepen.io/quinlo/pen/YONMEa ------------------- -->
         <div class="creditcard">
             <div class="front limedark">
                 <div id="ccsingle"></div>
@@ -78,29 +78,38 @@
         </div>
     </div>
     <div class="form-container">
-        <div class="field-container"><label for="name">Name</label><input id="name" maxlength="30" type="text"></div>
+        <div class="field-container"><label for="name">Name</label><input id="name" maxlength="33" type="text"></div>
         <div class="field-container">
             <label for="cardnumber">Card Number</label><span id="generatecard">generate random</span>
-            <input id="cardnumber" type="text" pattern="[0-9]*" inputmode="numeric">
+            <input id="cardnumber" type="text" pattern="[0-9]*" maxlength="16" inputmode="numeric">
             <svg id="ccicon" class="ccicon" width="750" height="471" viewBox="0 0 750 471" version="1.1"
                  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> </svg>
         </div>
         <div class="field-container">
             <label for="expirationdate">Expiration (mm/yy)</label>
-            <input id="expirationdate" type="text" pattern="[0-9]*" inputmode="numeric">
+            <input id="expirationdate" type="text" pattern="[0-9]*" maxlength="5" inputmode="numeric">
         </div>
         <div class="field-container">
             <label for="securitycode">Security Code</label>
-            <input id="securitycode" type="text" pattern="[0-9]*" inputmode="numeric">
+            <input id="securitycode" type="password" pattern="[0-9]*" maxlength="3" inputmode="numeric">
         </div>
     </div>
 </div>
-<div class="button-div" style="display: flex; justify-content: space-around; width: 70%;">
+<dialog id="hitloader-dialog"> <!--    https://codepen.io/quinlo/pen/QWgYNBb-->
+    <div id="hitloadercontainer" class="hitloadercontainer">
+        <div class="hitloader">
+            <div class="scwrap"><div class="spinner-item"></div></div>
+            <div class="scwrap"><div class="spinner-item"></div></div>
+            <div class="scwrap"><div class="spinner-item"></div></div>
+        </div>
+    </div>
+</dialog>
+<div class="three-button-div">
     <button id="payment-abort" onclick="window.location.href='/tickets/';">Abort</button>
     <button id="payment-clear">Clear</button>
     <button id="payment-proceed">Proceed</button>
 </div>
-<script>
+<script type="text/javascript">
     const name = document.getElementById('name');
     const cardnumber = document.getElementById('cardnumber');
     const expirationdate = document.getElementById('expirationdate');
@@ -108,22 +117,26 @@
 
     document.querySelector("#payment-clear").addEventListener("click", () => {
         document.getElementById('name').value = "";
-        document.getElementById('svgname').innerHTML = "";
+        document.getElementById('svgname').innerHTML = "YOUR NAME";
         document.getElementById('cardnumber').value = "";
+        document.getElementById('svgnumber').innerHTML = "";
         document.getElementById('expirationdate').value = "";
-        document.getElementById('svgexpire').innerHTML = "";
+        document.getElementById('svgexpire').innerHTML = "00/00";
         document.getElementById('securitycode').value = "";
     })
 
+    let hitloader = document.querySelector("#hitloader-dialog");
     document.querySelector("#payment-proceed").addEventListener("click", () => {
+        hitloader.showModal();
         fetch("/api/payment", {
-            method: "GET", headers: {Accept: "application/json", "Content-Type": "application/json"},
+            method: "POST", headers: {Accept: "application/json", "Content-Type": "application/json"},
             body: JSON.stringify({holder: name, number: cardnumber.value, expiration: expirationdate.value})
             })
             .then((response) => response.json())
             .then((result) => {
+                hitloader.close();
                 console.log(result);
-                window.open("/invoice/?file=" + result.file, "_blank");  // ----------- open receipt in new browser tab
+                window.open("/invoice/?file=" + result.file, "_blank", "popup");  // ----- open receipt in popup window
             }).catch((error) => {console.log(error);});
     });
 
@@ -156,10 +169,12 @@
         document.getElementById("securitycode").value = (Math.floor(Math.random() * 900) + 100).toString();
         document.getElementById("cardnumber").dispatchEvent(new CustomEvent("input"));
         document.getElementById("name").dispatchEvent(new CustomEvent("input"));
+        document.getElementById("expirationdate").dispatchEvent(new CustomEvent("input"));
     });
 
     document.querySelector('.creditcard').addEventListener('click', function () {
         console.log("flip");
+        changeColors();
         if (this.classList.contains('flipped')) {
             this.classList.remove('flipped');
         } else {
@@ -168,29 +183,34 @@
     });
 
     name.addEventListener("input", () => {
+
+        if (name.value.length > 27) document.getElementById("svgname").style.fontSize = "23px";
+        else if (name.value.length > 21) document.getElementById("svgname").style.fontSize = "27px";
+        else document.getElementById("svgname").style.fontSize = "33px";
         if (name.value.length === 0) {
             document.getElementById("svgname").innerHTML = "YOUR NAME";
             document.getElementById("svgnameback").innerHTML = "YOUR NAME";
         } else {
-            document.getElementById("svgname").innerHTML = this.value;
-            document.getElementById("svgnameback").innerHTML = this.value;
+            document.getElementById("svgname").innerHTML = name.value;
+            document.getElementById("svgnameback").innerHTML = name.value;
         }
     });
 
     expirationdate.addEventListener("input", () => {
-        document.getElementById("svgexpire").value = this.value;
+        document.getElementById("svgexpire").innerHTML = expirationdate.value;
     });
 
     cardnumber.addEventListener("input", () => {
         let target = document.getElementById("svgnumber");
-        target.innerHTML = this.value;
+        target.innerHTML = cardnumber.value;
         if (cardnumber.value.length >= 12) {
-            target.innerHTML = this.value.slice(0, 4) + " " + this.value.slice(4, 8) + " " +
-                    this.value.slice(8, 12) + " " + this.value.slice(12);
-        } else if (this.value.length >= 8) {
-            target.innerHTML = this.value.slice(0, 4) + " " + this.value.slice(4, 8) + " " + this.value.slice(8);
-        } else if (this.value.length >= 4) {
-            target.innerHTML = this.value.slice(0, 4) + " " + this.value.slice(4);
+            target.innerHTML = cardnumber.value.slice(0, 4) + " " + cardnumber.value.slice(4, 8) + " " +
+                    cardnumber.value.slice(8, 12) + " " + cardnumber.value.slice(12);
+        } else if (cardnumber.value.length >= 8) {
+            target.innerHTML = cardnumber.value.slice(0, 4) + " " + cardnumber.value.slice(4, 8) + " " +
+                    cardnumber.value.slice(8);
+        } else if (cardnumber.value.length >= 4) {
+            target.innerHTML = cardnumber.value.slice(0, 4) + " " + cardnumber.value.slice(4);
         }
     });
 
@@ -210,5 +230,4 @@
     securitycode.addEventListener('focus', function () {
         document.querySelector('.creditcard').classList.add('flipped');
     });
-
 </script>

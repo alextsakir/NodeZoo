@@ -246,7 +246,9 @@ class API {
         console.log(request.body.holder, request.body.number, request.body.expiration);
         console.log("PRINTING YOUR RECEIPT");
         accountant.invoice(request.session.paymentID);
-        API.document(request, response);
+        setTimeout(function() {
+            API.document(request, response);
+        }, 3000);
     }
 
     static register(request, response) {
@@ -334,7 +336,7 @@ router.route("/api/subscribers").get(API.subscribers).post(API.notAllowed);
 router.route("/api/tickets-selected").get(API.notAllowed).post(API.ticketsSelected);
 router.route("/api/login").get(API.notAllowed).post(API.login).delete(API.logout);
 
-router.route("/api/payment").get(API.payment).post(API.notAllowed);
+router.route("/api/payment").get(API.notAllowed).post(API.payment);
 router.route("/api/document").get(API.notAllowed).post(API.notAllowed);
 router.route("/api/").get(API.notAllowed).post(API.notAllowed);
 
