@@ -6,6 +6,21 @@ class Accountant {
     briefcase = [];
 
     /**
+    * Checks if given card number has 16 digits and if expiration date has elapsed, passes boolean result to callback.
+    * @param {Number} number the card number
+    * @param {String} expiration date in mm/yy format
+    * @param {Function[boolean]} callback
+    * @return void
+    */
+    checkCard(number, expiration, callback) {
+        if (number.toString().length !== 16 || expiration.length !== 5 || expiration[2] !== "/") callback(false);
+        let month = Number(expiration.slice(0, 2)) - 1, year = Number("20" + expiration.slice(3, 5));
+        if (year < new Date().getFullYear()) callback(false);
+        else if (year === new Date().getFullYear() && month < new Date().getMonth()) callback(false);
+        else callback(true);
+    }
+
+    /**
     * Returns the seconds elapsed from Jan 1, 1970 (Epoch).
     * @return {String}
     */
@@ -43,9 +58,12 @@ class Accountant {
     */
     invoice(paymentID) {
         for (const record of this.briefcase) {
-            if (record.paymentID === paymentID)
-                if (this.DEBUG) console.log("ACCOUNTANT IS WRITING PDF", paymentID)
+            if (record.paymentID === paymentID) {
+                if (this.DEBUG) console.log("ACCOUNTANT IS WRITING PDF", paymentID);
+                database.saveTicket(paymentID, record.email, record.tickets);
                 createInvoice(this.data(paymentID, record.email, record.tickets));
+                return;
+            }
         }
         if (this.DEBUG) console.log("Accountant could not create invoice pdf.")
     }

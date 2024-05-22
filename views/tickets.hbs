@@ -1,15 +1,9 @@
 <div id="tickets-date-container">
-    <h1>Select date --- fixme</h1>
     <p>
-        todo: create a calculateQuantities() function,
-        check if they selected any tickets before pressing OK,
-        show selected date in confirmation dialog,
-        send selected date to the server in the selectedData object,
-        create a method in database to calculate the total cost,
         lock login dialog before paying, as it was done for dashboard
     </p>
     <form id="ticket-date-selection-form">
-<!--        <label for="ticket-date">Select date</label>-->
+        <h1>Select date</h1>
         <input type="date" id="ticket-date" name="birthdate" value="{{minDate}}" min="{{minDate}}" max="{{maxDate}}">
     </form>
 </div>

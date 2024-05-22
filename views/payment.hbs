@@ -128,6 +128,7 @@
     let hitloader = document.querySelector("#hitloader-dialog");
     document.querySelector("#payment-proceed").addEventListener("click", () => {
         hitloader.showModal();
+        if (expirationdate.value.length !== 5) expirationdate.value = " " + expirationdate.value;  // ---- zero padding
         fetch("/api/payment", {
             method: "POST", headers: {Accept: "application/json", "Content-Type": "application/json"},
             body: JSON.stringify({holder: name, number: cardnumber.value, expiration: expirationdate.value})
@@ -136,7 +137,13 @@
             .then((result) => {
                 hitloader.close();
                 console.log(result);
-                window.open("/invoice/?file=" + result.file, "_blank", "popup");  // ----- open receipt in popup window
+                if (!result.success) {
+                    openDialog("Payment failed", "please check your card credentials", simpleClose);
+                } else {
+                    window.open("/invoice/?file=" + result.file, "_blank", "popup");  // - open receipt in popup window
+                    // fetch("/landing", {method: "GET", headers: {Accept: "text/html"}});
+                    window.location.href = "/landing";
+                }
             }).catch((error) => {console.log(error);});
     });
 

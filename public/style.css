@@ -274,11 +274,12 @@ header {
 }
 
 /* =================================================== INDEX ======================================================= */
-.hero{
+.hero {
     min-height: 100vh;
     display: flex;
     align-items: center;
     background: url(../images/home.jpg) no-repeat;
+    /* dont replace background with shorthand equivalent*/
     background-size: cover;
     background-position: top;
 
@@ -291,7 +292,7 @@ header {
         background-position: left;
     }
     
-  }
+}
   
   .hero .content{
     max-width: 60rem;
@@ -319,12 +320,16 @@ header {
     align-items: center;
     flex-wrap: wrap;
     gap: 6rem;
-  }
+
+    button {
+        padding: 1em;
+    }
+}
   
   
-  .about .box-container .image{
+.about .box-container .image {
     flex: 1 1 21rem; /*flex: 1 1 21rem;*/
-  }
+}
   
   .about .box-container .image img{
     width: 80%;
@@ -454,17 +459,36 @@ input {
 #ticket-date-selection-form{
     margin-left: auto;
     margin-right: auto;
-    width: 25%;  
+    width: 25%;
+}
+
+#tickets-container, #tickets-date-container {
+    text-align: center;
+    input[type="date"] {
+        font-size: 1.5em;
+    }
+}
+
+#tickets-date-container form {
+    width: 350px;
 }
 
 #tickets-container {
     text-align: center;
-    
-    #ticket-selection-form{
-        width: 25%;
-        max-width: 50%; 
-        margin: 0 auto;         
+
+    #ticket-selection-form {
+        width: 350px;
+        margin: 0 auto;
+        /*max-width: 50%; */
+
     }
+
+    /*@media screen and (max-width: 1440px) {*/
+    /*    #ticket-selection-form {*/
+    /*        width: 50%;*/
+    /*    }*/
+    /*}*/
+
     ul {
         list-style: none;
         padding: 0;
@@ -472,10 +496,10 @@ input {
         /* padding-bottom: 5rem; */
     }
 
-    .ticket{
-        margin-top: 3.5rem;
-        margin-bottom: 3.5rem;
-        padding: 1.5em 0 1.5em 0;
+    .ticket {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        padding: 1em 0;
         border: 1px red;
         border-radius: 1.2em;
         background-color: #070707;
