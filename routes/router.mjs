@@ -3,11 +3,12 @@ import bcrypt from "bcrypt";
 import {database, User} from "../model/database.mjs";
 import express from "express";
 import fs from "fs";
-import url from "url";
 
 const router = express.Router();
 const DEBUG_ROUTE_CALL = true;
 const DEBUG_API_CALL = true;
+const ENABLE_PAYMENT_CHECK = true;
+const ENABLE_AUTO_LOGIN = true;
 
 // class counter extends Function {
 //     log = [];
@@ -73,6 +74,7 @@ class ROUTE {
         console.log(request.socket.remoteAddress);
     }
 
+    // @autoLogin
     static index(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: index rendered");
         if (request.session.signedIn === undefined)
@@ -109,6 +111,8 @@ class ROUTE {
 
     static dashboard(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: dashboard rendered");
+        if (!request.session.admin)
+            response.redirect("/index");
         response.render("dashboard", {
             layout: "main", title: "Dashboard",
             signedIn: request.session.signedIn, email: request.session.email, admin: request.session.admin
@@ -126,6 +130,11 @@ class ROUTE {
         response.send(fs.readFileSync("./invoices/" + request.query.file.toString()));
     }
 
+    static landing(request, response) {
+        if (DEBUG_ROUTE_CALL) console.log("router: landing page sent");
+        response.send(fs.readFileSync("./views/landing.html", "utf8"))
+    }
+
     static login(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: login rendered");
         response.render("login", {layout: "main", title: "Login", signedIn: request.session.signedIn,
@@ -134,7 +143,7 @@ class ROUTE {
 
     static payment(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: payment rendered");
-        if (!request.session.signedIn) response.redirect("index");
+        if (!request.session.signedIn || !request.session.paymentID > 0) response.redirect("index");
         else {
             let cardName = request.session.email ? database.firstName(request.session.email)[0] + ". " +
                 database.lastName(request.session.email) : "YOUR NAME";
@@ -171,31 +180,89 @@ class ROUTE {
             minDate: yyyy + "-" + mm + "-" + dd, maxDate: (yyyy + 1) + "-" + mm + "-" + dd
         });
     }
+
+    static autoLogin(request, response, next) {
+        if (!request.session.email && ENABLE_AUTO_LOGIN) {
+            let foundEmail;
+            if (request.cookies.email) {
+                foundEmail = request.cookies.email.toString();  // --------------- try to read email in browser cookies
+            }
+            if (typeof foundEmail === "undefined") {
+                if (DEBUG_ROUTE_CALL) console.log("did not find email in your browser cookies");
+            } else if (!database.hasIntentionallyLogout(foundEmail)) {
+                if (DEBUG_ROUTE_CALL) console.log("AUTO LOGIN FOUND THIS EMAIL IN UNSIGNED COOKIES", foundEmail);
+                database.exists(foundEmail, (error, result) => {
+                    if (error) {
+                        // console.log(error)
+                    } else if (result) {  // automatically log in user
+                        if (DEBUG_ROUTE_CALL) console.log("CONNECTED AUTOMATICALLY");
+                        request.session.signedIn = true;
+                        request.session.email = foundEmail;
+                    }
+                });
+            }
+        }
+        next();
+    }
 }
 
-router.route("/").get(ROUTE.index);  // PLEASE preserve URL alphabetical order!
-router.route("/about").get(ROUTE.about);
-router.route("/animals").get(ROUTE.animals);
+router.route("/").get(ROUTE.autoLogin, ROUTE.index);  // ---------------------- PLEASE preserve URL alphabetical order!
+router.route("/about").get(ROUTE.autoLogin, ROUTE.about);
+router.route("/animals").get(ROUTE.autoLogin, ROUTE.animals);
 router.route("/april").get(ROUTE.april);
 router.route("/contact").get(ROUTE.contact);
-router.route("/dashboard").get(ROUTE.dashboard);
+router.route("/dashboard").get(ROUTE.autoLogin, ROUTE.dashboard);
 router.route("/gallery").get(ROUTE.gallery);
 router.route("/hello").get(ROUTE.hello);
-router.route("/home").get(ROUTE.index);
-router.route("/index").get(ROUTE.index);
+router.route("/home").get(ROUTE.autoLogin, ROUTE.index);
+router.route("/index").get(ROUTE.autoLogin, ROUTE.index);
 router.route("/invoice/").get(ROUTE.invoice);
+router.route("/landing").get(ROUTE.landing);
 router.route("/login").get(ROUTE.login);
 router.route("/payment").get(ROUTE.payment);
 router.route("/register").get(ROUTE.register);
 router.route("/registered").get(ROUTE.registered);
-router.route("/tickets").get(ROUTE.tickets);
+router.route("/tickets").get(ROUTE.autoLogin, ROUTE.tickets);
 
 // ==================================================== API ===========================================================
+
+// export function autoLogin(request, response, next) {
+//     if (!request.session.email) {
+//         if (DEBUG_API_CALL) console.log("auto login");
+//         let foundEmail = request.cookies.email.toString();
+//         console.log("AUTO LOGIN FOUND THIS EMAIL IN UNSIGNED COOKIES", foundEmail);
+//         database.exists(foundEmail, (error, result) => {
+//             if (error) {
+//                 console.log(error)
+//             } else if (result) {
+//                 console.log("CONNECTED AUTOMATICALLY");
+//                 request.session.signedIn = true;
+//                 request.session.email = foundEmail;
+//             }
+//         });
+//     } else next();
+// }
 
 /**
 * API functions are used for functionality.
 */
 class API {
+
+    static parseCookies (request) {  // unused, express cookieParser does it
+        const list = {};
+        const cookieHeader = request.headers?.cookie;
+        if (!cookieHeader) return list;
+
+        cookieHeader.split(`;`).forEach(function (cookie) {
+            let [name, ...rest] = cookie.split(`=`);
+            name = name?.trim();
+            if (!name) return;
+            const value = rest.join(`=`).trim();
+            if (!value) return;
+            list[name] = decodeURIComponent(value);
+        });
+        return list;
+    }
 
     static animalDescription(request, response) {
         if (DEBUG_API_CALL) console.log("API animal description");
@@ -209,23 +276,28 @@ class API {
         database.checkUser(request.body.email, request.body.password, (message, user) => {
             if (message) {
                 if (DEBUG_API_CALL) console.log(message);
-            } else {
-                if (!user) {
-                    if (DEBUG_API_CALL) console.log("wrong email or password");
-                    response.sendStatus(406);
-                } else {
-                    if (DEBUG_API_CALL) console.log("SUCCESSFUL LOGIN");
-                    request.session.signedIn = true;
-                    request.session.email = user.email;
-                    if (user.email === "alexandros.tsakiridis2@gmail.com" || user.email === "themispan2002@gmail.com")
-                        request.session.admin = true;
-                    if (DEBUG_API_CALL) console.log("Success with session", request.session);  // fixme it doesn't work
-                    if (request.session.paymentID) {
-                        if (DEBUG_API_CALL) console.log("THEY WANT TO PAY, paymentID:", request.session.paymentID)
-                        accountant.save(request.session.paymentID, request.session.email, null);
-                        response.redirect("/payment");
-                    } else response.sendStatus(200);  // --------------------------------------------- successful login
+                response.status(200).setHeader("Content-Type", "application/json");
+                response.end(JSON.stringify({success: false, message: message}));
+                response.send();  // ------------- send json with boolean success and string message in case of failure
+            } else if (user) {
+                if (DEBUG_API_CALL) console.log("SUCCESSFUL LOGIN");
+                request.session.signedIn = true;
+                request.session.email = user.email;
+                if (request.body.remember) {  // note ----------------------- this will keep them logged in for 4 hours
+                    console.log("THEY CHOSE REMEMBER ME");
+                    response.cookie("email", user.email, {maxAge: 1000 * 60 * 60 * 4});
                 }
+                if (user.email === "alexandros.tsakiridis2@gmail.com" || user.email === "themispan2002@gmail.com")
+                    request.session.admin = true;
+                if (DEBUG_API_CALL) console.log("Success with session", request.session);  // fixme --- it doesn't work
+                if (request.session.paymentID) {
+                    if (DEBUG_API_CALL) console.log("THEY WANT TO PAY, paymentID:", request.session.paymentID)
+                    accountant.save(request.session.paymentID, request.session.email, null);
+                    response.redirect("/payment");
+                } else
+                    response.status(200).setHeader("Content-Type", "application/json");
+                    response.end(JSON.stringify({success: true, message: ""}));  // ----- send json with truthy success
+                    response.send();  // ------------------------------------------------------------- successful login
             }
         })
     }
@@ -234,6 +306,7 @@ class API {
         if (DEBUG_API_CALL) console.log("API log out");
         if (request.session.signedIn) {
             if (DEBUG_API_CALL) console.log(request.session.email, "is logging out");
+            database.intentionalLogout(request.session.email);
             request.session.destroy();
             if (request.headers.referer === "/dashboard") response.redirect("/index");
             response.sendStatus(200);  // ----------------------------------------------------------- successful logout
@@ -242,13 +315,27 @@ class API {
 
     static payment(request, response) {
         if (DEBUG_API_CALL) console.log("API payment");
-        console.log("PAYMENT ACCEPTED paymentID:", request.session.paymentID);  // payment is always successful for now
-        console.log(request.body.holder, request.body.number, request.body.expiration);
-        console.log("PRINTING YOUR RECEIPT");
-        accountant.invoice(request.session.paymentID);
-        setTimeout(function() {
-            API.document(request, response);
-        }, 3000);
+        console.log("PAYMENT paymentID:", request.session.paymentID);  // -------- payment is always successful for now
+        API.paymentCheck(request, response, (result) => {
+            if (!result) {
+                if (DEBUG_API_CALL) console.log("PAYMENT FAILED");
+                response.status(200).setHeader("Content-Type", "application/json");
+                response.end(JSON.stringify({success: false}));
+                response.send();
+            } else {
+                if (DEBUG_API_CALL) console.log("PRINTING YOUR RECEIPT");
+                accountant.invoice(request.session.paymentID);
+                setTimeout(function () {
+                    API.document(request, response);
+                }, 3000);
+            }
+        });
+    }
+
+    static paymentCheck(request, response, callback) {
+        if (!ENABLE_PAYMENT_CHECK) callback(true);
+        console.log(request.body.holder, request.body.number, request.body.expiration);  //  cardholder is always valid
+        accountant.checkCard(request.body.number, request.body.expiration, (result) => callback(result));
     }
 
     static register(request, response) {
@@ -260,7 +347,7 @@ class API {
                 response.sendStatus(412);  // todo tell them that user already exists
             } else {
                 if (request.body.password === request.body.confirm_password) {
-                    const saltRounds =  10;
+                    const saltRounds = 10;
                     bcrypt.hash(request.body.password, saltRounds, function(err, hash) {
                         let user = new User(request.body.firstname,
                                             request.body.lastname,
@@ -318,7 +405,7 @@ class API {
     static document(request, response) {  // ------------------------------------------------------ send pdf to browser
         if (DEBUG_API_CALL) console.log("API document");
         response.status(200).setHeader("Content-Type", "application/json");
-        response.end(JSON.stringify({file: request.session.paymentID + ".pdf"}));
+        response.end(JSON.stringify({success: true, file: request.session.paymentID + ".pdf"}));
         request.session.paymentID = 0;  // --------------------------------- tickets are bought, remove ID from session
         response.send();
     }
@@ -328,6 +415,7 @@ class API {
     }
 }
 
+// router.route("/api/auto-login").get(API.autoLogin)
 router.route("/api/animal-description").get(API.animalDescription).post(API.notAllowed);  // note -------------- UNUSED
 router.route("/api/register").get(API.notAllowed).post(API.register);
 router.route("/api/subscribe").get(API.notAllowed).post(API.subscribe);

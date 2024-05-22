@@ -6,7 +6,7 @@ const LOCALE = Locale.EN;
 
 // ================================================== DATABASE ========================================================
 
-export class Ticket {
+export class Ticket {  // note ----------------------------------------------------------------------------- deprecated
     constructor(name_GR, name_EN, description, price) {
         this.name_GR = name_GR; this.name_EN = name_EN; this.description = description; this.price = price;
     }
@@ -35,6 +35,7 @@ export class User {
 class Database {
     DEBUG = false;
     connection = new db("model/storage.sqlite", {fileMustExist: true});
+    cacheIntentionalLogout = [];
 
     /**
     * Animals are stored in a table with their name, description.
@@ -55,6 +56,7 @@ class Database {
 
     /**
     * Checks if the provided password matches with the one in the database.
+     * Note, callback will be called with null, user if login is successful, otherwise message, null.
     * @param {String} email
     * @param {String} password
     * @param {function[message: Union[String, Error], user: User]} callback to be called after
@@ -63,11 +65,11 @@ class Database {
     checkUser(email, password, callback) {  // fixme docstring
         let user;
         try {
-            user = this.connection.prepare(("select * from user where email = ?")).get(email);
+            user = this.connection.prepare(("select * from user where email = ? and password is not null")).get(email);
             if (user) {
                 const match = bcrypt.compareSync(password, user.password);
                 if (match) {
-                    callback(null, user);
+                    callback(null, user);  // successful login
                 } else {
                     callback('Wrong Password', null);
                 }
@@ -95,6 +97,38 @@ class Database {
         }
     }
 
+    /**
+    * Checks if a user has cookie in client side to get logged in automatically, but preferred to log out.
+    *
+    * *Note: When an email is stored in database cache, it means that there is a cookie in their browser giving them
+    * the opportunity to get logged in automatically.*
+    * @param {String} email
+    * @return boolean
+    */
+    hasIntentionallyLogout(email) {
+        console.log("DATABASE hasIntentionallyLogout() called");
+        console.log(email, "found in database cache", this.cacheIntentionalLogout.includes(email));
+        return this.cacheIntentionalLogout.includes(email);
+    }
+
+    /**
+    * Gets called when a user is disconnected and stores his email in database cache.
+    *
+    * *Note: When an email is stored in database cache, it means that there is a cookie in their browser giving them
+    * the opportunity to get logged in automatically.*
+    * @param {String} email
+    * @return void
+    */
+    intentionalLogout(email) {
+        console.log("DATABASE intentionalLogout() called");
+        this.cacheIntentionalLogout.push(email);
+        console.log("database cache", this.cacheIntentionalLogout);
+    }
+
+    intentionalLogin(email) {
+
+    }
+
     firstName(email) {
         return this.connection.prepare("select firstname from user where email = ?").all(email)[0].firstname;
     }
@@ -117,6 +151,25 @@ class Database {
 
     price(ticket){
         return this.connection.prepare("select price from ticketType where name = ?").all(ticket)[0].price;
+    }
+
+    /**
+    * Returns an array of all tickets a specific user has bought.
+    * @param {String} email
+    * @return {Array}
+    */
+    userTickets(email) {
+        this.exists(email, (error, result) => {
+            if (error) console.log(error);
+            else if (result) return null;
+            else if (!result) {
+                try {
+                    return this.connection.prepare("select * from ticket where email = ?").all(email);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        });
     }
 
     /**
@@ -144,7 +197,7 @@ class Database {
     * Saves an email in user table, unless it already exists. Database differentiates between users and subscribers,
     * the former have passed all their credentials and the latter only their emails.
     * @param {String} email the address we want to save
-    * @param {function[error: Error, result: boolean]} callback to be called after
+    * @param {function[error: Error, result: boolean]} callback
     * @return void
     */
     saveSubscription(email, callback) {
@@ -152,10 +205,32 @@ class Database {
             if (error) callback(error, false);
             else if (result) callback(null, false);
             else if (!result) {
-                this.connection.prepare("insert into user (email) values (?)").run(email);
-                callback(null, true);
+                try {
+                    this.connection.prepare("insert into user (email) values (?)").run(email);
+                    callback(null, true);
+                } catch (error) {
+                    console.log(error);
+                }
             }
         });
+    }
+
+    /**
+    * Subscribers are stored in user table, only with their email address.
+    * @param {String} paymentID
+    * @param {String} email
+    * @param {Object} tickets
+    * @return void
+    */
+    saveTicket(paymentID, email, tickets) {
+        console.log("database.saveTicket() called with", paymentID, email, tickets);
+        console.log(JSON.stringify(tickets));
+        let statement = this.connection.prepare("insert into ticket (paymentID, email, data) values (?, ?, ?)");
+        try {
+            statement.run(paymentID, email, JSON.stringify(tickets));
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     /**
@@ -164,9 +239,25 @@ class Database {
     */
     get subscribers() {
         let out = [];
-        for (let address of this.connection.prepare("select email from user where password is null").all())
-            out.push(address.email);
+        try {
+            for (let address of this.connection.prepare("select email from user where password is null").all())
+                out.push(address.email);
+        } catch (error) {
+            console.log(error);
+        }
         return out;
+    }
+
+    /**
+    * Returns ticket amount.
+    * @return {Number}
+    */
+    get ticketAmount() {
+        try {
+            return this.connection.prepare("select count(*) from ticket").all();
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     /**
@@ -175,7 +266,11 @@ class Database {
     * @return {Array[String]}
     */
     ticketInfo(name) {
-        return this.connection.prepare("select description, price from ticketType where name = ?").all(name)[0];
+        try {
+            return this.connection.prepare("select description, price from ticketType where name = ?").all(name)[0];
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     /**
@@ -183,7 +278,11 @@ class Database {
     * @return {Array[Object]} of objects containing a name, description and a price property
     */
     get ticketTypes() {
-        return this.connection.prepare("select name, description, price from ticketType").all();
+        try {
+            return this.connection.prepare("select name, description, price from ticketType order by price").all();
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 export const database = new Database();
