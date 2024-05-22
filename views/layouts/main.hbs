@@ -36,7 +36,7 @@
         </div>
         <div id="header-menu-div">
             <nav class="header-menu">
-                <a href="/" class="header-tab">Home</a>
+                <a href="/index/" class="header-tab">Home</a>
                 <!-- <a href="/gallery/">Gallery</a>-->
                 <a href="/tickets/" class="header-tab">Tickets</a>
                 <a href="/animals/" class="header-tab">Animals</a>
@@ -87,6 +87,7 @@
         }
         // ---------------------------------------- HIGHLIGHT CURRENT TAB ---------------------------------------------
         let pathName = window.location.pathname, tabs = document.getElementsByClassName("header-tab");
+        console.log("path name", pathName);
         if (pathName === "/") pathName = "/index/";
         for (let tab of document.getElementsByClassName("header-tab"))
             if (tab.href.includes(pathName)) tab.style.textDecoration="underline";  // -------------- match current url
@@ -132,6 +133,7 @@
                 loginWarning = document.querySelector("#login-form-warning"),
                 email = document.getElementById("login-form-email"),
                 password = document.getElementById("login-form-password");
+                remember = document.getElementById("remember-me");
 
         document.getElementById("login-button").addEventListener("click", () => {
             loginWarning.style.visibility = "hidden"; email.value = ""; password.value = "";
@@ -156,19 +158,22 @@
                 console.log(`${email.value} is trying to log in`);
                 fetch("/api/login", {
                     method: "POST",
-                    headers: {Accept: "*/*", "Content-Type": "application/json"},
-                    body: JSON.stringify({email: email.value, password: password.value,
+                    headers: {Accept: "application/json", "Content-Type": "application/json"},
+                    body: JSON.stringify({email: email.value, password: password.value, remember: remember.checked
                     }),
-                }).then((response) => {
-                    console.log(response.status);
-                    if (response.status === 200) {
+                }).then((response) =>
+                    response.json()
+                ).then((result) => {
+                    if (result.success) {
                         openDialog("You are logged in", "", () => {
                             simpleClose(); loginDialog.close();
                             location.reload();
                         });
-                    } else if (response.status === 406) {
-                        console.log("login failure");
+                    } else if (!result.success) {
+                        console.log(result.message);
                         loginWarning.style.visibility = "visible";
+                        if (typeof result.message === "string")
+                            loginWarning.innerHTML = result.message;
                         email.value = "";
                         password.value = "";  // tell them to try again
                     }
@@ -200,6 +205,7 @@
                     document.querySelector("#generatecard").dispatchEvent(new CustomEvent("click"));
                 else if (event.key === "L") loginDialog.showModal();
                 else if (event.key === "R") window.location.href = "/register";
+                else if (event.key === "H") window.location.href = "/index";
             }
         })
 
