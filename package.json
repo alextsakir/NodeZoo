@@ -4,13 +4,13 @@
   "description": "a zoo website, made in Spring 2024",
   "main": "server.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.mjs"
   },
   "private": true,
   "dependencies": {
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^10.0.0",
-    "connect-sqlite3": "^0.9.15",
     "cookie-parser": "^1.4.6",
     "express": "^4.19.2",
     "express-handlebars": "^7.1.2",
@@ -19,8 +19,6 @@
     "handlebars": "^4.7.8",
     "http": "^0.0.1-security",
     "node-fetch": "^3.3.2",
-    "passport": "^0.7.0",
-    "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "pdfkit": "^0.15.0"
   }
