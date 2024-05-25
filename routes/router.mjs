@@ -293,7 +293,9 @@ class API {
                     console.log("THEY CHOSE REMEMBER ME");
                     response.cookie("email", user.email, {maxAge: 1000 * 60 * 60 * 4});
                 }
-                if (user.email === "alexandros.tsakiridis2@gmail.com" || user.email === "themispan2002@gmail.com")
+                if (user.email === "alexandros.tsakiridis2@gmail.com"
+                    || user.email === "themispan2002@gmail.com"
+                    || user.email === "admin@example.com")
                     request.session.admin = true;
                 if (DEBUG_API_CALL) console.log("Success with session", request.session);  // fixme --- it doesn't work
                 if (request.session.paymentID) {
