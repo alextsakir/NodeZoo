@@ -132,7 +132,12 @@ class ROUTE {
 
     static landing(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: landing page sent");
-        response.send(fs.readFileSync("./views/landing.html", "utf8"))
+        if (!request.session.paymentID || request.session.paymentID === "") {
+            response.sendStatus(404);
+        } else {
+            request.session.paymentID = 0;  // ----------------------------- tickets are bought, remove ID from session
+            response.send(fs.readFileSync("./views/landing.html", "utf8"));
+        }
     }
 
     static login(request, response) {
@@ -145,6 +150,7 @@ class ROUTE {
         if (DEBUG_ROUTE_CALL) console.log("router: payment rendered");
         if (!request.session.signedIn || !request.session.paymentID > 0) response.redirect("index");
         else {
+            console.log("PAYMENT WILL BE RENDERED");
             let cardName = request.session.email ? database.firstName(request.session.email)[0] + ". " +
                 database.lastName(request.session.email) : "YOUR NAME";
             response.render("payment", {
@@ -293,11 +299,14 @@ class API {
                 if (request.session.paymentID) {
                     if (DEBUG_API_CALL) console.log("THEY WANT TO PAY, paymentID:", request.session.paymentID)
                     accountant.save(request.session.paymentID, request.session.email, null);
-                    response.redirect("/payment");
-                } else
+                    response.status(200).setHeader("Content-Type", "application/json");
+                    response.end(JSON.stringify({success: true, message: "pay"}));  // -- send json with truthy success
+                    response.send();  // ----------------------------------------- successful login, proceed to payment
+                } else {
                     response.status(200).setHeader("Content-Type", "application/json");
                     response.end(JSON.stringify({success: true, message: ""}));  // ----- send json with truthy success
                     response.send();  // ------------------------------------------------------------- successful login
+                }
             }
         })
     }
@@ -390,7 +399,6 @@ class API {
     static ticketsSelected(request, response) {
         if (DEBUG_API_CALL) console.log("API tickets selected");
         if (DEBUG_API_CALL) console.log(request.session.email, request.body);
-
         if (!request.session.paymentID || request.session.paymentID === "")
             request.session.paymentID = accountant.generatePaymentID();  // ------ prevent making more payments at once
         if (request.session.signedIn) {
@@ -406,16 +414,15 @@ class API {
         if (DEBUG_API_CALL) console.log("API document");
         response.status(200).setHeader("Content-Type", "application/json");
         response.end(JSON.stringify({success: true, file: request.session.paymentID + ".pdf"}));
-        request.session.paymentID = 0;  // --------------------------------- tickets are bought, remove ID from session
         response.send();
     }
     static notAllowed(request, response) {
         if (DEBUG_API_CALL) console.log("API document");
-        response.sendStatus(405);
+        response.sendStatus(405);  // -------------------------------------------------------------- method not allowed
     }
 }
 
-// router.route("/api/auto-login").get(API.autoLogin)
+// router.route("/api/auto-login").get(API.autoLogin);
 router.route("/api/animal-description").get(API.animalDescription).post(API.notAllowed);  // note -------------- UNUSED
 router.route("/api/register").get(API.notAllowed).post(API.register);
 router.route("/api/subscribe").get(API.notAllowed).post(API.subscribe);
