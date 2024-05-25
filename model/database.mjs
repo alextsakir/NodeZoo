@@ -84,7 +84,7 @@ class Database {
     /**
     * Checks if an email already exists in the table, it is primary key.
     * @param {String} email to check
-    * @param {function[error: Error, result: boolean]} callback to be called after
+    * @param {function[error: Error, result: boolean]} callback
     * @return void
     */
     exists(email, callback) {
@@ -125,8 +125,14 @@ class Database {
         console.log("database cache", this.cacheIntentionalLogout);
     }
 
-    intentionalLogin(email) {
-
+    /**
+    * Checks if a user is newsletter, meaning its record in user table contains only email.
+    * Note: Returns true if there is no password stored.
+    * @param {String} email
+    * @return boolean
+    */
+    isNewsletter(email) {
+        return !this.connection.prepare("select password from user where email = ?").all(email)[0].password.length;
     }
 
     firstName(email) {

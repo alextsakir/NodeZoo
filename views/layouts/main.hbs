@@ -164,11 +164,15 @@
                 }).then((response) =>
                     response.json()
                 ).then((result) => {
-                    if (result.success) {
+                    if (result.success && !result.message) {
                         openDialog("You are logged in", "", () => {
                             simpleClose(); loginDialog.close();
                             location.reload();
                         });
+                    } else if (result.success && result.message === "pay") {
+                        openDialog("You are logged in", "", () => {
+                            loginDialog.close(); toPayUs();
+                        })
                     } else if (!result.success) {
                         console.log(result.message);
                         loginWarning.style.visibility = "visible";

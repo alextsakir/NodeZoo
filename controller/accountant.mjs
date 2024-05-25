@@ -16,6 +16,7 @@ class Accountant {
         if (number.toString().length !== 16 || expiration.length !== 5 || expiration[2] !== "/") callback(false);
         let month = Number(expiration.slice(0, 2)) - 1, year = Number("20" + expiration.slice(3, 5));
         if (year < new Date().getFullYear()) callback(false);
+        else if (month > 12) callback(false);
         else if (year === new Date().getFullYear() && month < new Date().getMonth()) callback(false);
         else callback(true);
     }
@@ -25,7 +26,27 @@ class Accountant {
     * @return {String}
     */
     generatePaymentID() {
-        return Math.round(Date.now() / 1000).toString();
+        let id = Math.round(Date.now() / 1000).toString();
+        let display = new Date(0); // The 0 there is the key, which sets the date to the epoch
+        display.setUTCSeconds(Number(id));
+        console.log("paymentID generated:", display);
+        return id
+    }
+
+    /**
+    * Checks if a record with the provided paymentID already exists in briefcase.
+    * @param {String} paymentID
+    * @return {boolean}
+    */
+    existsInBriefcase(paymentID) {
+        for (let record of this.briefcase) {
+            if (record.paymentID === paymentID) {
+                if (this.DEBUG) console.log("accountant found", paymentID, "in briefcase")
+                return true;
+            }
+        }
+        if (this.DEBUG) console.log("accountant did not found", paymentID, "in briefcase")
+        return false;
     }
 
     /**
@@ -37,18 +58,29 @@ class Accountant {
     */
     save(paymentID, email, tickets) {
         if (this.DEBUG) console.log("accountant.save() called with", paymentID, email, tickets);
-        if (tickets) {  // -------------------------------------------------- id, email, tickets or id, !email, tickets
+        // if (tickets) {  // -------------------------------------------------- id, email, tickets or id, !email, tickets
+        //     this.briefcase.push({paymentID: paymentID, email: email, tickets: tickets});
+        // }
+        // else if (email && !tickets) {  // --------------------- id, email, !tickets (id and tickets are already stored)
+        //     // ------------------------------------------ in case they selected tickets before logging in, so the first
+        //     // ------------------------------- accountant.save() call had null email, that is going to be completed now
+        //     for (const record of this.briefcase) {
+        //         if (record.paymentID === paymentID)
+        //             record.email = email;
+        //     }
+        // }
+
+        if (this.existsInBriefcase(paymentID)) {
+            for (const record of this.briefcase) {
+                if (record.paymentID === paymentID) {
+                    if (email) record.email = email;
+                    if (tickets) record.tickets = tickets;
+                }
+            }
+        } else {
             this.briefcase.push({paymentID: paymentID, email: email, tickets: tickets});
         }
-        else if (email && !tickets) {  // --------------------- id, email, !tickets (id and tickets are already stored)
-            // ------------------------------------------ in case they selected tickets before logging in, so the first
-            // ------------------------------- accountant.save() call had null email, that is going to be completed now
-            for (const record of this.briefcase) {
-                if (record.paymentID === paymentID)
-                    record.email = email
-            }
-        }
-        if (this.DEBUG) console.log("BRIEFCASE", this.briefcase);
+        if (this.DEBUG) console.log("ACCOUNTANT BRIEFCASE", this.briefcase);
     }
 
     /**
@@ -77,7 +109,7 @@ class Accountant {
     */
     data(paymentID, email, tickets) {
         let invoice;
-        if (this.DEBUG) console.log("accountant.data() called with", email);
+        if (this.DEBUG) console.log("accountant.data() called with", paymentID, email, tickets);
         invoice = {
             paymentID: paymentID,
             date: "",
@@ -89,7 +121,6 @@ class Accountant {
             total: 0
         }
         for (const [key, value] of Object.entries(tickets)) {
-            if (this.DEBUG) console.log(key);
             if (key === "date") {
                 invoice.date = value;
                 continue;
