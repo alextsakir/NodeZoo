@@ -172,6 +172,12 @@ class ROUTE {
             signedIn: request.session.signedIn, admin: request.session.admin});
     }
 
+    static report(request, response) {
+        if (DEBUG_ROUTE_CALL) console.log("router: report sent");
+        response.contentType("application/pdf");
+        response.send(fs.readFileSync("./docs/report.pdf"));
+    }
+
     static hello(request, response) {
         response.send("Hello World!");
     }
@@ -228,6 +234,7 @@ router.route("/login").get(ROUTE.login);
 router.route("/payment").get(ROUTE.payment);
 router.route("/register").get(ROUTE.register);
 router.route("/registered").get(ROUTE.registered);
+router.route("/report").get(ROUTE.report);
 router.route("/tickets").get(ROUTE.autoLogin, ROUTE.tickets);
 
 // ==================================================== API ===========================================================
