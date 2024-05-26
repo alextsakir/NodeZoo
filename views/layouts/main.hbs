@@ -87,7 +87,7 @@
         }
         // ---------------------------------------- HIGHLIGHT CURRENT TAB ---------------------------------------------
         let pathName = window.location.pathname, tabs = document.getElementsByClassName("header-tab");
-        console.log("path name", pathName);
+        //console.log("path name", pathName);
         if (pathName === "/") pathName = "/index/";
         for (let tab of document.getElementsByClassName("header-tab"))
             if (tab.href.includes(pathName)) tab.style.textDecoration="underline";  // -------------- match current url
@@ -155,7 +155,7 @@
         loginDialog.addEventListener("submit", (event) => {
             event.preventDefault();
             if (email.value !== "" && password.value !== "") {
-                console.log(`${email.value} is trying to log in`);
+                //console.log(`${email.value} is trying to log in`);
                 fetch("/api/login", {
                     method: "POST",
                     headers: {Accept: "application/json", "Content-Type": "application/json"},
@@ -174,7 +174,7 @@
                             loginDialog.close(); toPayUs();
                         })
                     } else if (!result.success) {
-                        console.log(result.message);
+                        //console.log(result.message);
                         loginWarning.style.visibility = "visible";
                         if (typeof result.message === "string")
                             loginWarning.innerHTML = result.message;
@@ -221,7 +221,7 @@
 
     <script>
         {{#if admin}}
-            console.log("admin.connected");
+            //console.log("admin.connected");
             let toDashboard = document.querySelector("#admin-to-dashboard");
             toDashboard.style.visible = (!window.location.href.includes("dashboard"));
         {{/if}}
@@ -301,7 +301,7 @@
                     document.querySelector("#subscribe-form").addEventListener("submit", (event) => {
                         event.preventDefault();
                         let email = document.getElementById("subscribe-form-input");
-                        console.log(`Subscribing with email ${email.value}`);
+                        //console.log(`Subscribing with email ${email.value}`);
                         fetch("/api/subscribe", {
                             method: "POST", headers: {Accept: "*/*", "Content-Type": "application/json"},
                             body: JSON.stringify({email: email.value}),

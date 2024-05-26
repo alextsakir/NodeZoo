@@ -136,7 +136,7 @@
             .then((response) => response.json())
             .then((result) => {
                 hitloader.close();
-                console.log(result);
+                //console.log(result);
                 if (!result.success) {
                     openDialog("Payment failed", "please check your card credentials", simpleClose);
                 } else {
@@ -180,7 +180,7 @@
     });
 
     document.querySelector('.creditcard').addEventListener('click', function () {
-        console.log("flip");
+        //console.log("flip");
         changeColors();
         if (this.classList.contains('flipped')) {
             this.classList.remove('flipped');

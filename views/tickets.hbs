@@ -76,7 +76,7 @@
 
     function clearQuantities () {
         let quantityInputs = document.querySelectorAll(".ticket-quantity-input");
-        console.log(quantityInputs);
+        //console.log(quantityInputs);
         for (let input of quantityInputs) input.value = 0;
         document.querySelector("#ticket-confirmation-dialog").querySelector("p").innerHTML = "";
         selectedData = {};
@@ -95,11 +95,11 @@
             totalQuantity += quantity.value;
             if (quantity.value > 0) selectedData[ticket.id] = quantity.value;
         }
-        console.log("total", totalQuantity)
+        //console.log("total", totalQuantity)
         if (totalQuantity == 0) // note == operator is intentional, don't change it
             openDialog("No tickets selected", "Please select at least one ticket to continue", simpleClose);
         else {
-            console.log(selectedData);
+            //console.log(selectedData);
             let paragraph = confirmationDialog.querySelector("p"), date = confirmationDialog.querySelector("i");
             paragraph.innerHTML = "";
             for (const [key, value] of Object.entries(selectedData)) {
@@ -135,7 +135,7 @@
                    toPayUs();
                });
             } else if (response.status === 300) {
-                console.log("login required");
+                //console.log("login required");
                 openDialog("Login required", "please log in", toLogin);
             }
         })
