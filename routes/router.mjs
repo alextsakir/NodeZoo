@@ -10,59 +10,6 @@ const DEBUG_API_CALL = true;
 const ENABLE_PAYMENT_CHECK = true;
 const ENABLE_AUTO_LOGIN = true;
 
-// class counter extends Function {
-//     log = [];
-//     constructor(request, response, next) {
-//         console.log("counter called");
-//         super();
-//         this.log.push(request);
-//         console.log("request count:", this.log.length);
-//         // response.sendStatus(429);
-//         next(request, response);
-//     }
-// }
-
-// function counter(request, response, next) {
-//     this.log.push(request);
-//     console.log("request count:", this.log.length);
-//     // response.sendStatus(429);
-//     next(request, response);
-// }
-// counter.log = [];
-
-// let counter = (function () {
-//
-//     let counter = function (request, response, next) {
-//         this.log = [];
-//         this.log.push(request);
-//         console.log("request count:", this.log.length);
-//         // response.sendStatus(429);
-//         next(request, response);
-//     }
-//
-//     counter.greet = function () {
-//         console.log("Hello!");
-//     }
-//
-//     counter.prototype = {
-//         greet: function () {
-//             console.log('Hello, my name is ' + this.log);
-//         }
-//     };
-//     return counter;
-// })();
-
-// function counter(target, key, descriptor) {
-//     const originalMethod = descriptor.value;
-//     descriptor.value = function (...args) {
-//         console.log(`Before ${key} is called`);
-//         const result = originalMethod.apply(this, args);
-//         console.log(`After ${key} is called`);
-//         return result;
-//     };
-//     return descriptor;
-// }
-
 // ==================================================== ROUTE =========================================================
 
 /**
@@ -70,16 +17,12 @@ const ENABLE_AUTO_LOGIN = true;
 */
 class ROUTE {
 
-    static counter (request, response) {
-        console.log(request.socket.remoteAddress);
-    }
-
     // @autoLogin
     static index(request, response) {
         if (DEBUG_ROUTE_CALL) console.log("router: index rendered");
         if (request.session.signedIn === undefined)
             request.session.signedIn = false;  // todo ------------------------------------------------- is it useless?
-        console.log("SESSION: ", request.session);
+        if (DEBUG_ROUTE_CALL) console.log("SESSION: ", request.session);
         response.render("index", {layout: "main", title: "Patras Zoo", signedIn: request.session.signedIn,
             admin: request.session.admin});  // -------------------- with layout you can change the Handlebars template
     }
@@ -125,7 +68,7 @@ class ROUTE {
     }
 
     static invoice(request, response) {
-        console.log(request.query.file);
+        if (DEBUG_ROUTE_CALL) console.log(request.query.file);
         response.contentType("application/pdf");
         response.send(fs.readFileSync("./invoices/" + request.query.file.toString()));
     }
@@ -150,7 +93,7 @@ class ROUTE {
         if (DEBUG_ROUTE_CALL) console.log("router: payment rendered");
         if (!request.session.signedIn || !request.session.paymentID > 0) response.redirect("index");
         else {
-            console.log("PAYMENT WILL BE RENDERED");
+            if (DEBUG_ROUTE_CALL) console.log("PAYMENT WILL BE RENDERED");
             let cardName = request.session.email ? database.firstName(request.session.email)[0] + ". " +
                 database.lastName(request.session.email) : "YOUR NAME";
             response.render("payment", {
@@ -239,43 +182,10 @@ router.route("/tickets").get(ROUTE.autoLogin, ROUTE.tickets);
 
 // ==================================================== API ===========================================================
 
-// export function autoLogin(request, response, next) {
-//     if (!request.session.email) {
-//         if (DEBUG_API_CALL) console.log("auto login");
-//         let foundEmail = request.cookies.email.toString();
-//         console.log("AUTO LOGIN FOUND THIS EMAIL IN UNSIGNED COOKIES", foundEmail);
-//         database.exists(foundEmail, (error, result) => {
-//             if (error) {
-//                 console.log(error)
-//             } else if (result) {
-//                 console.log("CONNECTED AUTOMATICALLY");
-//                 request.session.signedIn = true;
-//                 request.session.email = foundEmail;
-//             }
-//         });
-//     } else next();
-// }
-
 /**
 * API functions are used for functionality.
 */
 class API {
-
-    static parseCookies (request) {  // unused, express cookieParser does it
-        const list = {};
-        const cookieHeader = request.headers?.cookie;
-        if (!cookieHeader) return list;
-
-        cookieHeader.split(`;`).forEach(function (cookie) {
-            let [name, ...rest] = cookie.split(`=`);
-            name = name?.trim();
-            if (!name) return;
-            const value = rest.join(`=`).trim();
-            if (!value) return;
-            list[name] = decodeURIComponent(value);
-        });
-        return list;
-    }
 
     static animalDescription(request, response) {
         if (DEBUG_API_CALL) console.log("API animal description");
@@ -297,7 +207,7 @@ class API {
                 request.session.signedIn = true;
                 request.session.email = user.email;
                 if (request.body.remember) {  // note ----------------------- this will keep them logged in for 4 hours
-                    console.log("THEY CHOSE REMEMBER ME");
+                    if (DEBUG_API_CALL) console.log("THEY CHOSE REMEMBER ME");
                     response.cookie("email", user.email, {maxAge: 1000 * 60 * 60 * 4});
                 }
                 if (user.email === "alexandros.tsakiridis2@gmail.com"
@@ -333,7 +243,7 @@ class API {
 
     static payment(request, response) {
         if (DEBUG_API_CALL) console.log("API payment");
-        console.log("PAYMENT paymentID:", request.session.paymentID);  // -------- payment is always successful for now
+        if (DEBUG_API_CALL) console.log("PAYMENT paymentID:", request.session.paymentID);
         API.paymentCheck(request, response, (result) => {
             if (!result) {
                 if (DEBUG_API_CALL) console.log("PAYMENT FAILED");
@@ -352,7 +262,7 @@ class API {
 
     static paymentCheck(request, response, callback) {
         if (!ENABLE_PAYMENT_CHECK) callback(true);
-        console.log(request.body.holder, request.body.number, request.body.expiration);  //  cardholder is always valid
+        if (DEBUG_API_CALL) console.log(request.body.holder, request.body.number, request.body.expiration);
         accountant.checkCard(request.body.number, request.body.expiration, (result) => callback(result));
     }
 

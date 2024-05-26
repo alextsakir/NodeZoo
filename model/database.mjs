@@ -106,8 +106,8 @@ class Database {
     * @return boolean
     */
     hasIntentionallyLogout(email) {
-        console.log("DATABASE hasIntentionallyLogout() called");
-        console.log(email, "found in database cache", this.cacheIntentionalLogout.includes(email));
+        if (this.DEBUG) console.log("DATABASE hasIntentionallyLogout() called");
+        if (this.DEBUG) console.log(email, "found in database cache", this.cacheIntentionalLogout.includes(email));
         return this.cacheIntentionalLogout.includes(email);
     }
 
@@ -166,13 +166,13 @@ class Database {
     */
     userTickets(email) {
         this.exists(email, (error, result) => {
-            if (error) console.log(error);
+            if (error && this.DEBUG) console.log(error);
             else if (result) return null;
             else if (!result) {
                 try {
                     return this.connection.prepare("select * from ticket where email = ?").all(email);
                 } catch (error) {
-                    console.log(error);
+                    if (this.DEBUG) console.log(error);
                 }
             }
         });
@@ -193,7 +193,7 @@ class Database {
                     statement.run(user.firstname, user.lastname, user.address, user.town, user.postal_code,
                         user.birthdate, user.phone, user.email, user.password);
                 } catch (error) {
-                    console.error(error);
+                    if (this.DEBUG) console.error(error);
                 }
             }
         });
@@ -215,7 +215,7 @@ class Database {
                     this.connection.prepare("insert into user (email) values (?)").run(email);
                     callback(null, true);
                 } catch (error) {
-                    console.log(error);
+                    if (this.DEBUG) console.log(error);
                 }
             }
         });
@@ -235,7 +235,7 @@ class Database {
         try {
             statement.run(paymentID, email, JSON.stringify(tickets));
         } catch (error) {
-            console.log(error);
+            if (this.DEBUG) console.log(error);
         }
     }
 
@@ -249,7 +249,7 @@ class Database {
             for (let address of this.connection.prepare("select email from user where password is null").all())
                 out.push(address.email);
         } catch (error) {
-            console.log(error);
+            if (this.DEBUG) console.log(error);
         }
         return out;
     }
@@ -262,7 +262,7 @@ class Database {
         try {
             return this.connection.prepare("select count(*) from ticket").all();
         } catch (error) {
-            console.log(error);
+            if (this.DEBUG) console.log(error);
         }
     }
 
@@ -275,7 +275,7 @@ class Database {
         try {
             return this.connection.prepare("select description, price from ticketType where name = ?").all(name)[0];
         } catch (error) {
-            console.log(error);
+            if (this.DEBUG) console.log(error);
         }
     }
 
@@ -287,7 +287,7 @@ class Database {
         try {
             return this.connection.prepare("select name, description, price from ticketType order by price").all();
         } catch (error) {
-            console.log(error);
+            if (this.DEBUG) console.log(error);
         }
     }
 }
