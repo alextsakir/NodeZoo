@@ -109,7 +109,7 @@ html::-webkit-scrollbar-track {
 }
 
 html::-webkit-scrollbar-thumb {
-    background: var(--alpha_color);
+    background: hsl(212, 74%, 18%);
     border-radius: 5rem;
     width: 1em;
 }
@@ -127,7 +127,12 @@ body {
 
 section{
     padding: 5rem 3.5%;
-  }
+}
+
+main {
+    padding-top: 60px !important;
+    padding-bottom: 60px !important;
+}
 
 /* ================================================== HEADER ======================================================= */
 
@@ -137,11 +142,14 @@ header {
     width: 100%;
     z-index: 20;
     align-content: center;
+    justify-content: center;
+    align-items: center;
     background: var(--alpha_color);
     display: flex;
     flex-direction: row;
     padding: 0.66rem;
     transition: 800ms linear;
+    height: 64px;
 
     a {
         display: inline;
@@ -249,14 +257,14 @@ header {
     }
 
     @media screen and (max-width: 1440px) { /* laptop screen? */
-        background: ghostwhite; /* test */
+        background: hsl(212, 74%, 35%); /* test */
         #header-menu-div {
             width: 45%;
         }
     }
 
     @media screen and (max-width: 1000px) {
-        background: yellow; /* test */
+        background: hsl(212, 74%, 43%); /* test */
 
         #header-logo-div {
             width: 40%;
@@ -278,7 +286,7 @@ header {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    background: url(../images/home.jpg) no-repeat;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), #101010) ,url(../images/home.jpg) no-repeat;
     /* dont replace background with shorthand equivalent*/
     background-size: cover;
     background-position: top;
@@ -314,6 +322,9 @@ header {
     }
   }
 
+.about {
+    padding-top: 0;
+}
 
 .about .box-container{
     display: flex;

@@ -35,7 +35,7 @@
     for (let animal of animals) {
         animal.addEventListener("mouseenter", () => {
             animal.querySelector("div").style.color = "yellow";
-                for (let darkened of animals) if (darkened.id !== animal.id) darkened.style.opacity = "0.2";
+                for (let darkened of animals) if (darkened.id !== animal.id) darkened.style.opacity = "0.5";
 
         });
         animal.addEventListener("mouseleave", () => {

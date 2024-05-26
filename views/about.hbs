@@ -1,16 +1,22 @@
 <div class="about-class" style="text-align: center; padding: 2rem;">
-    <h1><a href="https://github.com/alextsakir/NodeZoo" class="link">Team 30</a></div></h1>
+    <h1><a style="color: #ff6e01" href="https://github.com/alextsakir/NodeZoo" class="link">Team 30</a></div></h1>
     <p style="text-align: center; padding: 3rem;"> ΕΥΘΥΜΙΟΣ, ΠΑΝΙΔΗΣ <br>
     themispan2002@gmail.com, up1084012@ac.upatras.gr<br><br>
     ΑΛΕΞΑΝΔΡΟΣ ΜΑΡΙΟΣ, ΤΣΑΚΙΡΙΔΗΣ<br>
-    alexandros.tsakiridis@gmail.com, up1083879@ac.upatras.gr <br><br><br>
-        <button style="padding: 1rem;" onclick="window.location.href='';">Report</button>
+    alexandros.tsakiridis2@gmail.com, up1083879@ac.upatras.gr <br><br><br>
+        <button style="padding: 0.75rem;" onclick="window.location.href='';">Report</button>
     </p>   
 
 </div>
 
 
 <section id="admin-to-dashboard" style="text-align: center; padding: 3rem;">
-        <button style="padding: 1rem;" onclick="window.location.href='/dashboard/';">Administration Dashboard</button>
+        <button style="padding: 0.75rem; margin-right: 1.2rem;" onclick="window.location.href='/dashboard/';">
+        Administration Dashboard</button>
+        <button id="cookie-test-button" style="padding: 0.75rem;">Cookies Policy Trial</button>
+        <script type="text/javascript">
+            const button = document.getElementById("cookie-test-button");
+            button.addEventListener("click", () => {document.getElementById("cookie-consent-dialog").showModal();});
+        </script>
 </section>
 
