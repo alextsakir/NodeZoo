@@ -10,6 +10,9 @@ function createInvoice(invoice) {
     generateInvoiceTable(doc, invoice);
     generateFooter(doc);
     doc.end();
+    if (!fs.existsSync("./invoices")) {
+        fs.mkdirSync("./invoices");
+    }
     doc.pipe(fs.createWriteStream("./invoices/" + invoiceID + ".pdf"));
     }
 
