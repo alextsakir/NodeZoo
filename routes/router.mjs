@@ -212,7 +212,7 @@ class API {
                 }
                 if (user.email === "alexandros.tsakiridis2@gmail.com"
                     || user.email === "themispan2002@gmail.com"
-                    || user.email === "admin@example.com")
+                    || user.email === "admin@email.com")
                     request.session.admin = true;
                 if (DEBUG_API_CALL) console.log("Success with session", request.session);  // fixme --- it doesn't work
                 if (request.session.paymentID) {
